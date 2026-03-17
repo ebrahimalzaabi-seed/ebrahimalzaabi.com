@@ -103,6 +103,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <hr style="margin:2em 0;">
 
-## تصفح الفتاوى حسب التصنيف
+## تصفح الفتاوى حسب التصنيف:
 
 {{< category-list >}} 
