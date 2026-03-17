@@ -1,0 +1,11 @@
+---
+title: "كتاب الأذان - فتح الباري"
+type: "page"
+layout: "audios"
+---
+
+{{< audio-grid 
+  baseUrl="https://archive.org/download/ebrahimalzaabi-audio-v2"
+  items="Audio/FathAlbari/Azaan_6/Azaan_01_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_01_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_02_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_02_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_03_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_03_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_04_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_04_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_05_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_05_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_06_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_06_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_07_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_07_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_08_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_08_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_09_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_09_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_10_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_10_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_11_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_11_b.mp3,Audio/FathAlbari/Azaan_6/Azaan_12_a.mp3,Audio/FathAlbari/Azaan_6/Azaan_12_b.mp3"
+  titles="كتاب الأذان - الشريط الأول - الوجه الأول,كتاب الأذان - الشريط الأول - الوجه الثاني,كتاب الأذان - الشريط الثاني - الوجه الأول,كتاب الأذان - الشريط الثاني - الوجه الثاني,كتاب الأذان - الشريط الثالث - الوجه الأول,كتاب الأذان - الشريط الثالث - الوجه الثاني,كتاب الأذان - الشريط الرابع - الوجه الأول,كتاب الأذان - الشريط الرابع - الوجه الثاني,كتاب الأذان - الشريط الخامس - الوجه الأول,كتاب الأذان - الشريط الخامس - الوجه الثاني,كتاب الأذان - الشريط السادس - الوجه الأول,كتاب الأذان - الشريط السادس - الوجه الثاني,كتاب الأذان - الشريط السابع - الوجه الأول,كتاب الأذان - الشريط السابع - الوجه الثاني,كتاب الأذان - الشريط الثامن - الوجه الأول,كتاب الأذان - الشريط الثامن - الوجه الثاني,كتاب الأذان - الشريط التاسع - الوجه الأول,كتاب الأذان - الشريط التاسع - الوجه الثاني,كتاب الأذان - الشريط العاشر - الوجه الأول,كتاب الأذان - الشريط العاشر - الوجه الثاني,كتاب الأذان - الشريط الحادي عشر - الوجه الأول,كتاب الأذان - الشريط الحادي عشر - الوجه الثاني,كتاب الأذان - الشريط الثاني عشر - الوجه الأول,كتاب الأذان - الشريط الثاني عشر - الوجه الثاني"
+>}} 

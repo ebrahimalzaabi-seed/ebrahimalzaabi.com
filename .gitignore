@@ -1,0 +1,34 @@
+# Generated files by hugo
+/public/
+/resources/_gen/
+/assets/jsconfig.json
+hugo_stats.json
+
+# Environment variables
+.env
+
+# Node
+node_modules/
+
+# Python virtual environment
+.venv/
+
+# Mac
+.DS_Store
+
+# Hugo executable
+hugo.exe
+hugo.darwin
+hugo.linux
+
+# Temporary lock file while building
+/.hugo_build.lock
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db 

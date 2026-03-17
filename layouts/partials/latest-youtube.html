@@ -1,0 +1,266 @@
+<!-- Custom YouTube Videos Widget -->
+<div class="custom-youtube-widget">
+  <div class="youtube-section-header">
+    <span class="youtube-section-badge">
+      <i class="fa-brands fa-youtube"></i>
+      <span class="arabic-text">أحدث الفيديوهات</span>
+    </span>
+    <a href="https://www.youtube.com/@ebrahim_alzaabi/videos" target="_blank" rel="noopener noreferrer" class="youtube-section-more arabic-text">المزيد</a>
+  </div>
+  <div class="youtube-grid" id="youtubeVideos">
+    <!-- Videos will be loaded here via JavaScript -->
+    <div class="loading-spinner">جاري التحميل...</div>
+  </div>
+  <div class="see-more-container tc mt4">
+    <a href="https://www.youtube.com/@ebrahim_alzaabi/videos" target="_blank" rel="noopener noreferrer" class="see-more-link">
+      <span class="youtube-icon see-more-icon"></span>
+      <span class="see-more-text arabic-text">مشاهدة المزيد من الفيديوهات</span>
+    </a>
+  </div>
+</div>
+
+<style>
+  .custom-youtube-widget {
+    margin-bottom: 3rem;
+    padding: 1.5rem 0;
+    background-color: transparent;
+  }
+  
+  .youtube-icon {
+    color: #FF0000;
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+    display: inline-block;
+    width: 1.4em;
+    height: 1.1em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='%23FF0000' d='M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    vertical-align: middle;
+  }
+  
+  .youtube-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0;
+  }
+
+  .youtube-section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #C5A059;
+    color: white;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px 8px 0 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: -2px;
+  }
+
+  .youtube-section-badge i {
+    font-size: 1.3rem;
+  }
+
+  .youtube-section-more {
+    color: #555;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    padding-bottom: 0.6rem;
+  }
+
+  .youtube-section-more:hover {
+    color: #C5A059;
+  }
+  
+  .youtube-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .youtube-video-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    height: 100%;
+  }
+  
+  .youtube-video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+    border-color: #C5A059;
+  }
+  
+
+  
+  .youtube-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .youtube-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    font-size: 1rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  
+  .youtube-meta {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: auto;
+  }
+  
+  .loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    grid-column: 1 / -1;
+  }
+  
+  .see-more-container {
+    margin-top: 1.5rem;
+  }
+  
+  .see-more-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background-color: #f0f0f0;
+    color: #333;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+  
+  .see-more-link:hover {
+    background-color: #FF0000;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2);
+  }
+  
+  .see-more-icon {
+    margin-right: 0.5rem;
+  }
+  
+  .see-more-text {
+    font-size: 1.1rem;
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .custom-youtube-widget {
+      background-color: #2a2a2a;
+    }
+    
+    .section-heading {
+      color: #f0f0f0;
+    }
+    
+    .youtube-video-card {
+      background: #333;
+    }
+    
+    .youtube-video-card:hover {
+      background-color: #444;
+    }
+    
+    .youtube-content {
+      color: #f0f0f0;
+    }
+    
+    .youtube-meta {
+      color: #aaa;
+    }
+    
+    .see-more-link {
+      background-color: #444;
+      color: #f0f0f0;
+    }
+    
+    .see-more-link:hover {
+      background-color: #FF0000;
+      color: white;
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 900px) {
+    .youtube-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .youtube-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const videosContainer = document.getElementById('youtubeVideos');
+  
+  // Fetch videos from the serverless function
+  fetch('https://splendid-beijinho-cc65f7.netlify.app/.netlify/functions/youtube-videos')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.videos && data.videos.length > 0) {
+        // Remove loading spinner
+        videosContainer.innerHTML = '';
+        
+        // Add videos to the grid
+        data.videos.forEach(video => {
+          const videoCard = document.createElement('a');
+          videoCard.href = video.url;
+          videoCard.target = "_blank";
+          videoCard.rel = "noopener noreferrer";
+          videoCard.className = 'youtube-video-card';
+          
+          videoCard.innerHTML = `
+            <div class="youtube-content">
+              <h3 class="youtube-title arabic-text"><span class="youtube-icon"></span>${video.title}</h3>
+              <div class="youtube-meta">
+                <span>${video.publishedTime}</span>
+                <span>${video.duration}</span>
+              </div>
+            </div>
+          `;
+          
+          videosContainer.appendChild(videoCard);
+        });
+      } else {
+        videosContainer.innerHTML = '<div class="error-message">عذراً، لا يمكن تحميل الفيديوهات حالياً</div>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching YouTube videos:', error);
+      videosContainer.innerHTML = '<div class="error-message">عذراً، حدث خطأ أثناء تحميل الفيديوهات</div>';
+    });
+});
+</script> 

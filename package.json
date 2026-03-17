@@ -1,0 +1,16 @@
+{
+  "name": "ebrahimalzaabi-search",
+  "version": "1.0.0",
+  "description": "Search functionality using Lunr.js for Hugo site",
+  "scripts": {
+    "build-index": "node scripts/build-search-index.js",
+    "admin": "node scripts/admin-server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "googleapis": "^171.4.0",
+    "gray-matter": "^4.0.3",
+    "remove-markdown": "^0.5.0",
+    "resend": "^6.9.3"
+  }
+}

@@ -1,0 +1,25 @@
+{{ define "main" }}
+<main class="pa3 pa4-ns w-100 w-70-ns center">
+  <section class="mw8 center">
+    <h1 class="arabic-text f1">
+      {{ .Title }}
+    </h1>
+    <div class="arabic-text">
+      {{ if .Content }}
+        <div class="nested-copy-line-height lh-copy f4 nested-links mid-gray">
+          {{ .Content }}
+        </div>
+      {{ end }}
+    </div>
+    <ul class="arabic-text list pl0">
+      {{ range .Data.Pages.ByTitle }}
+        <li class="mb3">
+          <a class="link dark-gray hover-blue f5" href="{{ .RelPermalink }}">
+            {{ .Title }}
+          </a>
+        </li>
+      {{ end }}
+    </ul>
+  </section>
+</main>
+{{ end }} 

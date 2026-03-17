@@ -1,0 +1,40 @@
+baseURL = 'https://ebrahimalzaabi.com/'
+languageCode = 'ar'
+languageDirection = 'rtl'
+title = 'الشيخ ابراهيم سيف الزعابي'
+theme = "ananke"
+
+[params]
+  custom_css = ["/css/custom.css", "css/custom-theme-override.css"]  # Add our custom CSS files
+
+[menu]
+  [[menu.main]]
+    identifier = "home"
+    name = "الرئيسية"
+    pageRef = "/"
+    weight = 1
+  [[menu.main]]
+    identifier = "publications"
+    name = "المؤلفات"
+    pageRef = "/مؤلفات/"
+    weight = 3
+  [[menu.main]]
+    identifier = "fatawa"
+    name = "الفتاوى"
+    pageRef = "/fatawa/"
+    weight = 4
+  [[menu.main]]
+    identifier = "audio"
+    name = "الصوتيات"
+    pageRef = "/الصوتيات/"
+    weight = 5
+  [[menu.main]]
+    identifier = "search"
+    name = "البحث"
+    pageRef = "/search/"
+    weight = 2
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true

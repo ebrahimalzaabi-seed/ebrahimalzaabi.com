@@ -1,0 +1,67 @@
+<footer class="{{ .Site.Params.background_color_class | compare.Default "bg-black" }} bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between items-center">
+    <div>
+      <a class="f5 fw4 hover-white footer-text pv2 ph3 no-underline" href="{{ .Site.Home.RelPermalink }}" >
+        &copy; {{ with .Site.Copyright | compare.Default .Site.Title }} {{ . | safe.HTML }} ٢٠٢٦ {{ end }}
+      </a>
+    </div>
+    <div class="footer-text pv2 ph3">
+      <span class="f5 fw4">تم تطوير الموقع بواسطة <a class="footer-link no-underline" href="https://digidub.com" target="_blank">ديجي دب</a> 🇦🇪</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+/* Footer text styling for light/dark mode */
+.footer-text {
+  color: #333 !important; /* Dark text for light mode */
+}
+
+.footer-link {
+  color: #333 !important; /* Dark text for light mode */
+  text-decoration: underline !important;
+}
+
+/* Dark mode override */
+@media (prefers-color-scheme: dark) {
+  .footer-text, .footer-link {
+    color: rgba(255, 255, 255, 0.7) !important; /* white-70 equivalent */
+  }
+}
+</style>
+
+<script>
+(function() {
+  var toArabic = function(str) {
+    return str.replace(/[0-9]/g, function(d) {
+      return '٠١٢٣٤٥٦٧٨٩'[d];
+    });
+  };
+
+  var formatDate = function(str) {
+    // Reformat YYYY-MM-DD to YYYY/MM/DD (RTL order), strip leading zeros
+    return toArabic(str.replace(/(\d{4})-(\d{2})-(\d{2})/g, function(_, y, m, d) {
+      return y + '/' + parseInt(m, 10) + '/' + parseInt(d, 10);
+    }));
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Convert and reformat dates in <time> elements
+    document.querySelectorAll('time').forEach(function(el) {
+      el.textContent = formatDate(el.textContent);
+    });
+    // Convert category counts in .categories-list links
+    document.querySelectorAll('.categories-list a').forEach(function(el) {
+      el.textContent = toArabic(el.textContent);
+    });
+    // Convert counts in .chip-count spans (categories cloud on homepage)
+    document.querySelectorAll('.chip-count').forEach(function(el) {
+      el.textContent = toArabic(el.textContent);
+    });
+    // Convert counts in .tag-link anchors (tags cloud on homepage)
+    document.querySelectorAll('.tag-link').forEach(function(el) {
+      el.textContent = toArabic(el.textContent);
+    });
+  });
+})();
+</script>

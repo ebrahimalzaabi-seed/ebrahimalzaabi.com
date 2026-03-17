@@ -1,0 +1,134 @@
+{{ define "header" }}
+  <header class="cover bg-top" style="background-color: #333;">
+    <div class="bg-black-60">
+      {{ partial "site-navigation.html" . }}
+      <div class="tc-l pv4 pv6-l ph3 ph4-ns">
+        <h1 class="arabic-text f2 f-subheadline-l fw2 white-90 mb0 lh-title">البحث</h1>
+      </div>
+    </div>
+  </header>
+{{ end }}
+
+{{ define "main" }}
+  <article class="flex-l flex-wrap justify-between mw8 center ph3 arabic-text">
+    <div class="w-100 mt4 relative">
+      <input id="search" type="text" placeholder="أدخل كلمة البحث…" class="f4 pa2 w-100">
+      <button id="clear-search" aria-label="مسح" class="clear-search-btn" style="display:none">×</button>
+    </div>
+    <div id="results" class="results-grid w-100 mt4"></div>
+  </article>
+
+  <!-- Lunr.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
+  <script src="/js/search.js"></script>
+
+  <style>
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      list-style: none;
+      padding: 0;
+    }
+
+    .result-card {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      padding: 1.25rem;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      direction: rtl;
+      cursor: pointer;
+    }
+
+    .result-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .result-card h3 {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      font-size: 1.125rem;
+    }
+
+    .result-card a {
+      color: #007acc;
+      text-decoration: none;
+    }
+
+    .result-card p {
+      margin: 0;
+      line-height: 1.6;
+      color: #333333;
+      font-size: 0.95rem;
+    }
+
+    /* Search input styling */
+    input#search {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #333333;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    input#search::placeholder {
+      color: #888888;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      input#search {
+        background: #2f2f2f;
+        color: #e0e0e0;
+        border: 1px solid #555555;
+      }
+
+      input#search::placeholder {
+        color: #bbbbbb;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .result-card {
+        background: #2f2f2f;
+        color: #e0e0e0;
+      }
+
+      .result-card a {
+        color: #4da3ff;
+      }
+
+      .result-card p {
+        color: #cccccc;
+      }
+    }
+
+    /* Clear button */
+    .clear-search-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0.75rem; /* For RTL place on left side */
+      background: transparent;
+      border: none;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      color: #888888;
+    }
+
+    .clear-search-btn:hover {
+      color: #555555;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .clear-search-btn {
+        color: #bbbbbb;
+      }
+      .clear-search-btn:hover {
+        color: #ffffff;
+      }
+    }
+  </style>
+{{ end }} 

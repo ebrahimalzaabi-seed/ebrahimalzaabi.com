@@ -1,0 +1,582 @@
+/* Self-hosted Noto Naskh Arabic — font-display: block prevents FOUT */
+@font-face {
+  font-family: 'Noto Naskh Arabic';
+  src: url('/fonts/NotoNaskhArabic-arabic.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+
+@font-face {
+  font-family: 'Noto Naskh Arabic';
+  src: url('/fonts/NotoNaskhArabic-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Define font variables */
+:root {
+  --site-font: 'Noto Naskh Arabic', 'Traditional Arabic', 'Arabic Typesetting', 'Simplified Arabic', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  --font-weight: 400 !important;
+  --letter-spacing: normal !important;
+}
+
+/* Global reset for all elements */
+* {
+  font-family: var(--site-font) !important;
+  letter-spacing: var(--letter-spacing) !important;
+  font-weight: var(--font-weight) !important;
+  text-transform: none !important;
+}
+
+/* Body and HTML level settings */
+html,
+body {
+  font-family: var(--site-font) !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Override any Tachyons or theme classes */
+.helvetica,
+.avenir,
+.athelas,
+.georgia,
+.times,
+.bodoni,
+.calisto,
+.garamond,
+.baskerville,
+.sans-serif,
+.serif,
+[class*="helvetica"],
+[class*="avenir"],
+[class*="athelas"],
+[class*="georgia"],
+[class*="times"],
+[class*="bodoni"],
+[class*="calisto"],
+[class*="garamond"],
+[class*="baskerville"],
+[class*="sans-serif"],
+[class*="serif"],
+.tracked,
+.tracked-tight,
+.tracked-mega,
+.ttu,
+.ttl,
+.ttc,
+.ttn,
+.instapaper_ignoref,
+[class*="instapaper"] {
+  font-family: var(--site-font) !important;
+  letter-spacing: var(--letter-spacing) !important;
+  font-weight: var(--font-weight) !important;
+  text-transform: none !important;
+}
+
+/* Ensure RTL for text containers */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+div,
+article,
+section,
+header,
+footer,
+nav,
+aside,
+main {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: var(--site-font) !important;
+}
+
+/* Force RTL for specific elements */
+.site-title,
+.page-title,
+.post-title,
+.article-title,
+.header-title,
+[class*="title"],
+[class*="heading"] {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: var(--site-font) !important;
+}
+
+/* Handle dynamic content */
+*[class^="f"],  /* All Tachyons font size classes */
+*[class*=" f"], /* All Tachyons font size classes with space before */
+*[class*="-l"], /* All large viewport classes */
+*[class*="-m"], /* All medium viewport classes */
+*[class*="-ns"] /* All not-small viewport classes */ {
+  font-family: var(--site-font) !important;
+}
+
+/* Ensure links maintain the font */
+a,
+a:link,
+a:visited,
+a:hover,
+a:active {
+  font-family: var(--site-font) !important;
+}
+
+/* Override any !important declarations from the theme */
+body * {
+  font-family: var(--site-font) !important;
+}
+
+/* Arabic text specific styles */
+.arabic-text,
+[lang="ar"],
+[dir="rtl"] {
+  font-family: var(--site-font) !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* Force RTL for specific elements */
+h1, h2, h3, h4, h5, h6,
+.site-title,
+.page-title,
+.post-title {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Category chip styles (clickable links) */
+.category {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  margin-left: 0.3rem;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+  border: 1px solid #ddd;
+  color: #555;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category:hover {
+  background: linear-gradient(135deg, #e0e0e0 0%, #d5d5d5 100%);
+  border-color: #ccc;
+  color: #333;
+  text-decoration: none;
+}
+
+/* Tags styles */
+.tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  direction: rtl;
+}
+
+.tag-link {
+  display: inline-block;
+  margin-right: 0.5rem;
+  margin-left: 0;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.tag-link:hover {
+  background-color: #f0f0f0;
+  text-decoration: none;
+}
+
+/* Dark mode support for tags */
+@media (prefers-color-scheme: dark) {
+  .tag-link {
+    color: #e0e0e0 !important; /* Light text for tags */
+  }
+  
+  .tag-link:hover {
+    background-color: #404040 !important;
+    color: #ffffff !important;
+  }
+}
+
+/* ===== BOXED LAYOUT STYLES ===== */
+
+/* Set gray background for the entire viewport */
+html,
+html body.boxed-layout.ma0.avenir.bg-near-white {
+  background-color: #e0e0e0 !important; /* Slightly darker gray */
+  background-image: radial-gradient(#a0a0a0 1px, transparent 1px) !important; /* Much darker dots */
+  background-size: 12px 12px !important; /* Closer dots */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Dark mode support for background */
+@media (prefers-color-scheme: dark) {
+  html,
+  html body.boxed-layout.ma0.avenir.bg-near-white {
+    background-color: #000000 !important; /* Pitch black background */
+    background-image: radial-gradient(#4d4d4d 1px, transparent 1px) !important; /* Grey dots */
+  }
+}
+
+/* Add visual separation with padding */
+html body.boxed-layout.ma0.avenir.bg-near-white {
+  padding: 30px 0 !important;
+  min-height: 100vh !important;
+}
+
+/* Main content, footer, and header: white box with max-width */
+html body.boxed-layout.ma0.avenir.bg-near-white > header,
+html body.boxed-layout.ma0.avenir.bg-near-white > main,
+html body.boxed-layout.ma0.avenir.bg-near-white > footer {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  background-color: #ffffff !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Apply shadow only to header and footer for unified container effect */
+html body.boxed-layout.ma0.avenir.bg-near-white > header {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+html body.boxed-layout.ma0.avenir.bg-near-white > footer {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Dark mode content boxes - placed after light mode to override */
+@media (prefers-color-scheme: dark) {
+  html body.boxed-layout.ma0.avenir.bg-near-white > header,
+  html body.boxed-layout.ma0.avenir.bg-near-white > main,
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer {
+    background-color: #2d2d2d !important; /* Dark background for content boxes */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important; /* Stronger shadow for dark mode */
+  }
+  
+  /* Dark mode text colors for readability */
+  html body.boxed-layout.ma0.avenir.bg-near-white > main,
+  html body.boxed-layout.ma0.avenir.bg-near-white > main *,
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer,
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer *,
+  html body.boxed-layout.ma0.avenir.bg-near-white > header,
+  html body.boxed-layout.ma0.avenir.bg-near-white > header * {
+    color: #e0e0e0 !important; /* Light text for dark backgrounds */
+  }
+  
+  /* Ensure links are visible and accessible */
+  html body.boxed-layout.ma0.avenir.bg-near-white > main a,
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer a {
+    color: #87ceeb !important; /* Light blue for links */
+  }
+  
+  /* Link hover states */
+  html body.boxed-layout.ma0.avenir.bg-near-white > main a:hover,
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer a:hover {
+    color: #add8e6 !important; /* Lighter blue on hover */
+  }
+  
+  /* Special elements that need extra care */
+  html body.boxed-layout.ma0.avenir.bg-near-white > main .intro-link,
+  html body.boxed-layout.ma0.avenir.bg-near-white > main .sheikh-message {
+    background-color: #404040 !important;
+    color: #e0e0e0 !important;
+    border-color: #606060 !important;
+  }
+  
+  html body.boxed-layout.ma0.avenir.bg-near-white > main .intro-link:hover,
+  html body.boxed-layout.ma0.avenir.bg-near-white > main .sheikh-message:hover {
+    background-color: #505050 !important;
+    color: #ffffff !important;
+    border-color: #707070 !important;
+  }
+  
+  /* Ensure proper contrast for white content elements like cards */
+  html body.boxed-layout.ma0.avenir.bg-near-white > main .audio-card,
+  html body.boxed-layout.ma0.avenir.bg-near-white > main .fatwa-item,
+  html body.boxed-layout.ma0.avenir.bg-near-white > main .book-card {
+    background-color: #3a3a3a !important;
+    color: #e0e0e0 !important;
+  }
+
+  /* Force dark backgrounds for cards on sub-pages, overruling inline gradients */
+  html body.boxed-layout.ma0.avenir.bg-near-white .book-card,
+  html body.boxed-layout.ma0.avenir.bg-near-white .audio-card {
+    background: #3a3a3a !important; /* Solid dark grey */
+    color: #e0e0e0 !important;
+  }
+
+  /* Ensure action links remain visible */
+  html body.boxed-layout.ma0.avenir.bg-near-white .download-link,
+  html body.boxed-layout.ma0.avenir.bg-near-white .audio-link {
+    color: #87ceeb !important; /* Light blue */
+  }
+  html body.boxed-layout.ma0.avenir.bg-near-white .download-link:hover,
+  html body.boxed-layout.ma0.avenir.bg-near-white .audio-link:hover {
+    background-color: #404040 !important;
+    color: #add8e6 !important;
+  }
+
+  /* Dark-mode styles for fatwa items and category chips */
+  html body.boxed-layout.ma0.avenir.bg-near-white .fatwa-item {
+    background-color: #3a3a3a !important;
+    color: #e0e0e0 !important;
+  }
+
+  /* Inline chips inside each fatwa */
+  html body.boxed-layout.ma0.avenir.bg-near-white .fatwa-item .category {
+    background: linear-gradient(135deg, #3a3a3a 0%, #444 100%) !important;
+    border-color: #555 !important;
+    color: #e0e0e0 !important;
+  }
+
+  html body.boxed-layout.ma0.avenir.bg-near-white .fatwa-item .category:hover {
+    background: linear-gradient(135deg, #555 0%, #4a4a4a 100%) !important;
+    border-color: #666 !important;
+    color: #fff !important;
+  }
+
+  /* Category list chips on taxonomy page */
+  html body.boxed-layout.ma0.avenir.bg-near-white .categories-list li a {
+    background: linear-gradient(135deg, #3a3a3a 0%, #444 100%) !important;
+    border-color: #555 !important;
+    color: #e0e0e0 !important;
+  }
+
+  html body.boxed-layout.ma0.avenir.bg-near-white .categories-list li a:hover {
+    background: linear-gradient(135deg, #555 0%, #4a4a4a 100%) !important;
+    border-color: #666 !important;
+    color: #fff !important;
+  }
+
+  /* Fatwa post page elements */
+  html body.boxed-layout.ma0.avenir.bg-near-white .fatwa-post .category {
+    background: linear-gradient(135deg, #3a3a3a 0%, #444 100%) !important;
+    border-color: #555 !important;
+    color: #e0e0e0 !important;
+  }
+
+  html body.boxed-layout.ma0.avenir.bg-near-white .fatwa-post .category:hover {
+    background: linear-gradient(135deg, #555 0%, #4a4a4a 100%) !important;
+    border-color: #666 !important;
+    color: #fff !important;
+  }
+
+  html body.boxed-layout.ma0.avenir.bg-near-white .fatwa-question,
+  html body.boxed-layout.ma0.avenir.bg-near-white .fatwa-answer {
+    background-color: #3a3a3a !important;
+    color: #e0e0e0 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+  }
+
+  /* Ensure headings in Q/A boxes stay visible */
+  html body.boxed-layout.ma0.avenir.bg-near-white .question-header h2,
+  html body.boxed-layout.ma0.avenir.bg-near-white .answer-header h2 {
+    color: #e0e0e0 !important;
+  }
+
+  /* Borders for Q/A boxes in dark mode (slightly muted) */
+  html body.boxed-layout.ma0.avenir.bg-near-white .fatwa-question {
+    border-right: 4px solid #4CAF50 !important; /* keep green */
+  }
+  html body.boxed-layout.ma0.avenir.bg-near-white .fatwa-answer {
+    border-right: 4px solid #2196F3 !important; /* keep blue */
+  }
+}
+
+/* Header spacing - top of the box */
+html body.boxed-layout.ma0.avenir.bg-near-white > header,
+html body.boxed-layout > header,
+body.boxed-layout > header,
+header.cover {
+  margin-bottom: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Main content spacing - middle of the box */
+html body.boxed-layout.ma0.avenir.bg-near-white > main {
+  padding: 2rem !important;
+  border-radius: 0 !important;
+}
+
+/* Footer spacing - bottom of the box */
+html body.boxed-layout.ma0.avenir.bg-near-white > footer,
+html body.boxed-layout > footer,
+body.boxed-layout > footer,
+body > footer {
+  margin-top: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Footer text color override */
+@media (prefers-color-scheme: light) {
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer,
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer a {
+    color: #333333 !important;
+  }
+}
+
+/* Header styles */
+header.cover {
+  min-height: 200px !important;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+  width: 100% !important;
+  margin: 0 !important;
+  background-image: url('/images/hero.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* Fix header background color */
+header.cover .bg-black-60,
+header.cover > div {
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Ensure content stays within max-width */
+html body.boxed-layout.ma0.avenir.bg-near-white .mw8 {
+  max-width: 64rem !important;
+}
+
+/* Center content */
+html body.boxed-layout.ma0.avenir.bg-near-white .center {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 1240px) {
+  html body.boxed-layout.ma0.avenir.bg-near-white > header,
+  html body.boxed-layout.ma0.avenir.bg-near-white > main,
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer {
+    max-width: calc(100vw - 40px) !important;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  /* Reduce body padding on mobile */
+  html,
+  html body.boxed-layout.ma0.avenir.bg-near-white {
+    padding: 10px 0 !important;
+    /* Keep the background pattern visible */
+    background-color: #e0e0e0 !important;
+    background-image: radial-gradient(#a0a0a0 1px, transparent 1px) !important; /* Much darker dots */
+    background-size: 12px 12px !important; /* Closer dots */
+  }
+  
+  /* Dark mode mobile background */
+  @media (prefers-color-scheme: dark) {
+    html,
+    html body.boxed-layout.ma0.avenir.bg-near-white {
+      background-color: #000000 !important; /* Pitch black background */
+      background-image: radial-gradient(#4d4d4d 1px, transparent 1px) !important; /* Grey dots */
+    }
+  }
+
+  /* Adjust header, main, and footer on mobile */
+  html body.boxed-layout.ma0.avenir.bg-near-white > header,
+  html body.boxed-layout.ma0.avenir.bg-near-white > main,
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer {
+    max-width: calc(100vw - 20px) !important;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+    border-radius: 8px !important;
+  }
+
+  /* Adjust header background on mobile */
+  header.cover .bg-black-60,
+  header.cover > div {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* Even tighter spacing for very small screens */
+  html body.boxed-layout.ma0.avenir.bg-near-white > header,
+  html body.boxed-layout.ma0.avenir.bg-near-white > main,
+  html body.boxed-layout.ma0.avenir.bg-near-white > footer {
+    max-width: calc(100vw - 10px) !important;
+    margin-left: 5px !important;
+    margin-right: 5px !important;
+  }
+}
+
+/* Fix for publications page header */
+.publications-page header.cover,
+.publications-page header.cover .bg-black-60 {
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Header title font size consistency */
+header .tc-l h1 {
+  font-size: 2.25rem !important; /* f2 in Tachyons */
+}
+
+@media screen and (min-width: 60em) {
+  header .tc-l h1 {
+    font-size: 3rem !important; /* Slightly larger for desktop */
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Dark-mode overrides for the fatawa question form */
+  #question-form input,
+  #question-form textarea {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #555 !important;
+  }
+
+  #question-form input::placeholder,
+  #question-form textarea::placeholder {
+    color: #a0a0a0 !important;
+  }
+
+  #question-form button {
+    background-color: #555 !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #777 !important;
+    transition: background-color 0.3s ease !important;
+  }
+
+  #question-form button:hover:enabled {
+    background-color: #666 !important;
+  }
+
+  #question-form button:disabled {
+    background-color: #444 !important;
+    color: #888 !important;
+  }
+} 

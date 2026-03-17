@@ -1,0 +1,195 @@
+{{ $pages := .Pages }}
+{{ if .Data.Term }}
+    {{ $pages = (where .Site.RegularPages "Params.categories" "intersect" (slice .Data.Term)) }}
+{{ end }}
+
+<div class="fatwa-list-container">
+    {{ if eq .Kind "section" }}
+    <h1 class="category-title">{{ .Title }}</h1>
+    {{ end }}
+    
+    {{ if eq .Title "فتاوى" }}
+    <div class="category-description">
+        <h2>تصفح الفتاوى حسب التصنيف</h2>
+        <ul class="categories-list">
+            {{ range .Site.Taxonomies.categories }}
+            <li>
+                <a href="{{ .Page.RelPermalink }}">{{ .Page.Title }} ({{ .Count }})</a>
+            </li>
+            {{ end }}
+        </ul>
+    </div>
+    {{ end }}
+
+    <div class="fatwa-list">
+        {{ range $pages }}
+        <article class="fatwa-item">
+            <h2 class="fatwa-title">
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            </h2>
+            <div class="fatwa-meta">
+                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+                {{ with .Params.categories }}
+                <div class="fatwa-categories">
+                    {{ range . }}
+                    <a href="{{ "/categories/" | relURL }}{{ . | urlize }}/" class="category">{{ . }}</a>
+                    {{ end }}
+                </div>
+                {{ end }}
+            </div>
+            {{ with .Params.question }}
+            <div class="fatwa-excerpt">
+                {{ . | safeHTML | truncate 200 }}
+            </div>
+            {{ end }}
+            <a href="{{ .RelPermalink }}" class="read-more">اقرأ المزيد ←</a>
+        </article>
+        {{ end }}
+    </div>
+</div>
+
+<style>
+.fatwa-list-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    direction: rtl;
+}
+
+.category-title {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.category-description {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.categories-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+}
+
+.categories-list li a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.45rem 1rem;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e8edf2 100%);
+    border: 1px solid #dce3ea;
+    border-radius: 20px;
+    color: #3a4a5c;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.categories-list li a:hover {
+    background: linear-gradient(135deg, #d0d4da 0%, #c2c7ce 100%);
+    border-color: #b8bcc3;
+    color: #2c3e50;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.fatwa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.fatwa-item {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.fatwa-item:hover {
+    transform: translateY(-2px);
+}
+
+.fatwa-item .fatwa-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.fatwa-item .fatwa-title a {
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.fatwa-item .fatwa-title a:hover {
+    color: #3498db;
+}
+
+.fatwa-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.fatwa-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.category {
+    display: inline-block;
+    padding: 0.3rem 0.9rem;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e8edf2 100%);
+    border: 1px solid #dce3ea;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #3a4a5c;
+    transition: all 0.25s ease;
+}
+
+.category:hover {
+    background: linear-gradient(135deg, #d0d4da 0%, #c2c7ce 100%);
+    border-color: #b8bcc3;
+    color: #2c3e50;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fatwa-excerpt {
+    color: #666;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.read-more {
+    display: inline-block;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.read-more:hover {
+    color: #2980b9;
+}
+
+@media (max-width: 768px) {
+    .fatwa-list-container {
+        margin: 1rem auto;
+    }
+
+    .category-title {
+        font-size: 2rem;
+    }
+
+    .fatwa-item {
+        padding: 1rem;
+    }
+}
+</style> 

@@ -1,0 +1,35 @@
+{{ $fatawa := (where .Site.RegularPages "Section" "fatawa") }}
+{{ $latest := ($fatawa | first 3) }}
+
+{{ if $latest }}
+<div class="latest-fatawa-section">
+  <div class="latest-fatawa-header">
+    <span class="latest-fatawa-badge">
+      <i class="fa-solid fa-scale-balanced"></i>
+      <span class="arabic-text">أحدث الفتاوى</span>
+    </span>
+    <a href="/fatawa/" class="latest-fatawa-more arabic-text">المزيد</a>
+  </div>
+
+  <div class="latest-fatawa-list">
+    {{ range $latest }}
+    <a href="{{ .RelPermalink }}" class="latest-fatawa-card">
+      <div class="latest-fatawa-card-inner">
+        <h3 class="arabic-text">{{ .Title }}</h3>
+        {{ with .Params.question }}
+        <p class="latest-fatawa-excerpt arabic-text">{{ . | plainify | truncate 120 }}</p>
+        {{ end }}
+        <div class="latest-fatawa-meta">
+          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+          {{ with .Params.categories }}
+            {{ range first 2 . }}
+            <span class="latest-fatawa-cat">{{ . }}</span>
+            {{ end }}
+          {{ end }}
+        </div>
+      </div>
+    </a>
+    {{ end }}
+  </div>
+</div>
+{{ end }}

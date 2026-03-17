@@ -1,0 +1,10 @@
+name = "blue-dew-502c"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# If your worker uses the .workers.dev subdomain:
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "FATWA_QUESTIONS"
+id = "a0741d49fdcc4d6a8573c7e8aa97e295"

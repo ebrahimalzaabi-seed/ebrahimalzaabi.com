@@ -1,0 +1,180 @@
+{{ define "header" }}
+  <header class="cover bg-top" style="border-top-left-radius: 12px; border-top-right-radius: 12px; overflow: hidden;">
+    <div class="bg-black-60">
+      {{ partial "site-navigation.html" . }}
+      <div class="tc-l pv4 pv6-l ph3 ph4-ns">
+        <h1 class="arabic-text f2 f-subheadline-l fw2 white-90 mb0 lh-title">
+          {{ .Title }}
+        </h1>
+        {{ with .Params.description }}
+          <h2 class="fw1 f5 f3-l white-80 measure-wide-l center mt3">
+            {{ . }}
+          </h2>
+        {{ end }}
+      </div>
+    </div>
+  </header>
+{{ end }}
+
+{{ define "main" }}
+  <article class="flex-l flex-wrap justify-between mw8 center ph3 arabic-text publications-page">
+    <header class="mt4 w-100">
+      <h1 class="arabic-text f1 mt3 mb1">
+        {{- .Title -}}
+      </h1>
+    </header>
+    
+    <div class="nested-copy-line-height lh-copy arabic-text f4 nested-links pr4-l w-100">
+      {{/* For the books section, use a grid of cards */}}
+      <h2>مؤلفات</h2>
+      
+      <div class="books-grid">
+        <div class="book-card">
+          <h3>فتح العلام في أحكام الصيام</h3>
+          <div class="book-thumbnail">
+            <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/fath_alalaam.pdf">
+              <img src="/images/publications/syam.png" alt="فتح العلام في أحكام الصيام">
+            </a>
+          </div>
+          <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/fath_alalaam.pdf" class="download-link"><i class="fa-solid fa-download"></i> تحميل الكتاب</a>
+        </div>
+        
+        <div class="book-card">
+          <h3>الزاد في بيان مناسك المعتمر والحاج</h3>
+          <div class="book-thumbnail">
+            <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/alzaad.pdf">
+              <img src="/images/publications/hajj.png" alt="الزاد في بيان مناسك المعتمر والحاج">
+            </a>
+          </div>
+          <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/alzaad.pdf" class="download-link"><i class="fa-solid fa-download"></i> تحميل الكتاب</a>
+          <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/zad_reading_version3.pdf" class="download-link"><i class="fa-solid fa-download"></i> نسخة للقراءة</a>
+        </div>
+        
+        <div class="book-card">
+          <h3>الإصابة في أحكام الحيض والنفاس والاستحاضة</h3>
+          <div class="book-thumbnail">
+            <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/alesaaba.pdf">
+              <img src="/images/publications/esaaba.png" alt="الإصابة في أحكام الحيض والنفاس والاستحاضة">
+            </a>
+          </div>
+          <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/alesaaba.pdf" class="download-link"><i class="fa-solid fa-download"></i> تحميل الكتاب</a>
+        </div>
+        
+        <div class="book-card">
+          <h3>جامع الأحكام في مسائل الصيام والاعتكاف وعيد الفطر والقيام</h3>
+          <div class="book-thumbnail">
+            <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/jame3_ala7kam.pdf">
+              <img src="/images/publications/jame3_ala7kam.png" alt="جامع الأحكام في مسائل الصيام والاعتكاف وعيد الفطر والقيام">
+            </a>
+          </div>
+          <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/jame3_ala7kam.pdf" class="download-link"><i class="fa-solid fa-download"></i> تحميل الكتاب</a>
+        </div>
+        
+        <div class="book-card">
+          <h3>التنقيحات في شرح تسهيل الطرقات لنظم الورقات</h3>
+          <div class="book-thumbnail">
+            <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/tanke7at_part1.pdf">
+              <img src="/images/publications/tanke7at.png" alt="التنقيحات في شرح تسهيل الطرقات لنظم الورقات">
+            </a>
+          </div>
+          <a href="https://archive.org/download/ebrahimalzaabi-audio-v2/pubs/tanke7at_part1.pdf" class="download-link"><i class="fa-solid fa-download"></i> تحميل الكتاب - القسم الأول</a>
+        </div>
+      </div>
+      
+      <style>
+        .books-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 2rem;
+          margin-bottom: 3rem;
+        }
+        
+        .book-card {
+          background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 50%, #f0f4ff 100%);
+          border-radius: 10px;
+          padding: 1.5rem;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          transition: transform 0.3s ease;
+          text-align: center;
+        }
+        
+        .book-card:first-child {
+          background: linear-gradient(135deg, #ffffff 0%, #fffbf0 50%, #fff3e0 100%);
+        }
+        
+        .book-card:nth-child(2) {
+          background: linear-gradient(135deg, #ffffff 0%, #fef5f5 50%, #fde8e8 100%);
+        }
+        
+        .book-card:nth-child(3) {
+          background: linear-gradient(135deg, #ffffff 0%, #fef9f3 50%, #fdebd0 100%);
+        }
+        
+        .book-card:hover {
+          transform: translateY(-5px);
+        }
+        
+        .book-card h3 {
+          margin-top: 0;
+          margin-bottom: 1rem;
+          font-size: 1.25rem;
+          height: 3em;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .book-thumbnail {
+          margin-bottom: 1rem;
+        }
+        
+        .book-thumbnail img {
+          width: 150px;
+          height: 200px;
+          object-fit: contain;
+          transition: transform 0.3s ease;
+        }
+        
+        .book-thumbnail img:hover {
+          transform: scale(1.05);
+        }
+        
+        .download-link {
+          display: inline-block;
+          color: #3498db;
+          text-decoration: none;
+          font-weight: 500;
+          padding: 0.5rem 1rem;
+          border-radius: 5px;
+          transition: background-color 0.3s ease;
+        }
+        
+        .download-link:hover {
+          background-color: #f8f9fa;
+          color: #2980b9;
+        }
+        
+        @media (max-width: 768px) {
+          .books-grid {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+          }
+          
+          .book-card h3 {
+            font-size: 1rem;
+            height: 4em;
+          }
+          
+          .book-thumbnail img {
+            width: 120px;
+            height: 160px;
+          }
+        }
+      </style>
+      
+      {{/* For the research papers section, use our custom partial */}}
+      {{ partial "research-papers.html" . }}
+      
+    </div>
+  </article>
+{{ end }} 

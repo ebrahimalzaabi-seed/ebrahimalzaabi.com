@@ -1,0 +1,16 @@
+{{ $tags := $.Site.Taxonomies.tags }}
+
+{{ if gt (len $tags) 0 }}
+<div class="pa3">
+  <h3 class="f4 b arabic-text">الوسوم</h3>
+  <div class="arabic-text flex flex-wrap">
+    {{ range $name, $taxonomy := $tags }}
+      {{ with $.Site.GetPage (printf "/tags/%s" $name) }}
+        <a href="{{ .RelPermalink }}" class="tag-link link dark-gray hover-blue ba b--dotted br2 ph2 mr1 mb2 dib">
+          {{ .Title }} ({{ $taxonomy.Count }})
+        </a>
+      {{ end }}
+    {{ end }}
+  </div>
+</div>
+{{ end }} 

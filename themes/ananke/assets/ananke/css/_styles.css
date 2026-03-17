@@ -1,0 +1,66 @@
+/* Put your custom styles here and run `npm start` from the "src" directory on */
+
+#TableOfContents ul li {
+  margin-bottom: 1em;
+}
+
+.lh-copy blockquote {
+  display: block;
+  font-size: .875em;
+  margin-left: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border-left: 4px solid #ccc;
+  padding-left: 1rem;
+}
+
+.nested-links a{
+  overflow-wrap: break-word;
+}
+
+header.cover,
+header.cover > .bg-black-60 {
+  min-height: 200px !important;
+  height: 200px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+header.cover > .bg-black-60 > .tc-l,
+header.cover > .bg-black-60 > .tc-l > * {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+header.cover .pv4,
+header.cover .pv6-l {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+a.active {
+  text-decoration: underline !important;
+  text-underline-offset: 6px;
+  color: #fff !important;
+}
+
+/* Font family rules */
+body {
+  font-family: 'Noto Naskh Arabic', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Naskh Arabic', sans-serif;
+}
+
+.f1, .f2, .f3, .f-subheadline-l {
+  font-family: 'Noto Naskh Arabic', sans-serif;
+  font-weight: 700;
+}
+
+.content, p, a, span, div {
+  font-family: 'Noto Naskh Arabic', sans-serif;
+}

@@ -1,0 +1,142 @@
+{{ $categories := $.Site.Taxonomies.categories }}
+
+{{ if gt (len $categories) 0 }}
+<div class="pa3">
+  <div class="categories-section-header">
+    <span class="categories-section-badge">
+      <i class="fa-solid fa-layer-group"></i>
+      <span class="arabic-text">التصنيفات</span>
+    </span>
+  </div>
+
+  {{/* Determine the maximum post count among all categories */}}
+  {{ $max := 1 }}
+  {{ range $name, $taxonomy := $categories }}
+    {{ if gt $taxonomy.Count $max }}
+      {{ $max = $taxonomy.Count }}
+    {{ end }}
+  {{ end }}
+
+  <div class="arabic-text category-chips-cloud">
+    {{ range $name, $taxonomy := $categories }}
+      {{/* Calculate weight percentage */}}
+      {{ $ratio := div (mul $taxonomy.Count 100) $max }}
+      {{ $sizeClass := "cloud-size-1" }}
+      {{ if ge $ratio 80 }}
+        {{ $sizeClass = "cloud-size-5" }}
+      {{ else if ge $ratio 60 }}
+        {{ $sizeClass = "cloud-size-4" }}
+      {{ else if ge $ratio 40 }}
+        {{ $sizeClass = "cloud-size-3" }}
+      {{ else if ge $ratio 20 }}
+        {{ $sizeClass = "cloud-size-2" }}
+      {{ end }}
+      <a href="/categories/{{ $name | urlize }}/" class="category-chip {{ $sizeClass }}">
+        <span class="chip-label">{{ $name }}</span>
+        <span class="chip-count">{{ $taxonomy.Count }}</span>
+      </a>
+    {{ end }}
+  </div>
+</div>
+
+<style>
+  .categories-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0;
+  }
+
+  .categories-section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #C5A059;
+    color: white;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px 8px 0 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: -2px;
+  }
+
+  .categories-section-badge i {
+    font-size: 1.3rem;
+  }
+
+  .category-chips-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+  }
+
+  .category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e8edf2 100%);
+    border: 1px solid #dce3ea;
+    border-radius: 20px;
+    color: #3a4a5c !important;
+    text-decoration: none !important;
+    transition: all 0.25s ease;
+    cursor: pointer;
+  }
+
+  .category-chip:hover {
+    background: linear-gradient(135deg, #d0d4da 0%, #c2c7ce 100%);
+    border-color: #b8bcc3;
+    color: #2c3e50 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-chip:hover .chip-count {
+    background: rgba(0, 0, 0, 0.1);
+    color: #444;
+  }
+
+  .chip-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5em;
+    padding: 0.1rem 0.4rem;
+    background: rgba(0, 0, 0, 0.07);
+    border-radius: 10px;
+    font-size: 0.75em;
+    color: #667;
+    transition: all 0.25s ease;
+  }
+
+  /* Font-size scaling for cloud weights */
+  .cloud-size-1 { font-size: 0.85rem; }
+  .cloud-size-2 { font-size: 1rem; }
+  .cloud-size-3 { font-size: 1.15rem; }
+  .cloud-size-4 { font-size: 1.3rem; }
+  .cloud-size-5 { font-size: 1.45rem; }
+
+  @media (prefers-color-scheme: dark) {
+    .category-chip {
+      background: linear-gradient(135deg, #3a3a3a 0%, #444 100%);
+      border-color: #555;
+      color: #e0e0e0 !important;
+    }
+
+    .chip-count {
+      background: rgba(255, 255, 255, 0.1);
+      color: #bbb;
+    }
+
+    .category-chip:hover {
+      background: linear-gradient(135deg, #555 0%, #4a4a4a 100%);
+      border-color: #666;
+      color: #fff !important;
+    }
+  }
+</style>
+{{ end }} 
