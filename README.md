@@ -12,7 +12,7 @@ graph TD
     Visitor -->|browses| GHP[GitHub Pages<br/>Hugo SSG + Ananke theme<br/>ebrahimalzaabi.com]
     GHP -->|submits question| CF[DNS + Cloudflare Worker<br/>send-question + KV store<br/>+ Turnstile CAPTCHA]
 
-    GHP --- Clarity[Microsoft Clarity<br/>Analytics & heatmaps]
+    GHP --- GA4[Google Analytics 4<br/>Website analytics]
     GHP --- Archive[Archive.org<br/>Legacy MP3s & PDFs]
     Dev -->|push to main| CICD[GitHub Actions CI/CD<br/>Hugo build → deploy]
     CICD -->|deploys| GHP
@@ -29,7 +29,7 @@ graph TD
     style Admin fill:#d0bfff,stroke:#862e9c
     style Resend fill:#ffa8a8,stroke:#c92a2a
     style CICD fill:#a5d8ff,stroke:#1971c2
-    style Clarity fill:#99e9f2,stroke:#0c8599
+    style GA4 fill:#99e9f2,stroke:#0c8599
     style Archive fill:#dee2e6,stroke:#495057
 ```
 
@@ -42,7 +42,7 @@ graph TD
 | [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) | CAPTCHA for the question form |
 | [Cloudflare KV](https://developers.cloudflare.com/kv/) | Stores pending questions for admin review |
 | [Resend](https://resend.com/) | Transactional emails (notifications to sheikh & questioners) |
-| [Microsoft Clarity](https://clarity.microsoft.com/) | Analytics & heatmaps |
+| [Google Analytics 4](https://analytics.google.com/) | Website analytics |
 | [Archive.org](https://archive.org/) | Hosting legacy MP3s & PDFs |
 
 > All services above are accessible via the Google account **ebrahimalzaabi.seed@gmail.com**.
@@ -144,6 +144,23 @@ npx wrangler deploy   # deploy to Cloudflare
 - `ADMIN_API_KEY` (any secure random string — must match the value in `scripts/admin-server.js`)
 - `NOTIFY_EMAIL_PRIMARY` — The sheikh's email that receives question notifications in production. Must match the value in `scripts/.env`.
 - `NOTIFY_EMAIL_DEV` — The developer email BCC on all notifications. Must match the value in `scripts/.env`.
+
+## Cloudflare Worker (`workers/analytics-proxy/`)
+
+Proxies the Google Analytics 4 Data API with 24-hour caching. Uses a GCP service account for JWT authentication.
+
+```bash
+cd workers/analytics-proxy
+npm install
+npx wrangler deploy   # deploy to Cloudflare
+```
+
+**Secrets** (secrets are deployed via `npx wrangler secret put <NAME>`).  To list them: `npx wrangler secret list`
+- `GA4_PROPERTY_ID` — GA4 numeric property ID
+- `GCP_CLIENT_EMAIL` — GCP service account email
+- `GCP_PRIVATE_KEY` — GCP service account private key (PEM format)
+
+For local development, create `workers/analytics-proxy/.dev.vars` with these values (already gitignored).
 
 ## Dry Run Mode
 
