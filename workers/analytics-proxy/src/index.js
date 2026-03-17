@@ -194,6 +194,7 @@ async function createJWT(env) {
 
 async function importPrivateKey(pem) {
   const pemBody = pem
+    .replace(/\\n/g, '\n')
     .replace('-----BEGIN PRIVATE KEY-----', '')
     .replace('-----END PRIVATE KEY-----', '')
     .replace(/\s/g, '');
