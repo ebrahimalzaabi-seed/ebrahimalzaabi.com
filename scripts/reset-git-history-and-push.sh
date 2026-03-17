@@ -21,4 +21,4 @@ git branch -D main
 git branch -m main
 
 # Force push
-git push -f origin main
+git push -f --set-upstream origin main
