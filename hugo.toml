@@ -15,7 +15,7 @@ theme = "ananke"
     weight = 1
   [[menu.main]]
     identifier = "publications"
-    name = "المجلدات"
+    name = "المؤلفات"
     pageRef = "/مؤلفات/"
     weight = 3
   [[menu.main]]
