@@ -579,4 +579,113 @@ header .tc-l h1 {
     background-color: #444 !important;
     color: #888 !important;
   }
-} 
+}
+
+/* ===== MANUAL DARK MODE (data-theme="dark") ===== */
+/* Mirrors @media (prefers-color-scheme: dark) for the manual toggle */
+
+[data-theme="dark"] .tag-link { color: #e0e0e0 !important; }
+[data-theme="dark"] .tag-link:hover { background-color: #404040 !important; color: #ffffff !important; }
+
+[data-theme="dark"] html,
+[data-theme="dark"] body,
+html[data-theme="dark"],
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white {
+  background-color: #000000 !important;
+  background-image: radial-gradient(#4d4d4d 1px, transparent 1px) !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > header,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > main,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > footer {
+  background-color: #2d2d2d !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > main,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > main *,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > footer,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > footer *,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > header,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > header * {
+  color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > main a,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > footer a {
+  color: #87ceeb !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > main a:hover,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > footer a:hover {
+  color: #add8e6 !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > main .intro-link,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white > main .sheikh-message {
+  background-color: #404040 !important;
+  color: #e0e0e0 !important;
+  border-color: #606060 !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .book-card,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .audio-card {
+  background: #3a3a3a !important;
+  color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .download-link,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .audio-link {
+  color: #87ceeb !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .fatwa-item {
+  background-color: #3a3a3a !important;
+  color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .fatwa-item .category {
+  background: linear-gradient(135deg, #3a3a3a 0%, #444 100%) !important;
+  border-color: #555 !important;
+  color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .categories-list li a {
+  background: linear-gradient(135deg, #3a3a3a 0%, #444 100%) !important;
+  border-color: #555 !important;
+  color: #e0e0e0 !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .fatwa-question,
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .fatwa-answer {
+  background-color: #3a3a3a !important;
+  color: #e0e0e0 !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .fatwa-question {
+  border-right: 4px solid #4CAF50 !important;
+}
+html[data-theme="dark"] body.boxed-layout.ma0.avenir.bg-near-white .fatwa-answer {
+  border-right: 4px solid #2196F3 !important;
+}
+
+html[data-theme="dark"] #question-form input,
+html[data-theme="dark"] #question-form textarea {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #555 !important;
+}
+html[data-theme="dark"] #question-form input::placeholder,
+html[data-theme="dark"] #question-form textarea::placeholder {
+  color: #a0a0a0 !important;
+}
+html[data-theme="dark"] #question-form button {
+  background-color: #555 !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #777 !important;
+}
+html[data-theme="dark"] #question-form button:disabled {
+  background-color: #444 !important;
+  color: #888 !important;
+}
