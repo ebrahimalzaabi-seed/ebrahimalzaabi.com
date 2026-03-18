@@ -1,7 +1,7 @@
 baseURL = 'https://ebrahimalzaabi.com/'
 languageCode = 'ar'
 languageDirection = 'rtl'
-title = 'الشيخ ابراهيم سيف الزعابي'
+title = 'الشيخ إبراهيم سيف الزعابي'
 theme = "ananke"
 
 [params]
