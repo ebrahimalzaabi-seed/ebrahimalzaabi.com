@@ -436,7 +436,7 @@
 
       html += '<div class="lists">';
       html += topPagesSection(data.topPages || []);
-      html += listSection('أكثر الدول زيارة', data.topCountries || [], 'users', 'زائر');
+      html += countrySection(data.topCountries || []);
       html += trafficSourcesSection(data.topReferrals || []);
       html += '<div id="channelDetail"></div>';
       html += '</div>';
@@ -523,6 +523,28 @@
       }
       html += '</div>';
       return html;
+    }
+
+    function countrySection(items) {
+      let html = '<div class="list-section"><div class="list-title">أكثر الدول زيارة</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          html += '<div class="list-row">';
+          html += '<span class="list-rank">' + countryFlag(item.code) + '</span>';
+          html += '<span class="list-name">' + esc(item.name) + '</span>';
+          html += '<span class="list-value">' + fmt(item.users) + ' زائر</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function countryFlag(code) {
+      if (!code || code.length !== 2) return '';
+      return [...code.toUpperCase()].map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join('');
     }
 
     function listSection(title, items, key, suffix) {

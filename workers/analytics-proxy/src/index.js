@@ -205,7 +205,7 @@ function parseTopCountries(data) {
     const code = row.dimensionValues[0].value || '';
     let name;
     try { name = countryNames.of(code); } catch { name = code; }
-    return { name: name || code, users: parseInt(row.metricValues[0].value || 0) };
+    return { code, name: name || code, users: parseInt(row.metricValues[0].value || 0) };
   });
 }
 
