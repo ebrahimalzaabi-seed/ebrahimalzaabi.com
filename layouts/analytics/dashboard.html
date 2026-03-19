@@ -466,7 +466,7 @@
 
       window._channelDetails = {
         'من مواقع أخرى': data.topReferrers || [],
-        'بحث عضوي': data.topSearchEngines || []
+        'من محركات البحث': data.topSearchEngines || []
       };
       document.querySelectorAll('.channel-link').forEach(el => {
         el.addEventListener('click', () => {
@@ -526,7 +526,7 @@
       return html;
     }
 
-    const EXPANDABLE_CHANNELS = ['من مواقع أخرى', 'بحث عضوي'];
+    const EXPANDABLE_CHANNELS = ['من مواقع أخرى', 'من محركات البحث'];
 
     function trafficSourcesSection(items) {
       let html = '<div class="list-section"><div class="list-title">مصادر الزيارات</div>';

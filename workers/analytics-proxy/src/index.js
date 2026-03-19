@@ -220,7 +220,7 @@ function parseTopPages(data) {
 
 const CHANNEL_AR = {
   'Direct': 'مباشر',
-  'Organic Search': 'بحث عضوي',
+  'Organic Search': 'من محركات البحث',
   'Referral': 'من مواقع أخرى',
   'Organic Social': 'تواصل اجتماعي',
   'Paid Search': 'بحث مدفوع',
