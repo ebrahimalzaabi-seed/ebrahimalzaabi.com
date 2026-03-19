@@ -1,22 +1,15 @@
 <!-- Latest Tweet Widget -->
-<section id="tweet-widget" class="tweet-widget pa3 pa4-ns mt4" style="display:none;">
-  <div class="tc mb3">
-    <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
-      <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
-    </svg>
-  </div>
-  <div class="tweet-card pa3">
-    <div id="tweet-profile" class="tweet-profile flex items-center mb3"></div>
-    <blockquote id="tweet-text" class="lh-copy arabic-text f4 mb3"></blockquote>
-    <div class="tc mt3">
-      <a id="tweet-date-link" href="#" target="_blank" rel="noopener noreferrer" class="db mb2 link dim f6 f5-ns gray"></a>
+<section id="tweet-widget" class="tweet-widget mt4" style="display:none;">
+  <div class="tweet-card">
+    <div class="tweet-card-header">
+      <div id="tweet-profile" class="tweet-profile"></div>
+      <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" class="tweet-icon-link link dim">
+        <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
+          <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+        </svg>
+      </a>
     </div>
-  </div>
-  <div class="tc mt3">
-    <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" class="tweet-btn inline-flex items-center pv2 ph3 br-pill f6 f5-ns">
-      <svg class="tweet-btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
-      <span class="tweet-btn-text arabic-text">المزيد</span>
-    </a>
+    <blockquote id="tweet-text" class="tweet-text arabic-text"></blockquote>
   </div>
 </section>
 
@@ -30,19 +23,17 @@
       var t = data.tweet || {};
       var profileEl = document.getElementById("tweet-profile");
       var html = "";
-      if (p.imageUrl) html += '<img src="' + p.imageUrl + '" alt="' + (p.name || "") + '" class="tweet-profile-img br-100 mr3" loading="lazy"/>';
-      html += '<div class="tweet-profile-text">';
-      if (p.name) html += '<span class="tweet-profile-name fw6">' + p.name + '</span><br/>';
-      if (p.handle) html += '<span class="tweet-profile-handle gray f6">' + p.handle + '</span>';
-      html += '</div>';
-      profileEl.innerHTML = html;
-      document.getElementById("tweet-text").textContent = t.text || "";
-      var dateLink = document.getElementById("tweet-date-link");
-      dateLink.href = t.url || "#";
+      var profileLink = 'https://x.com/ebrahimuae1';
+      if (p.imageUrl) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-avatar-link link dim"><img src="' + p.imageUrl + '" alt="' + (p.name || "") + '" class="tweet-profile-img" loading="lazy"/></a>';
+      if (p.name) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-name link dim">' + p.name + '</a>';
+      if (p.handle) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-handle link dim">' + p.handle + '</a>';
       if (t.datetime) {
         var dateOnly = t.datetime.split("T")[0];
-        dateLink.innerHTML = '<time datetime="' + t.datetime + '">' + dateOnly + '</time>';
+        html += '<span class="tweet-meta-dot"> · </span>';
+        html += '<a href="' + (t.url || "#") + '" target="_blank" rel="noopener noreferrer" class="tweet-date link dim">' + dateOnly + '</a>';
       }
+      profileEl.innerHTML = html;
+      document.getElementById("tweet-text").textContent = t.text || "";
       document.getElementById("tweet-widget").style.display = "";
     })
     .catch(function(err) {
@@ -54,84 +45,106 @@
 <style>
   /* Tweet widget custom styling */
   .tweet-widget {
-    background-color: #f8f8f8; /* match YouTube widget */
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 3rem;
-  }
-  .tweet-btn {
-    text-decoration: none;
-    background-color: #f0f0f0;
-    color: #333;
-    border: 2px solid transparent;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-  .tweet-btn:hover {
-    background-color: #000000;
-    color: #ffffff;
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  }
-  .tweet-icon {
-    width: 32px;
-    height: 32px;
-    fill: currentColor;
-    color: #000000;
-  }
-  .tweet-btn-icon {
-    width: 1.4em;
-    height: 1.1em;
-    fill: currentColor;
-    margin-right: 0.5rem; /* since RTL, icon appears then text */
-    margin-left: 0.5rem;
-    vertical-align: middle;
+    margin-bottom: 2rem;
   }
   .tweet-card {
     background: #ffffff;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    transition: box-shadow 0.2s ease;
   }
-  .tweet-profile-img {
-    width: 48px;
-    height: 48px;
+  .tweet-card:hover {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .tweet-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  .tweet-icon {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+    color: #000;
+    flex-shrink: 0;
   }
   .tweet-profile {
-    gap: 0.75rem; /* space between avatar and text */
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .tweet-profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
   }
   .tweet-profile-name {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f1419;
+    white-space: nowrap;
   }
   .tweet-profile-handle {
-    font-size: 0.9rem;
-    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    color: #536471;
+    text-decoration: none;
+    white-space: nowrap;
   }
-  .tweet-json-dump {
-    direction:ltr;
-    white-space: pre-wrap;
-    word-break: break-all;
+  .tweet-meta-dot {
+    color: #536471;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .tweet-date {
+    font-size: 0.85rem;
+    color: #536471;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .tweet-icon-link {
+    flex-shrink: 0;
+  }
+  .tweet-text {
+    margin: 0;
+    padding: 0;
+    font-size: 1.15rem;
+    line-height: 1.5;
+    color: #0f1419;
+    border: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   /* Dark mode */
   @media (prefers-color-scheme: dark) {
-    .tweet-widget {
-      background-color: #2d2d2d;
-      border-color: #444 !important;
-    }
     .tweet-card {
-      background: #333333;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+      background: #1a1a1a;
+      border-color: #333;
     }
-    .tweet-btn {
-      background-color: #444444;
-      color: #f0f0f0;
+    .tweet-card:hover {
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
-    .tweet-btn:hover {
-      background-color: #000000;
-      color: #ffffff;
+    .tweet-profile-name {
+      color: #e7e9ea;
+    }
+    .tweet-profile-handle {
+      color: #71767b;
+    }
+    .tweet-text {
+      color: #e7e9ea;
+    }
+    .tweet-date {
+      color: #71767b;
+    }
+    .tweet-meta-dot {
+      color: #71767b;
     }
     .tweet-icon {
-      color: #ffffff;
+      color: #e7e9ea;
     }
   }
 </style> 
