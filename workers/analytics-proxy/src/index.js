@@ -47,7 +47,7 @@ async function handleAnalytics(url, ctx, env) {
     const headers = { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
     const dateRanges = [{ startDate, endDate }];
 
-    const [totalsRes, pagesRes, countriesRes, referralsRes, referrersRes] = await Promise.all([
+    const [totalsRes, pagesRes, countriesRes, referralsRes, referrersRes, searchEnginesRes] = await Promise.all([
       fetch(apiUrl, {
         method: 'POST', headers,
         body: JSON.stringify({
@@ -104,6 +104,22 @@ async function handleAnalytics(url, ctx, env) {
           orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
           limit: 5
         })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'sessionSource' }],
+          metrics: [{ name: 'sessions' }],
+          dimensionFilter: {
+            filter: {
+              fieldName: 'sessionDefaultChannelGroup',
+              stringFilter: { value: 'Organic Search', matchType: 'EXACT' }
+            }
+          },
+          orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+          limit: 5
+        })
       })
     ]);
 
@@ -112,8 +128,8 @@ async function handleAnalytics(url, ctx, env) {
       return jsonResponse({ error: 'GA4 API error', status: totalsRes.status, details: err }, totalsRes.status);
     }
 
-    const [totalsData, pagesData, countriesData, referralsData, referrersData] = await Promise.all([
-      totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json(), referrersRes.json()
+    const [totalsData, pagesData, countriesData, referralsData, referrersData, searchEnginesData] = await Promise.all([
+      totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json(), referrersRes.json(), searchEnginesRes.json()
     ]);
 
     const totals = parseTotals(totalsData);
@@ -121,8 +137,9 @@ async function handleAnalytics(url, ctx, env) {
     const topCountries = parseTopCountries(countriesData);
     const topReferrals = parseTopDimension(referralsData, 'sessions', true);
     const topReferrers = parseTopDimension(referrersData, 'sessions');
+    const topSearchEngines = parseTopDimension(searchEnginesData, 'sessions');
 
-    const result = { period: label, startDate, endDate, totals, topPages, topCountries, topReferrals, topReferrers, fetchTime: new Date().toISOString() };
+    const result = { period: label, startDate, endDate, totals, topPages, topCountries, topReferrals, topReferrers, topSearchEngines, fetchTime: new Date().toISOString() };
 
     if (!noCache) {
       const responseToCache = new Response(JSON.stringify(result), {

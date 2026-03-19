@@ -224,6 +224,33 @@
       color: var(--text-dim);
     }
 
+    .list-row.clickable {
+      cursor: pointer;
+      transition: background 0.15s;
+      border-radius: 6px;
+      padding: 0.55rem 0.35rem;
+      margin: 0 -0.35rem;
+    }
+
+    .list-row.clickable:hover {
+      background: var(--border);
+    }
+
+    .list-row.clickable.active {
+      background: var(--accent-blue);
+    }
+
+    .list-row.clickable.active .list-name,
+    .list-row.clickable.active .list-rank,
+    .list-row.clickable.active .list-value {
+      color: #fff;
+    }
+
+    .list-row.clickable .list-name {
+      color: var(--accent-blue);
+    }
+
+
     .footer {
       text-align: center;
       margin-top: 2rem;
@@ -402,11 +429,42 @@
       html += '<div class="lists">';
       html += topPagesSection(data.topPages || []);
       html += listSection('أكثر الدول زيارة', data.topCountries || [], 'users', 'زائر');
-      html += listSection('مصادر الزيارات', data.topReferrals || [], 'sessions', 'زيارة');
-      html += listSection('الدخول من مواقع', data.topReferrers || [], 'sessions', 'زيارة');
+      html += trafficSourcesSection(data.topReferrals || []);
+      html += '<div id="channelDetail"></div>';
       html += '</div>';
 
       content.innerHTML = html;
+
+      window._channelDetails = {
+        'من مواقع أخرى': data.topReferrers || [],
+        'بحث عضوي': data.topSearchEngines || []
+      };
+      document.querySelectorAll('.channel-link').forEach(el => {
+        el.addEventListener('click', () => {
+          const ch = el.dataset.channel;
+          const panel = document.getElementById('channelDetail');
+          const items = window._channelDetails[ch] || [];
+          if (panel.dataset.active === ch) {
+            panel.innerHTML = ''; panel.dataset.active = '';
+            document.querySelectorAll('.channel-link.active').forEach(e => e.classList.remove('active'));
+            return;
+          }
+          document.querySelectorAll('.channel-link.active').forEach(e => e.classList.remove('active'));
+          el.classList.add('active');
+          panel.dataset.active = ch;
+          let h = '<div class="list-section"><div class="list-title">' + esc(ch) + '</div>';
+          if (items.length === 0) { h += '<div class="list-empty">لا توجد بيانات</div>'; }
+          else { items.forEach((item, i) => {
+            h += '<div class="list-row">';
+            h += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+            h += '<span class="list-name">' + esc(item.name) + '</span>';
+            h += '<span class="list-value">' + fmt(item.sessions) + ' زيارة</span>';
+            h += '</div>';
+          }); }
+          h += '</div>';
+          panel.innerHTML = h;
+        });
+      });
 
       const cached = data.cached ? ' (مخزّن)' : '';
       const fetchTime = new Date(data.fetchTime).toLocaleString('ar-AE', {
@@ -432,6 +490,26 @@
           html += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
           html += '<span class="list-name"><a href="' + pageUrl + '" target="_blank">' + esc(item.name) + '</a></span>';
           html += '<span class="list-value">' + fmt(item.pageViews) + ' مشاهدة</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+
+    const EXPANDABLE_CHANNELS = ['من مواقع أخرى', 'بحث عضوي'];
+
+    function trafficSourcesSection(items) {
+      let html = '<div class="list-section"><div class="list-title">مصادر الزيارات</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          const expandable = EXPANDABLE_CHANNELS.includes(item.name);
+          html += '<div class="list-row' + (expandable ? ' clickable channel-link" data-channel="' + esc(item.name) : '') + '">';
+          html += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+          html += '<span class="list-name">' + esc(item.name) + '</span>';
+          html += '<span class="list-value">' + fmt(item.sessions) + ' زيارة</span>';
           html += '</div>';
         });
       }
