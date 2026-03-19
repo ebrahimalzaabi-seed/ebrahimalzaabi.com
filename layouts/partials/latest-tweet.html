@@ -1,57 +1,55 @@
 <!-- Latest Tweet Widget -->
-{{ $tweetEndpoint := cond hugo.IsProduction "https://embeded-tweet.ebrahimalzaabi-seed.workers.dev" "http://localhost:8787" }}
-{{ $timestamp := now.Unix }}
-{{ $tweetEndpoint = printf "%s?t=%d" $tweetEndpoint $timestamp }}
-{{ $remote := "" }}
-{{ with try (resources.GetRemote $tweetEndpoint) }}
-  {{ with .Err }}{{ warnf "Tweet fetch error: %s" . }}{{ end }}
-  {{ with .Value }}{{ $remote = . }}{{ end }}
-{{ end }}
+<section id="tweet-widget" class="tweet-widget pa3 pa4-ns mt4" style="display:none;">
+  <div class="tc mb3">
+    <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
+      <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+    </svg>
+  </div>
+  <div class="tweet-card pa3">
+    <div id="tweet-profile" class="tweet-profile flex items-center mb3"></div>
+    <blockquote id="tweet-text" class="lh-copy arabic-text f4 mb3"></blockquote>
+    <div class="tc mt3">
+      <a id="tweet-date-link" href="#" target="_blank" rel="noopener noreferrer" class="db mb2 link dim f6 f5-ns gray"></a>
+    </div>
+  </div>
+  <div class="tc mt3">
+    <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" class="tweet-btn inline-flex items-center pv2 ph3 br-pill f6 f5-ns">
+      <svg class="tweet-btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
+      <span class="tweet-btn-text arabic-text">المزيد</span>
+    </a>
+  </div>
+</section>
 
-{{ if $remote }}
-  {{ $tweetData := $remote | transform.Unmarshal }}
-  {{ $profile := index $tweetData "profile" }}
-  {{ with $tweetData }}
-    {{ with .tweet }}
-      <section class="tweet-widget pa3 pa4-ns mt4">
-        <div class="tc mb3">
-          <!-- X (Twitter) icon -->
-          <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
-            <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
-          </svg>
-        </div>
-        <div class="tweet-card pa3">
-          {{ with $profile }}
-            {{ $img := index . "imageUrl" }}
-            {{ $name := index . "name" }}
-            {{ $handle := index . "handle" }}
-            <div class="tweet-profile flex items-center mb3">
-              {{ if $img }}<img src="{{ $img }}" alt="{{ $name }}" class="tweet-profile-img br-100 mr3" loading="lazy"/>{{ end }}
-              <div class="tweet-profile-text">
-                {{ if $name }}<span class="tweet-profile-name fw6">{{ $name }}</span><br/>{{ end }}
-                {{ if $handle }}<span class="tweet-profile-handle gray f6">{{ $handle }}</span>{{ end }}
-              </div>
-            </div>
-          {{ end }}
-          <blockquote class="lh-copy arabic-text f4 mb3">
-            {{ .text }}
-          </blockquote>
-          <div class="tc mt3">
-            <a href="{{ .url }}" target="_blank" rel="noopener noreferrer" class="db mb2 link dim f6 f5-ns gray">
-              {{ with .datetime }}<time datetime="{{ . }}">{{ . }}</time>{{ end }}
-            </a>
-          </div>
-        </div>
-        <div class="tc mt3">
-          <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" class="tweet-btn inline-flex items-center pv2 ph3 br-pill f6 f5-ns">
-            <svg class="tweet-btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
-            <span class="tweet-btn-text arabic-text">المزيد</span>
-          </a>
-        </div>
-      </section>
-    {{ end }}
-  {{ end }}
-{{ end }}
+<script>
+(function() {
+  var endpoint = {{ if hugo.IsProduction }}"https://embeded-tweet.ebrahimalzaabi-seed.workers.dev"{{ else }}"http://localhost:8787"{{ end }};
+  fetch(endpoint)
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var p = data.profile || {};
+      var t = data.tweet || {};
+      var profileEl = document.getElementById("tweet-profile");
+      var html = "";
+      if (p.imageUrl) html += '<img src="' + p.imageUrl + '" alt="' + (p.name || "") + '" class="tweet-profile-img br-100 mr3" loading="lazy"/>';
+      html += '<div class="tweet-profile-text">';
+      if (p.name) html += '<span class="tweet-profile-name fw6">' + p.name + '</span><br/>';
+      if (p.handle) html += '<span class="tweet-profile-handle gray f6">' + p.handle + '</span>';
+      html += '</div>';
+      profileEl.innerHTML = html;
+      document.getElementById("tweet-text").textContent = t.text || "";
+      var dateLink = document.getElementById("tweet-date-link");
+      dateLink.href = t.url || "#";
+      if (t.datetime) {
+        var dateOnly = t.datetime.split("T")[0];
+        dateLink.innerHTML = '<time datetime="' + t.datetime + '">' + dateOnly + '</time>';
+      }
+      document.getElementById("tweet-widget").style.display = "";
+    })
+    .catch(function(err) {
+      console.error("Tweet fetch error:", err);
+    });
+})();
+</script>
 
 <style>
   /* Tweet widget custom styling */

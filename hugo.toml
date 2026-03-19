@@ -34,10 +34,6 @@ theme = "ananke"
     pageRef = "/search/"
     weight = 2
 
-[security]
-  [security.http]
-    urls = ['.*']
-
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
