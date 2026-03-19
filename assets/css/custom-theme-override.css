@@ -239,10 +239,8 @@ html body.boxed-layout.ma0.avenir.bg-near-white {
   min-height: 100vh !important;
 }
 
-/* Main content, footer, header, nav-bar and breadcrumbs: white box with max-width */
+/* Main content, footer, and header: white box with max-width */
 html body.boxed-layout.ma0.avenir.bg-near-white > header,
-html body.boxed-layout.ma0.avenir.bg-near-white > .nav-bar-container,
-html body.boxed-layout.ma0.avenir.bg-near-white > nav.breadcrumbs,
 html body.boxed-layout.ma0.avenir.bg-near-white > main,
 html body.boxed-layout.ma0.avenir.bg-near-white > footer {
   max-width: 1200px !important;
@@ -264,8 +262,6 @@ html body.boxed-layout.ma0.avenir.bg-near-white > footer {
 /* Dark mode content boxes - placed after light mode to override */
 @media (prefers-color-scheme: dark) {
   html body.boxed-layout.ma0.avenir.bg-near-white > header,
-  html body.boxed-layout.ma0.avenir.bg-near-white > .nav-bar-container,
-  html body.boxed-layout.ma0.avenir.bg-near-white > nav.breadcrumbs,
   html body.boxed-layout.ma0.avenir.bg-near-white > main,
   html body.boxed-layout.ma0.avenir.bg-near-white > footer {
     background-color: #2d2d2d !important; /* Dark background for content boxes */
@@ -417,8 +413,14 @@ header.cover {
 
 /* Main content spacing - middle of the box */
 html body.boxed-layout.ma0.avenir.bg-near-white > main {
-  padding: 2rem !important;
+  padding: 0 !important;
   border-radius: 0 !important;
+}
+
+/* Content inside main (everything after nav-bar and breadcrumbs) gets padding */
+html body.boxed-layout.ma0.avenir.bg-near-white > main > *:not(.nav-bar-container):not(nav.breadcrumbs) {
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
 }
 
 /* Footer spacing - bottom of the box */

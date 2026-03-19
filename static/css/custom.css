@@ -269,18 +269,25 @@ input#search::placeholder {
   }
 }
 
-/* Responsive: stack on very small screens */
-@media (max-width: 480px) {
+/* Responsive: horizontal scroll on mobile */
+@media (max-width: 768px) {
   .nav-bar {
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+  .nav-bar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
   .nav-bar-item {
-    padding: 0.7rem 1rem;
-    min-width: 75px;
+    padding: 0.6rem 0.8rem;
+    min-width: 70px;
+    flex-shrink: 0;
   }
   .nav-bar-icon {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
   .nav-bar-label {
     font-size: 0.75rem;
