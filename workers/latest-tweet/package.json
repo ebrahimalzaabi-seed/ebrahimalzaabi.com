@@ -1,0 +1,17 @@
+{
+  "name": "latest-tweet",
+  "version": "1.0.0",
+  "description": "Scrapes the latest tweet from x.com/ebrahimuae1",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": [],
+  "author": "digidub",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "wrangler": "^4.73.0"
+  }
+}
