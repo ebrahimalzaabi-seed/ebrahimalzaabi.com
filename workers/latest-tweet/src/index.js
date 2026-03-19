@@ -29,15 +29,32 @@ export default {
       return new Response(null, { headers: CORS_HEADERS });
     }
 
+    const cacheUrl = new URL(request.url);
+    cacheUrl.search = "";
+    const cacheKey = new Request(cacheUrl.toString());
+    const cache = caches.default;
+
+    const cached = await cache.match(cacheKey);
+    if (cached) {
+      const body = await cached.json();
+      body.cached = true;
+      return new Response(JSON.stringify(body, null, 2), {
+        headers: cached.headers,
+      });
+    }
+
     try {
       const data = await fetchPinnedTweet();
-      return new Response(JSON.stringify(data, null, 2), {
+      data.cached = false;
+      const response = new Response(JSON.stringify(data, null, 2), {
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=3600",
+          "Cache-Control": "public, s-maxage=3600",
           ...CORS_HEADERS,
         },
       });
+      ctx.waitUntil(cache.put(cacheKey, response.clone()));
+      return response;
     } catch (err) {
       return new Response(
         JSON.stringify({ error: err.message }),

@@ -1,15 +1,19 @@
 <!-- Latest Tweet Widget -->
-{{ $tweetEndpoint := "https://splendid-beijinho-cc65f7.netlify.app/.netlify/functions/pinned-tweet" }}
+{{ $tweetEndpoint := cond hugo.IsProduction "https://latest-tweet.ebrahimalzaabi-seed.workers.dev" "http://localhost:8787" }}
 {{ $timestamp := now.Unix }}
-{{ $tweetEndpoint := printf "%s?t=%d" $tweetEndpoint $timestamp }}
-{{ $remote := resources.GetRemote $tweetEndpoint }}
+{{ $tweetEndpoint = printf "%s?t=%d" $tweetEndpoint $timestamp }}
+{{ $remote := "" }}
+{{ with try (resources.GetRemote $tweetEndpoint) }}
+  {{ with .Err }}{{ warnf "Tweet fetch error: %s" . }}{{ end }}
+  {{ with .Value }}{{ $remote = . }}{{ end }}
+{{ end }}
 
 {{ if $remote }}
   {{ $tweetData := $remote | transform.Unmarshal }}
   {{ $profile := index $tweetData "profile" }}
   {{ with $tweetData }}
     {{ with .tweet }}
-      <section class="tweet-widget pa3 pa4-ns mt4">
+      <section class="tweet-widget pa3 pa4-ns mt4" data-cached="{{ index $tweetData "cached" }}">
         <div class="tc mb3">
           <!-- X (Twitter) icon -->
           <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
