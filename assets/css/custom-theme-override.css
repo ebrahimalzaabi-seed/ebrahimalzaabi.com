@@ -239,8 +239,10 @@ html body.boxed-layout.ma0.avenir.bg-near-white {
   min-height: 100vh !important;
 }
 
-/* Main content, footer, and header: white box with max-width */
+/* Main content, footer, header, nav-bar and breadcrumbs: white box with max-width */
 html body.boxed-layout.ma0.avenir.bg-near-white > header,
+html body.boxed-layout.ma0.avenir.bg-near-white > .nav-bar-container,
+html body.boxed-layout.ma0.avenir.bg-near-white > nav.breadcrumbs,
 html body.boxed-layout.ma0.avenir.bg-near-white > main,
 html body.boxed-layout.ma0.avenir.bg-near-white > footer {
   max-width: 1200px !important;
@@ -262,6 +264,8 @@ html body.boxed-layout.ma0.avenir.bg-near-white > footer {
 /* Dark mode content boxes - placed after light mode to override */
 @media (prefers-color-scheme: dark) {
   html body.boxed-layout.ma0.avenir.bg-near-white > header,
+  html body.boxed-layout.ma0.avenir.bg-near-white > .nav-bar-container,
+  html body.boxed-layout.ma0.avenir.bg-near-white > nav.breadcrumbs,
   html body.boxed-layout.ma0.avenir.bg-near-white > main,
   html body.boxed-layout.ma0.avenir.bg-near-white > footer {
     background-color: #2d2d2d !important; /* Dark background for content boxes */

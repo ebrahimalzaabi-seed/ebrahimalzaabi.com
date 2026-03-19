@@ -190,11 +190,7 @@ input#search::placeholder {
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
-/* Negate main's 2rem padding so nav-bar sits flush under header */
-main > .nav-bar-container {
-  margin: -2rem -2rem 2rem -2rem !important;
-  padding: 0;
-}
+/* Nav bar sits between header and main, no margin needed */
 
 .nav-bar {
   display: flex;

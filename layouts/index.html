@@ -38,45 +38,6 @@
 {{ end }}
 
 {{ define "main" }}
-  <div class="nav-bar-container">
-    <div class="nav-bar">
-      <a href="/" class="nav-bar-item">
-        <div class="nav-bar-icon"><i class="fa-solid fa-house"></i></div>
-        <span class="nav-bar-label">الرئيسية</span>
-      </a>
-
-      <a href="/search/" class="nav-bar-item">
-        <div class="nav-bar-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
-        <span class="nav-bar-label">بحث</span>
-      </a>
-
-      <a href="/مؤلفات/" class="nav-bar-item">
-        <div class="nav-bar-icon"><i class="fa-solid fa-book-open-reader"></i></div>
-        <span class="nav-bar-label">مؤلفات</span>
-      </a>
-
-      <a href="/fatawa/" class="nav-bar-item">
-        <div class="nav-bar-icon"><i class="fa-solid fa-scale-balanced"></i></div>
-        <span class="nav-bar-label">فتاوى</span>
-      </a>
-
-      <a href="/الصوتيات/" class="nav-bar-item">
-        <div class="nav-bar-icon"><i class="fa-solid fa-headphones"></i></div>
-        <span class="nav-bar-label">صوتيات</span>
-      </a>
-
-      <a href="/الافتتاحية/" class="nav-bar-item">
-        <div class="nav-bar-icon"><i class="fa-solid fa-pen-fancy"></i></div>
-        <span class="nav-bar-label">كلمة الشيخ</span>
-      </a>
-
-      <a href="/الترجمة/" class="nav-bar-item">
-        <div class="nav-bar-icon"><i class="fa-solid fa-user-graduate"></i></div>
-        <span class="nav-bar-label">الترجمة</span>
-      </a>
-    </div>
-  </div>
-
   <div class="flex-l mt2 mw8 center">
     <article class="center cf pb5 ph3 ph4-ns mw8">
       <div class="nested-copy-line-height lh-copy arabic-text f4 nested-links {{ $.Param "text_color" | default "mid-gray" }}">
