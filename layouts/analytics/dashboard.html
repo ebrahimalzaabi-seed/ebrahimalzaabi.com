@@ -145,7 +145,7 @@
 
     .lists {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1rem;
       max-width: 800px;
       margin: 0 auto;
@@ -190,6 +190,7 @@
 
     .list-name {
       flex: 1;
+      min-width: 0;
       font-size: 0.85rem;
       color: var(--text);
       overflow: hidden;
@@ -328,9 +329,29 @@
     .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
 
     @media (max-width: 600px) {
-      body { padding: 1rem; }
+      body { padding: 0.75rem; }
+      .header { margin-bottom: 1.25rem; }
+      .header h1 { font-size: 1.25rem; }
+      .period-selector { gap: 0.35rem; margin-bottom: 1.25rem; }
+      .period-btn { padding: 0.4rem 0.75rem; font-size: 0.8rem; border-radius: 6px; }
+      .cards { grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
+      .card { padding: 1rem; border-radius: 10px; }
       .card-value { font-size: 1.75rem; }
-      .lists { grid-template-columns: 1fr; }
+      .card-label { font-size: 0.75rem; }
+      .lists { grid-template-columns: 1fr; gap: 0.75rem; }
+      .list-section { padding: 1rem; border-radius: 10px; }
+      .list-name { font-size: 0.8rem; padding-left: 0.5rem; }
+      .list-value { font-size: 0.8rem; }
+      .footer { font-size: 0.7rem; margin-top: 1.25rem; }
+    }
+
+    @media (max-width: 380px) {
+      .period-selector { gap: 0.25rem; }
+      .period-btn { padding: 0.35rem 0.5rem; font-size: 0.75rem; }
+      .card-value { font-size: 1.5rem; }
+      .list-rank { width: 20px; font-size: 0.7rem; }
+      .list-name { font-size: 0.75rem; padding-left: 0.35rem; }
+      .list-value { font-size: 0.75rem; }
     }
   </style>
 </head>
