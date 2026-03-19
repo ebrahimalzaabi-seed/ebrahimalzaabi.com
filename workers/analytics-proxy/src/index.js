@@ -28,13 +28,13 @@ async function handleAnalytics(url, ctx, env) {
 
     const noCache = url.searchParams.get('nocache') === '1';
 
-    let cacheRequest;
-    if (!noCache) {
-      const cacheKey = `ga4-v3-${startDate}-${endDate}`;
-      const cacheUrl = new URL(url.toString());
-      cacheUrl.searchParams.set('_ck', cacheKey);
-      cacheRequest = new Request(cacheUrl.toString());
+    const cacheKey = `ga4-v3-${startDate}-${endDate}`;
+    const cacheUrl = new URL(url.toString());
+    cacheUrl.searchParams.delete('nocache');
+    cacheUrl.searchParams.set('_ck', cacheKey);
+    const cacheRequest = new Request(cacheUrl.toString());
 
+    if (!noCache) {
       const cached = await caches.default.match(cacheRequest);
       if (cached) {
         const cachedData = await cached.json();
@@ -141,12 +141,10 @@ async function handleAnalytics(url, ctx, env) {
 
     const result = { period: label, startDate, endDate, totals, topPages, topCountries, topReferrals, topReferrers, topSearchEngines, fetchTime: new Date().toISOString() };
 
-    if (!noCache) {
-      const responseToCache = new Response(JSON.stringify(result), {
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${CACHE_TTL}` }
-      });
-      ctx.waitUntil(caches.default.put(cacheRequest, responseToCache.clone()));
-    }
+    const responseToCache = new Response(JSON.stringify(result), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${CACHE_TTL}` }
+    });
+    ctx.waitUntil(caches.default.put(cacheRequest, responseToCache.clone()));
 
     return jsonResponse({ ...result, cached: false });
 
