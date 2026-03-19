@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>الإحصائيات — {{ .Site.Title }}</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --bg-card: #1e293b;
+        --border: #334155;
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --text-dim: #475569;
+        --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .period-selector {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .period-btn {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .period-btn:hover {
+      border-color: var(--accent-blue);
+      color: var(--text);
+    }
+
+    .period-btn.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0;
+      height: 3px;
+    }
+
+    .card:nth-child(1)::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .card:nth-child(2)::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .card:nth-child(3)::before { background: linear-gradient(90deg, #10b981, #34d399); }
+
+    .card-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .card-value {
+      font-size: 2.25rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card:nth-child(1) .card-value { color: var(--accent-blue); }
+    .card:nth-child(2) .card-value { color: var(--accent-purple); }
+    .card:nth-child(3) .card-value { color: var(--accent-green); }
+
+    .card-sub {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.25rem;
+    }
+
+    .lists {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .list-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .list-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .list-row:last-child { border-bottom: none; }
+
+    .list-rank {
+      width: 24px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .list-name {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-left: 0.75rem;
+    }
+
+    .list-name a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .list-name a:hover {
+      color: var(--accent-blue);
+      text-decoration: underline;
+    }
+
+    .list-value {
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .list-empty {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 0.75rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      text-align: center;
+      padding: 2rem;
+      color: #ef4444;
+      font-size: 0.9rem;
+    }
+
+    .dev-toolbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .toggle input { display: none; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 10px;
+      transition: background 0.2s;
+    }
+
+    .toggle input:checked + .toggle-track { background: var(--accent-blue); }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      pointer-events: none;
+    }
+
+    .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .card-value { font-size: 1.75rem; }
+      .lists { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>الإحصائيات</h1>
+    <p>ebrahimalzaabi.com</p>
+  </div>
+
+  <div class="period-selector">
+    <button class="period-btn" data-period="today">اليوم</button>
+    <button class="period-btn" data-period="yesterday">أمس</button>
+    <button class="period-btn active" data-period="7d">٧ أيام</button>
+    <button class="period-btn" data-period="30d">٣٠ يوم</button>
+    <button class="period-btn" data-period="90d">٩٠ يوم</button>
+  </div>
+
+  <div class="dev-toolbar" id="devToolbar" style="display:none;">
+    <label class="toggle">
+      <input type="checkbox" id="cacheToggle">
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+    <span id="cacheLabel">Cache: off</span>
+  </div>
+
+  <div id="content">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <div>جارٍ التحميل...</div>
+    </div>
+  </div>
+
+  <div class="footer" id="footer" style="display:none;"></div>
+
+  <script>
+    const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const WORKER_URL = isDev ? 'http://localhost:8787' : 'https://analytics-proxy.ebrahimalzaabi-seed.workers.dev';
+    const periodLabels = { today: 'اليوم', yesterday: 'أمس', '7d': 'آخر ٧ أيام', '30d': 'آخر ٣٠ يوم', '90d': 'آخر ٩٠ يوم' };
+    let currentPeriod = '7d';
+
+    let cacheEnabled = localStorage.getItem('analytics_cache') === 'true';
+
+    if (isDev) {
+      const toolbar = document.getElementById('devToolbar');
+      const toggle = document.getElementById('cacheToggle');
+      const label = document.getElementById('cacheLabel');
+      toolbar.style.display = 'flex';
+      toggle.checked = cacheEnabled;
+      label.textContent = 'Cache: ' + (cacheEnabled ? 'on' : 'off');
+      toggle.addEventListener('change', () => {
+        cacheEnabled = toggle.checked;
+        localStorage.setItem('analytics_cache', cacheEnabled);
+        label.textContent = 'Cache: ' + (cacheEnabled ? 'on' : 'off');
+        fetchData(currentPeriod);
+      });
+    }
+
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPeriod = btn.dataset.period;
+        fetchData(currentPeriod);
+      });
+    });
+
+    async function fetchData(period) {
+      const content = document.getElementById('content');
+      const footer = document.getElementById('footer');
+      content.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Loading analytics...</div></div>';
+      footer.style.display = 'none';
+
+      try {
+        const nocache = isDev && !cacheEnabled ? '&nocache=1' : '';
+        const res = await fetch(WORKER_URL + '/analytics?period=' + period + nocache);
+        if (!res.ok) throw new Error('API returned ' + res.status);
+        const data = await res.json();
+        render(data);
+      } catch (err) {
+        content.innerHTML = '<div class="error-msg">فشل تحميل الإحصائيات: ' + err.message + '</div>';
+      }
+    }
+
+    function render(data) {
+      const content = document.getElementById('content');
+      const footer = document.getElementById('footer');
+      const label = periodLabels[currentPeriod] || data.period;
+
+      let html = '<div class="cards">';
+      html += card('عدد الزوار', fmt(data.totals.users), label);
+      html += card('عدد الزيارات', fmt(data.totals.sessions), label);
+      html += card('الصفحات المزورة', fmt(data.totals.pageViews), label);
+      html += '</div>';
+
+      html += '<div class="lists">';
+      html += topPagesSection(data.topPages || []);
+      html += listSection('أكثر الدول زيارة', data.topCountries || [], 'users', 'زائر');
+      html += listSection('مصادر الزيارات', data.topReferrals || [], 'sessions', 'زيارة');
+      html += '</div>';
+
+      content.innerHTML = html;
+
+      const cached = data.cached ? ' (مخزّن)' : '';
+      const fetchTime = new Date(data.fetchTime).toLocaleString('ar-AE', {
+        month: 'short', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+      });
+      footer.textContent = 'آخر تحديث: ' + fetchTime + cached + ' \u00B7 البيانات مخزّنة لمدة ٢٤ ساعة';
+      footer.style.display = 'block';
+    }
+
+    function card(label, value, sub) {
+      return '<div class="card"><div class="card-label">' + label + '</div><div class="card-value">' + value + '</div><div class="card-sub">' + sub + '</div></div>';
+    }
+
+    function topPagesSection(items) {
+      let html = '<div class="list-section"><div class="list-title">أكثر الصفحات زيارة</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          const pageUrl = 'https://ebrahimalzaabi.com' + esc(item.path);
+          html += '<div class="list-row">';
+          html += '<span class="list-rank">' + (i + 1) + '.</span>';
+          html += '<span class="list-name"><a href="' + pageUrl + '" target="_blank">' + esc(item.name) + '</a></span>';
+          html += '<span class="list-value">' + fmt(item.pageViews) + ' مشاهدة</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function listSection(title, items, key, suffix) {
+      let html = '<div class="list-section"><div class="list-title">' + title + '</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          html += '<div class="list-row">';
+          html += '<span class="list-rank">' + (i + 1) + '.</span>';
+          html += '<span class="list-name">' + esc(item.name) + '</span>';
+          html += '<span class="list-value">' + fmt(item[key]) + ' ' + suffix + '</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function fmt(n) {
+      return (n || 0).toLocaleString('en-US');
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    fetchData(currentPeriod);
+  </script>
+
+</body>
+</html>

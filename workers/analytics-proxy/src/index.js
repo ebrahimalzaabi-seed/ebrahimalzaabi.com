@@ -23,54 +23,96 @@ async function handleAnalytics(url, ctx, env) {
     const { startDate, endDate, label } = parsePeriod(period);
 
     if (!startDate) {
-      return jsonResponse({ error: 'Invalid period. Use: today, yesterday, 7d, 30d, 90d, or start=YYYY-MM-DD&end=YYYY-MM-DD' }, 400);
+      return jsonResponse({ error: 'Invalid period. Use: today, yesterday, 7d, 30d, 90d' }, 400);
     }
 
-    const cacheKey = `ga4-${startDate}-${endDate}`;
-    const cache = caches.default;
-    const cacheUrl = new URL(url.toString());
-    cacheUrl.searchParams.set('_ck', cacheKey);
-    const cacheRequest = new Request(cacheUrl.toString());
+    const noCache = url.searchParams.get('nocache') === '1';
 
-    const cached = await cache.match(cacheRequest);
-    if (cached) {
-      const cachedData = await cached.json();
-      return jsonResponse({ ...cachedData, cached: true });
+    let cacheRequest;
+    if (!noCache) {
+      const cacheKey = `ga4-v3-${startDate}-${endDate}`;
+      const cacheUrl = new URL(url.toString());
+      cacheUrl.searchParams.set('_ck', cacheKey);
+      cacheRequest = new Request(cacheUrl.toString());
+
+      const cached = await caches.default.match(cacheRequest);
+      if (cached) {
+        const cachedData = await cached.json();
+        return jsonResponse({ ...cachedData, cached: true });
+      }
     }
 
     const accessToken = await getAccessToken(env);
     const apiUrl = `https://analyticsdata.googleapis.com/v1beta/properties/${env.GA4_PROPERTY_ID}:runReport`;
+    const headers = { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
+    const dateRanges = [{ startDate, endDate }];
 
-    const gaResponse = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        dateRanges: [{ startDate, endDate }],
-        dimensions: [{ name: 'date' }],
-        metrics: [
-          { name: 'activeUsers' },
-          { name: 'sessions' },
-          { name: 'screenPageViews' }
-        ],
-        orderBys: [{ dimension: { dimensionName: 'date' }, desc: false }]
+    const [totalsRes, pagesRes, countriesRes, referralsRes] = await Promise.all([
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          metrics: [
+            { name: 'activeUsers' },
+            { name: 'sessions' },
+            { name: 'screenPageViews' }
+          ]
+        })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'pageTitle' }, { name: 'pagePath' }],
+          metrics: [{ name: 'screenPageViews' }],
+          orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
+          limit: 5
+        })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'country' }],
+          metrics: [{ name: 'activeUsers' }],
+          orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
+          limit: 5
+        })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'sessionDefaultChannelGroup' }],
+          metrics: [{ name: 'sessions' }],
+          orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+          limit: 5
+        })
       })
-    });
+    ]);
 
-    if (!gaResponse.ok) {
-      const err = await gaResponse.text();
-      return jsonResponse({ error: 'GA4 API error', status: gaResponse.status, details: err }, gaResponse.status);
+    if (!totalsRes.ok) {
+      const err = await totalsRes.text();
+      return jsonResponse({ error: 'GA4 API error', status: totalsRes.status, details: err }, totalsRes.status);
     }
 
-    const data = await gaResponse.json();
-    const result = parseGA4Response(data, label, startDate, endDate);
+    const [totalsData, pagesData, countriesData, referralsData] = await Promise.all([
+      totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json()
+    ]);
 
-    const responseToCache = new Response(JSON.stringify(result), {
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${CACHE_TTL}` }
-    });
-    ctx.waitUntil(cache.put(cacheRequest, responseToCache.clone()));
+    const totals = parseTotals(totalsData);
+    const topPages = parseTopPages(pagesData);
+    const topCountries = parseTopDimension(countriesData, 'users');
+    const topReferrals = parseTopDimension(referralsData, 'sessions');
+
+    const result = { period: label, startDate, endDate, totals, topPages, topCountries, topReferrals, fetchTime: new Date().toISOString() };
+
+    if (!noCache) {
+      const responseToCache = new Response(JSON.stringify(result), {
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${CACHE_TTL}` }
+      });
+      ctx.waitUntil(caches.default.put(cacheRequest, responseToCache.clone()));
+    }
 
     return jsonResponse({ ...result, cached: false });
 
@@ -111,40 +153,33 @@ function parsePeriod(period) {
   }
 }
 
-function parseGA4Response(data, label, startDate, endDate) {
-  let totalUsers = 0;
-  let totalSessions = 0;
-  let totalPageViews = 0;
-  const daily = [];
-
-  if (data.rows) {
-    data.rows.forEach(row => {
-      const dateStr = row.dimensionValues[0].value;
-      const users = parseInt(row.metricValues[0].value || 0);
-      const sessions = parseInt(row.metricValues[1].value || 0);
-      const pageViews = parseInt(row.metricValues[2].value || 0);
-
-      totalUsers += users;
-      totalSessions += sessions;
-      totalPageViews += pageViews;
-
-      daily.push({
-        date: `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`,
-        users,
-        sessions,
-        pageViews
-      });
-    });
+function parseTotals(data) {
+  if (data.rows && data.rows.length > 0) {
+    const row = data.rows[0];
+    return {
+      users: parseInt(row.metricValues[0].value || 0),
+      sessions: parseInt(row.metricValues[1].value || 0),
+      pageViews: parseInt(row.metricValues[2].value || 0)
+    };
   }
+  return { users: 0, sessions: 0, pageViews: 0 };
+}
 
-  return {
-    period: label,
-    startDate,
-    endDate,
-    totals: { users: totalUsers, sessions: totalSessions, pageViews: totalPageViews },
-    daily,
-    fetchTime: new Date().toISOString()
-  };
+function parseTopPages(data) {
+  if (!data.rows) return [];
+  return data.rows.map(row => ({
+    name: row.dimensionValues[0].value || '(not set)',
+    path: row.dimensionValues[1].value || '/',
+    pageViews: parseInt(row.metricValues[0].value || 0)
+  }));
+}
+
+function parseTopDimension(data, metricLabel) {
+  if (!data.rows) return [];
+  return data.rows.map(row => ({
+    name: row.dimensionValues[0].value || '(not set)',
+    [metricLabel]: parseInt(row.metricValues[0].value || 0)
+  }));
 }
 
 // --- GA4 JWT Auth ---
