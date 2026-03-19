@@ -1,0 +1,9 @@
+name = "embeded-tweet"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "TWEET_CACHE"
+id = "8d0089feba3848548b989d46f04029b4"

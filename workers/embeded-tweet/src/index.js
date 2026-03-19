@@ -23,39 +23,48 @@ const USER_FEATURES = {
   responsive_web_graphql_timeline_navigation_enabled: true,
 };
 
+const CACHE_KEY = "latest_tweet";
+const CACHE_TTL = 3600; // 1 hour in seconds
+
 export default {
   async fetch(request, env, ctx) {
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: CORS_HEADERS });
     }
 
-    const cacheUrl = new URL(request.url);
-    cacheUrl.search = "";
-    const cacheKey = new Request(cacheUrl.toString());
-    const cache = caches.default;
+    const kv = env.TWEET_CACHE;
+    const cached = await kv.get(CACHE_KEY, { type: "json" });
 
-    const cached = await cache.match(cacheKey);
     if (cached) {
-      const body = await cached.json();
-      body.cached = true;
-      return new Response(JSON.stringify(body, null, 2), {
-        headers: cached.headers,
-      });
+      console.log("[CACHE HIT] Serving tweet from KV cache");
+      return new Response(
+        JSON.stringify(cached, null, 2),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=3600",
+            ...CORS_HEADERS,
+          },
+        }
+      );
     }
 
     try {
       const data = await fetchPinnedTweet();
-      data.cached = false;
-      const response = new Response(JSON.stringify(data, null, 2), {
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, s-maxage=3600",
-          ...CORS_HEADERS,
-        },
-      });
-      ctx.waitUntil(cache.put(cacheKey, response.clone()));
-      return response;
+      console.log("[CACHE MISS] Fetched fresh tweet from Twitter, storing in KV");
+      ctx.waitUntil(kv.put(CACHE_KEY, JSON.stringify(data), { expirationTtl: CACHE_TTL }));
+      return new Response(
+        JSON.stringify(data, null, 2),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=3600",
+            ...CORS_HEADERS,
+          },
+        }
+      );
     } catch (err) {
+      console.error("[ERROR] Tweet fetch failed:", err.message);
       return new Response(
         JSON.stringify({ error: err.message }),
         {

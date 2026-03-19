@@ -1,5 +1,5 @@
 <!-- Latest Tweet Widget -->
-{{ $tweetEndpoint := cond hugo.IsProduction "https://latest-tweet.ebrahimalzaabi-seed.workers.dev" "http://localhost:8787" }}
+{{ $tweetEndpoint := cond hugo.IsProduction "https://embeded-tweet.ebrahimalzaabi-seed.workers.dev" "http://localhost:8787" }}
 {{ $timestamp := now.Unix }}
 {{ $tweetEndpoint = printf "%s?t=%d" $tweetEndpoint $timestamp }}
 {{ $remote := "" }}
@@ -13,7 +13,7 @@
   {{ $profile := index $tweetData "profile" }}
   {{ with $tweetData }}
     {{ with .tweet }}
-      <section class="tweet-widget pa3 pa4-ns mt4" data-cached="{{ index $tweetData "cached" }}">
+      <section class="tweet-widget pa3 pa4-ns mt4">
         <div class="tc mb3">
           <!-- X (Twitter) icon -->
           <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">

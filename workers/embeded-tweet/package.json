@@ -1,5 +1,5 @@
 {
-  "name": "latest-tweet",
+  "name": "embeded-tweet",
   "version": "1.0.0",
   "description": "Scrapes the latest tweet from x.com/ebrahimuae1",
   "main": "src/index.js",
