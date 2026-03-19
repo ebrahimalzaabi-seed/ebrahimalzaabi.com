@@ -1,5 +1,5 @@
 ---
-title: "كتاب الغسل - فتح الباري"
+title: "كتاب الغسل"
 type: "page"
 layout: "audios"
 ---

@@ -1,5 +1,5 @@
 ---
-title: "كتاب الحيض - فتح الباري"
+title: "كتاب الحيض"
 type: "page"
 layout: "audios"
 ---

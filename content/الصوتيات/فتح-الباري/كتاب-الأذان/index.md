@@ -1,5 +1,5 @@
 ---
-title: "كتاب الأذان - فتح الباري"
+title: "كتاب الأذان"
 type: "page"
 layout: "audios"
 ---

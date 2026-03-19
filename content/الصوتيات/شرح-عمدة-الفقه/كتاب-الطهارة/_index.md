@@ -1,5 +1,5 @@
 ---
-title: "كتاب الطهارة - شرح عمدة الفقه"
+title: "كتاب الطهارة"
 type: "page"
 layout: "audios"
 ---

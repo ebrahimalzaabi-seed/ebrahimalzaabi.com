@@ -1,5 +1,5 @@
 ---
-title: "كتاب التيمم - فتح الباري"
+title: "كتاب التيمم"
 type: "page"
 layout: "audios"
 ---
