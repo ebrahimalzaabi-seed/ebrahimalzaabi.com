@@ -13,7 +13,7 @@ header.cover .pv6-l {
 /* Styles for audios page */
 .audios-page .audio-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
   gap: 2rem !important;
   margin-bottom: 3rem !important;
 }
@@ -60,15 +60,31 @@ header.cover .pv6-l {
   color: #2980b9 !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .audios-page .audio-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-    gap: 1rem !important;
+    display: block !important;
   }
   
+  .audio-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .audio-card {
+    min-width: unset !important;
+    flex: 1 1 0 !important;
+  }
+
   .audios-page .audio-card h3 {
-    font-size: 1rem !important;
-    height: 4em !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .audio-row {
+    flex-direction: column !important;
   }
 }
 
@@ -364,6 +380,30 @@ nav.breadcrumbs {
 
 .breadcrumb-current {
   color: #555;
+}
+
+/* Dark Mode support for breadcrumbs */
+@media (prefers-color-scheme: dark) {
+  nav.breadcrumbs {
+    background-color: #2a2a2a;
+    border-bottom-color: #444;
+    color: #aaa;
+  }
+  .breadcrumb-link {
+    color: #aaa;
+  }
+  .breadcrumb-link:hover {
+    color: #d4b06a;
+  }
+  .breadcrumb-home {
+    color: #C5A059;
+  }
+  .breadcrumb-sep {
+    color: #666;
+  }
+  .breadcrumb-current {
+    color: #ddd;
+  }
 }
 
 /* --- Latest Fatawa Section (Homepage) --- */
