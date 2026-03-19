@@ -47,7 +47,7 @@ async function handleAnalytics(url, ctx, env) {
     const headers = { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
     const dateRanges = [{ startDate, endDate }];
 
-    const [totalsRes, pagesRes, countriesRes, referralsRes] = await Promise.all([
+    const [totalsRes, pagesRes, countriesRes, referralsRes, referrersRes] = await Promise.all([
       fetch(apiUrl, {
         method: 'POST', headers,
         body: JSON.stringify({
@@ -88,6 +88,22 @@ async function handleAnalytics(url, ctx, env) {
           orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
           limit: 5
         })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'sessionSource' }],
+          metrics: [{ name: 'sessions' }],
+          dimensionFilter: {
+            filter: {
+              fieldName: 'sessionDefaultChannelGroup',
+              stringFilter: { value: 'Referral', matchType: 'EXACT' }
+            }
+          },
+          orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+          limit: 5
+        })
       })
     ]);
 
@@ -96,16 +112,17 @@ async function handleAnalytics(url, ctx, env) {
       return jsonResponse({ error: 'GA4 API error', status: totalsRes.status, details: err }, totalsRes.status);
     }
 
-    const [totalsData, pagesData, countriesData, referralsData] = await Promise.all([
-      totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json()
+    const [totalsData, pagesData, countriesData, referralsData, referrersData] = await Promise.all([
+      totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json(), referrersRes.json()
     ]);
 
     const totals = parseTotals(totalsData);
     const topPages = parseTopPages(pagesData);
     const topCountries = parseTopDimension(countriesData, 'users');
-    const topReferrals = parseTopDimension(referralsData, 'sessions');
+    const topReferrals = parseTopDimension(referralsData, 'sessions', true);
+    const topReferrers = parseTopDimension(referrersData, 'sessions');
 
-    const result = { period: label, startDate, endDate, totals, topPages, topCountries, topReferrals, fetchTime: new Date().toISOString() };
+    const result = { period: label, startDate, endDate, totals, topPages, topCountries, topReferrals, topReferrers, fetchTime: new Date().toISOString() };
 
     if (!noCache) {
       const responseToCache = new Response(JSON.stringify(result), {
@@ -174,12 +191,29 @@ function parseTopPages(data) {
   }));
 }
 
-function parseTopDimension(data, metricLabel) {
+const CHANNEL_AR = {
+  'Direct': 'مباشر',
+  'Organic Search': 'بحث عضوي',
+  'Referral': 'من مواقع أخرى',
+  'Organic Social': 'تواصل اجتماعي',
+  'Paid Search': 'بحث مدفوع',
+  'Paid Social': 'إعلان اجتماعي',
+  'Email': 'بريد إلكتروني',
+  'Display': 'إعلانات مرئية',
+  'Affiliates': 'شركاء',
+  'Unassigned': 'غير مصنّف',
+  '(not set)': 'غير محدد'
+};
+
+function parseTopDimension(data, metricLabel, localize) {
   if (!data.rows) return [];
-  return data.rows.map(row => ({
-    name: row.dimensionValues[0].value || '(not set)',
-    [metricLabel]: parseInt(row.metricValues[0].value || 0)
-  }));
+  return data.rows.map(row => {
+    const raw = row.dimensionValues[0].value || '(not set)';
+    return {
+      name: localize ? (CHANNEL_AR[raw] || raw) : raw,
+      [metricLabel]: parseInt(row.metricValues[0].value || 0)
+    };
+  });
 }
 
 // --- GA4 JWT Auth ---

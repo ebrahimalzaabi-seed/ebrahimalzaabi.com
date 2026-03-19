@@ -404,6 +404,7 @@
       html += topPagesSection(data.topPages || []);
       html += listSection('أكثر الدول زيارة', data.topCountries || [], 'users', 'زائر');
       html += listSection('مصادر الزيارات', data.topReferrals || [], 'sessions', 'زيارة');
+      html += listSection('الدخول من مواقع', data.topReferrers || [], 'sessions', 'زيارة');
       html += '</div>';
 
       content.innerHTML = html;
@@ -429,7 +430,7 @@
         items.forEach((item, i) => {
           const pageUrl = 'https://ebrahimalzaabi.com' + esc(item.path);
           html += '<div class="list-row">';
-          html += '<span class="list-rank">' + (i + 1) + '.</span>';
+          html += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
           html += '<span class="list-name"><a href="' + pageUrl + '" target="_blank">' + esc(item.name) + '</a></span>';
           html += '<span class="list-value">' + fmt(item.pageViews) + ' مشاهدة</span>';
           html += '</div>';
@@ -446,7 +447,7 @@
       } else {
         items.forEach((item, i) => {
           html += '<div class="list-row">';
-          html += '<span class="list-rank">' + (i + 1) + '.</span>';
+          html += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
           html += '<span class="list-name">' + esc(item.name) + '</span>';
           html += '<span class="list-value">' + fmt(item[key]) + ' ' + suffix + '</span>';
           html += '</div>';
@@ -457,7 +458,11 @@
     }
 
     function fmt(n) {
-      return (n || 0).toLocaleString('en-US');
+      return (n || 0).toLocaleString('ar-EG');
+    }
+
+    function arNum(n) {
+      return String(n).replace(/[0-9]/g, d => String.fromCharCode(0x0660 + +d));
     }
 
     function esc(s) {
