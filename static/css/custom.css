@@ -269,28 +269,39 @@ input#search::placeholder {
   }
 }
 
-/* Responsive: horizontal scroll on mobile */
-@media (max-width: 768px) {
-  .nav-bar {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
+/* Responsive: tighter spacing on tablets */
+@media (max-width: 900px) {
+  .nav-bar-item {
+    padding: 0.7rem 1rem;
+    min-width: 80px;
   }
-  .nav-bar::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
+  .nav-bar-icon {
+    font-size: 1.4rem;
+  }
+  .nav-bar-label {
+    font-size: 0.8rem;
+  }
+}
+
+/* Responsive: wrap last items to centered second row on small screens */
+@media (max-width: 620px) {
+  .nav-bar {
+    flex-wrap: wrap;
+    justify-content: center;
   }
   .nav-bar-item {
-    padding: 0.6rem 0.8rem;
-    min-width: 70px;
-    flex-shrink: 0;
+    padding: 0.5rem 0.7rem;
+    min-width: 65px;
+    border-left: none;
+  }
+  .nav-bar-item:first-child {
+    border-right: none;
   }
   .nav-bar-icon {
     font-size: 1.2rem;
   }
   .nav-bar-label {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
   }
 }
 
