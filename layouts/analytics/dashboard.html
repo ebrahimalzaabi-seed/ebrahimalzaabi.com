@@ -343,7 +343,7 @@
   <div class="period-selector">
     <button class="period-btn" data-period="today">اليوم</button>
     <button class="period-btn" data-period="yesterday">أمس</button>
-    <button class="period-btn active" data-period="7d">٧ أيام</button>
+    <button class="period-btn" data-period="7d">٧ أيام</button>
     <button class="period-btn" data-period="30d">٣٠ يوم</button>
     <button class="period-btn" data-period="90d">٩٠ يوم</button>
   </div>
@@ -370,7 +370,14 @@
     const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     const WORKER_URL = isDev ? 'http://localhost:8787' : 'https://analytics-proxy.ebrahimalzaabi-seed.workers.dev';
     const periodLabels = { today: 'اليوم', yesterday: 'أمس', '7d': 'آخر ٧ أيام', '30d': 'آخر ٣٠ يوم', '90d': 'آخر ٩٠ يوم' };
-    let currentPeriod = '7d';
+    const VALID_PERIODS = ['today', 'yesterday', '7d', '30d', '90d'];
+    const savedPeriod = localStorage.getItem('analytics_period');
+    let currentPeriod = VALID_PERIODS.includes(savedPeriod) ? savedPeriod : '7d';
+
+    // Set the correct button active on load
+    document.querySelectorAll('.period-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.period === currentPeriod);
+    });
 
     let cacheEnabled = localStorage.getItem('analytics_cache') === 'true';
 
@@ -394,6 +401,7 @@
         document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentPeriod = btn.dataset.period;
+        localStorage.setItem('analytics_period', currentPeriod);
         fetchData(currentPeriod);
       });
     });
