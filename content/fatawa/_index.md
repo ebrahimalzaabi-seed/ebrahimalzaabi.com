@@ -22,7 +22,10 @@ featured_image: "/images/hero.jpg"
 <script>
 if (window.location.hostname === 'localhost') {
   var devNote = document.createElement('div');
-  devNote.style.cssText = 'background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:6px;padding:10px 14px;margin-top:1em;max-width:400px;font-size:0.9em;direction:ltr;text-align:left;';
+  var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  devNote.style.cssText = isDark
+    ? 'background:#3a3000;color:#ffc107;border:1px solid #665500;border-radius:6px;padding:10px 14px;margin-top:1em;max-width:400px;font-size:0.9em;direction:ltr;text-align:left;'
+    : 'background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:6px;padding:10px 14px;margin-top:1em;max-width:400px;font-size:0.9em;direction:ltr;text-align:left;';
   devNote.textContent = 'Dev mode: notification emails will only be sent to the dev email (the primary email will not receive them).';
   document.getElementById('question-form').after(devNote);
 }

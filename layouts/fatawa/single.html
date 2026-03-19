@@ -202,6 +202,54 @@
     box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2);
 }
 
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .youtube-link {
+        background-color: #333 !important;
+        color: #e0e0e0 !important;
+        border-color: #555 !important;
+    }
+    .youtube-link:hover {
+        background-color: #FF0000 !important;
+        color: white !important;
+    }
+    .fatwa-meta {
+        color: #aaa;
+    }
+    .category {
+        background: linear-gradient(135deg, #3a3a3a 0%, #444 100%) !important;
+        border-color: #555 !important;
+        color: #e0e0e0 !important;
+    }
+    .category:hover {
+        background: linear-gradient(135deg, #555 0%, #4a4a4a 100%) !important;
+        color: #fff !important;
+    }
+    .fatwa-question {
+        background-color: #2a2a2a !important;
+    }
+    .fatwa-answer {
+        background-color: #2d2d2d !important;
+    }
+    .fatwa-question, .fatwa-answer {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    }
+    .question-header h2, .answer-header h2 {
+        color: #e0e0e0 !important;
+    }
+    .question-header, .answer-header {
+        border-bottom-color: #444 !important;
+    }
+    .question-content, .answer-content {
+        color: #ddd !important;
+    }
+    .answer-type-badge {
+        background: #333 !important;
+        border-color: #666 !important;
+        color: #e0e0e0 !important;
+    }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .fatwa-post {
