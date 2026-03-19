@@ -73,7 +73,7 @@ async function handleAnalytics(url, ctx, env) {
         method: 'POST', headers,
         body: JSON.stringify({
           dateRanges,
-          dimensions: [{ name: 'country' }],
+          dimensions: [{ name: 'countryId' }],
           metrics: [{ name: 'activeUsers' }],
           orderBys: [{ metric: { metricName: 'activeUsers' }, desc: true }],
           limit: 5
@@ -118,7 +118,7 @@ async function handleAnalytics(url, ctx, env) {
 
     const totals = parseTotals(totalsData);
     const topPages = parseTopPages(pagesData);
-    const topCountries = parseTopDimension(countriesData, 'users');
+    const topCountries = parseTopCountries(countriesData);
     const topReferrals = parseTopDimension(referralsData, 'sessions', true);
     const topReferrers = parseTopDimension(referrersData, 'sessions');
 
@@ -180,6 +180,18 @@ function parseTotals(data) {
     };
   }
   return { users: 0, sessions: 0, pageViews: 0 };
+}
+
+const countryNames = new Intl.DisplayNames(['ar'], { type: 'region' });
+
+function parseTopCountries(data) {
+  if (!data.rows) return [];
+  return data.rows.map(row => {
+    const code = row.dimensionValues[0].value || '';
+    let name;
+    try { name = countryNames.of(code); } catch { name = code; }
+    return { name: name || code, users: parseInt(row.metricValues[0].value || 0) };
+  });
 }
 
 function parseTopPages(data) {
