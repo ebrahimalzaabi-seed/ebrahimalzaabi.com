@@ -235,6 +235,12 @@ input#search::placeholder {
   border-right: 1px solid #f0f0f0;
 }
 
+.nav-bar-item.nav-bar-active {
+  border-bottom: 3px solid #C5A059;
+  color: #C5A059;
+  background: #fdf8f0;
+}
+
 .nav-bar-item:hover {
   background: #fdf8f0;
   color: #C5A059;
@@ -272,6 +278,11 @@ input#search::placeholder {
   }
   .nav-bar-item:first-child {
     border-right-color: #333;
+  }
+  .nav-bar-item.nav-bar-active {
+    border-bottom-color: #C5A059;
+    color: #d4b06a;
+    background: #2e2a1e;
   }
   .nav-bar-item:hover {
     background: #2e2a1e;
