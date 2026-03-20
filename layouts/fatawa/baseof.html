@@ -7,6 +7,19 @@
     <title>{{ block "title" . }}{{ with .Params.Title }}{{ . }} | {{ end }}{{ .Site.Title }}{{ end }}</title>
     <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{if .IsPage}}{{ .Summary }}{{ else }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ end }}{{ end }}">
     {{ hugo.Generator }}
+    {{ $production := hugo.IsProduction }}
+    {{ $public := not .Params.private }}
+    {{ if and $production $public }}
+      <meta name="robots" content="index, follow">
+    {{ else }}
+      <meta name="robots" content="noindex, nofollow">
+    {{ end }}
+
+    {{ if .Params.canonicalUrl }}
+      <link rel="canonical" href="{{ .Params.canonicalUrl }}">
+    {{ else }}
+      <link rel="canonical" href="{{ .Permalink }}">
+    {{ end }}
     
     {{ partial "site-style.html" . }}
     {{ partial "site-scripts.html" . }}
