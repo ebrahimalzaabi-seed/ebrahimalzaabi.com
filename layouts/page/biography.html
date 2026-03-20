@@ -17,6 +17,29 @@
 {{ end }}
 
 {{ define "main" }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "إبراهيم بن سيف بن إبراهيم الزعابي",
+  "alternateName": "الشيخ إبراهيم الزعابي",
+  "birthDate": "1972-06-01",
+  "nationality": {
+    "@type": "Country",
+    "name": "الإمارات العربية المتحدة"
+  },
+  "jobTitle": "عالم شرعي",
+  "url": "https://ebrahimalzaabi.com/",
+  "sameAs": [
+    "https://www.youtube.com/@ebaborea"
+  ],
+  "alumniOf": {
+    "@type": "CollegeOrUniversity",
+    "name": "جامعة أبوظبي"
+  },
+  "knowsAbout": ["الفقه الإسلامي", "أصول الفقه", "الحديث", "العقيدة", "النحو"]
+}
+</script>
   {{ $section := .Site.GetPage "section" .Section }}
   <article class="flex-l flex-wrap justify-between mw8 center ph3">
     <header class="mt4 w-100">
@@ -32,7 +55,7 @@
       {{- partials.IncludeCached "social/share.html" . . -}}
       {{ with .Params.author | default .Site.Params.author }}
       <p class="tracked">
-        {{- if compare.Eq .Language "de" "en" "es" "fr" "it" "no" "pt" -}}
+        {{- if compare.Eq $.Site.Language.Lang "de" "en" "es" "fr" "it" "no" "pt" -}}
           {{- lang.Translate "by" -}}
         {{ end -}} <strong>
         {{- if reflect.IsSlice . -}}
