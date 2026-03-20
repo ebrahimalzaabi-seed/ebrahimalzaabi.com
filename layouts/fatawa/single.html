@@ -12,6 +12,22 @@
 {{ end }}
 
 {{ define "main" }}
+{{ if and .Params.question .Params.answer }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{
+    "@type": "Question",
+    "name": {{ .Title | jsonify }},
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": {{ .Params.answer | plainify | jsonify }}
+    }
+  }]
+}
+</script>
+{{ end }}
 <article class="fatwa-post">
     <div class="fatwa-meta-container">
         <div class="fatwa-meta">

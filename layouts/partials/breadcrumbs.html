@@ -2,6 +2,64 @@
   Custom breadcrumb navigation using .Section (decoded) instead of .RelPermalink (URL-encoded)
   Shows: Home › Section › [Parent(s)] › Current Page
 */}}
+{{/* BreadcrumbList structured data */}}
+{{ if not .IsHome }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "الرئيسية",
+      "item": {{ .Site.BaseURL | jsonify }}
+    }
+    {{ if eq .Section "fatawa" }}
+      {{ if ne .Kind "section" }}
+    ,{
+      "@type": "ListItem",
+      "position": 2,
+      "name": "الفتاوى",
+      "item": {{ (printf "%sfatawa/" .Site.BaseURL) | jsonify }}
+    }
+    ,{
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ .Title | jsonify }}
+    }
+      {{ else }}
+    ,{
+      "@type": "ListItem",
+      "position": 2,
+      "name": "الفتاوى"
+    }
+      {{ end }}
+    {{ else if eq .Section "الصوتيات" }}
+    ,{
+      "@type": "ListItem",
+      "position": 2,
+      "name": "الصوتيات",
+      "item": {{ (printf "%s%s/" .Site.BaseURL ("الصوتيات" | urlize)) | jsonify }}
+    }
+      {{ if ne .Kind "section" }}
+    ,{
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ .Title | jsonify }}
+    }
+      {{ end }}
+    {{ else }}
+    ,{
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ .Title | jsonify }}
+    }
+    {{ end }}
+  ]
+}
+</script>
+{{ end }}
 <nav class="breadcrumbs arabic-text" aria-label="breadcrumb">
   {{/* Home link is always shown */}}
   <span class="breadcrumb-item">

@@ -30,9 +30,9 @@
         {{- end -}}
       </aside>
       {{- partials.IncludeCached "social/share.html" . . -}}
-      <h1 class="arabic-text f1 mt3 mb1">
+      <h2 class="arabic-text f1 mt3 mb1">
         {{- .Title -}}
-      </h1>
+      </h2>
       {{ with .Params.author | default .Site.Params.author }}
       <p class="tracked">
         {{- if compare.Eq .Language "de" "en" "es" "fr" "it" "no" "pt" -}}
