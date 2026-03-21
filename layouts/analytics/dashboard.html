@@ -225,6 +225,23 @@
       color: var(--text-dim);
     }
 
+    #channelDetail,
+    #deviceDetail {
+      display: flex;
+    }
+
+    #channelDetail > .list-section,
+    #deviceDetail > .list-section {
+      flex: 1;
+    }
+
+    #channelDetail > .list-section:has(> .list-empty:only-child),
+    #deviceDetail > .list-section:has(> .list-empty:only-child) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .list-row.clickable {
       cursor: pointer;
       transition: background 0.15s;
