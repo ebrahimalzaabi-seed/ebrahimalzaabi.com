@@ -1,4 +1,4 @@
-const CACHE_TTL = 86400;
+const CACHE_TTL = 10800;
 const TOKEN_URI = 'https://oauth2.googleapis.com/token';
 
 export default {
@@ -28,7 +28,7 @@ async function handleAnalytics(url, ctx, env) {
 
     const noCache = url.searchParams.get('nocache') === '1';
 
-    const cacheKey = `ga4-v4-${startDate}-${endDate}`;
+    const cacheKey = `ga4-v5-${startDate}-${endDate}`;
     const cacheUrl = new URL(url.toString());
     cacheUrl.searchParams.delete('nocache');
     cacheUrl.searchParams.set('_ck', cacheKey);
