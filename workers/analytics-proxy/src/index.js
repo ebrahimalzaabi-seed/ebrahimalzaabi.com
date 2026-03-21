@@ -28,7 +28,7 @@ async function handleAnalytics(url, ctx, env) {
 
     const noCache = url.searchParams.get('nocache') === '1';
 
-    const cacheKey = `ga4-v7-${startDate}-${endDate}`;
+    const cacheKey = `ga4-v8-${startDate}-${endDate}`;
     const cacheUrl = new URL(url.toString());
     cacheUrl.searchParams.delete('nocache');
     cacheUrl.searchParams.set('_ck', cacheKey);
@@ -47,7 +47,7 @@ async function handleAnalytics(url, ctx, env) {
     const headers = { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
     const dateRanges = [{ startDate, endDate }];
 
-    const [totalsRes, pagesRes, countriesRes, referralsRes, referrersRes, searchEnginesRes, devicesRes, osDesktopRes, osMobileRes, osTabletRes] = await Promise.all([
+    const [totalsRes, pagesRes, countriesRes, referralsRes, referrersRes, searchEnginesRes, devicesRes, osDesktopRes, osMobileRes, osTabletRes, newVsReturningRes] = await Promise.all([
       fetch(apiUrl, {
         method: 'POST', headers,
         body: JSON.stringify({
@@ -56,7 +56,7 @@ async function handleAnalytics(url, ctx, env) {
             { name: 'activeUsers' },
             { name: 'sessions' },
             { name: 'screenPageViews' },
-            { name: 'engagedSessions' }
+            { name: 'averageSessionDuration' }
           ]
         })
       }),
@@ -163,6 +163,14 @@ async function handleAnalytics(url, ctx, env) {
           orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
           limit: 5
         })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'newVsReturning' }],
+          metrics: [{ name: 'activeUsers' }]
+        })
       })
     ]);
 
@@ -171,8 +179,8 @@ async function handleAnalytics(url, ctx, env) {
       return jsonResponse({ error: 'GA4 API error', status: totalsRes.status, details: err }, totalsRes.status);
     }
 
-    const [totalsData, pagesData, countriesData, referralsData, referrersData, searchEnginesData, devicesData, osDesktopData, osMobileData, osTabletData] = await Promise.all([
-      totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json(), referrersRes.json(), searchEnginesRes.json(), devicesRes.json(), osDesktopRes.json(), osMobileRes.json(), osTabletRes.json()
+    const [totalsData, pagesData, countriesData, referralsData, referrersData, searchEnginesData, devicesData, osDesktopData, osMobileData, osTabletData, newVsReturningData] = await Promise.all([
+      totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json(), referrersRes.json(), searchEnginesRes.json(), devicesRes.json(), osDesktopRes.json(), osMobileRes.json(), osTabletRes.json(), newVsReturningRes.json()
     ]);
 
     const totals = parseTotals(totalsData);
@@ -188,7 +196,9 @@ async function handleAnalytics(url, ctx, env) {
       tablet: parseTopDimension(osTabletData, 'sessions')
     };
 
-    const result = { period: label, startDate, endDate, totals, topPages, topCountries, topReferrals, topReferrers, topSearchEngines, topDevices, osPerDevice, fetchTime: new Date().toISOString() };
+    const newVsReturning = parseNewVsReturning(newVsReturningData);
+
+    const result = { period: label, startDate, endDate, totals, newVsReturning, topPages, topCountries, topReferrals, topReferrers, topSearchEngines, topDevices, osPerDevice, fetchTime: new Date().toISOString() };
 
     const responseToCache = new Response(JSON.stringify(result), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${CACHE_TTL}` }
@@ -237,16 +247,26 @@ function parsePeriod(period) {
 function parseTotals(data) {
   if (data.rows && data.rows.length > 0) {
     const row = data.rows[0];
-    const sessions = parseInt(row.metricValues[1].value || 0);
-    const engagedSessions = parseInt(row.metricValues[3].value || 0);
     return {
       users: parseInt(row.metricValues[0].value || 0),
-      sessions,
+      sessions: parseInt(row.metricValues[1].value || 0),
       pageViews: parseInt(row.metricValues[2].value || 0),
-      engagementRate: sessions > 0 ? Math.round((engagedSessions / sessions) * 100) : 0
+      avgSessionDuration: Math.round(parseFloat(row.metricValues[3].value || 0))
     };
   }
-  return { users: 0, sessions: 0, pageViews: 0, engagementRate: 0 };
+  return { users: 0, sessions: 0, pageViews: 0, avgSessionDuration: 0 };
+}
+
+function parseNewVsReturning(data) {
+  const result = { new: 0, returning: 0 };
+  if (!data.rows) return result;
+  data.rows.forEach(row => {
+    const type = row.dimensionValues[0].value;
+    const users = parseInt(row.metricValues[0].value || 0);
+    if (type === 'new') result.new = users;
+    else if (type === 'returning') result.returning = users;
+  });
+  return result;
 }
 
 const countryNames = new Intl.DisplayNames(['ar'], { type: 'region' });

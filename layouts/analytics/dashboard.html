@@ -469,10 +469,11 @@
       const label = periodLabels[currentPeriod] || data.period;
 
       let html = '<div class="cards">';
-      html += card('عدد الزوار', fmt(data.totals.users), label);
+      const nvr = data.newVsReturning || { new: 0, returning: 0 };
+      html += card('عدد الزوار', fmt(data.totals.users), fmt(nvr.new) + ' جديد \u00B7 ' + fmt(nvr.returning) + ' عائد');
       html += card('عدد الزيارات', fmt(data.totals.sessions), label);
       html += card('الصفحات المشاهدة', fmt(data.totals.pageViews), label);
-      html += card('معدل التفاعل', fmt(data.totals.engagementRate) + '٪', label);
+      html += card('متوسط مدة الزيارة', fmtDuration(data.totals.avgSessionDuration), label);
       html += '</div>';
 
       html += '<div class="lists">';
@@ -657,6 +658,13 @@
 
     function fmt(n) {
       return (n || 0).toLocaleString('ar-EG');
+    }
+
+    function fmtDuration(seconds) {
+      const s = seconds || 0;
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return fmt(m) + ':' + String(sec).padStart(2, '0').replace(/[0-9]/g, d => String.fromCharCode(0x0660 + +d));
     }
 
     function arNum(n) {
