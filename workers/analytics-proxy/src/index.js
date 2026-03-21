@@ -28,7 +28,7 @@ async function handleAnalytics(url, ctx, env) {
 
     const noCache = url.searchParams.get('nocache') === '1';
 
-    const cacheKey = `ga4-v6-${startDate}-${endDate}`;
+    const cacheKey = `ga4-v7-${startDate}-${endDate}`;
     const cacheUrl = new URL(url.toString());
     cacheUrl.searchParams.delete('nocache');
     cacheUrl.searchParams.set('_ck', cacheKey);
@@ -55,7 +55,8 @@ async function handleAnalytics(url, ctx, env) {
           metrics: [
             { name: 'activeUsers' },
             { name: 'sessions' },
-            { name: 'screenPageViews' }
+            { name: 'screenPageViews' },
+            { name: 'engagedSessions' }
           ]
         })
       }),
@@ -236,13 +237,16 @@ function parsePeriod(period) {
 function parseTotals(data) {
   if (data.rows && data.rows.length > 0) {
     const row = data.rows[0];
+    const sessions = parseInt(row.metricValues[1].value || 0);
+    const engagedSessions = parseInt(row.metricValues[3].value || 0);
     return {
       users: parseInt(row.metricValues[0].value || 0),
-      sessions: parseInt(row.metricValues[1].value || 0),
-      pageViews: parseInt(row.metricValues[2].value || 0)
+      sessions,
+      pageViews: parseInt(row.metricValues[2].value || 0),
+      engagementRate: sessions > 0 ? Math.round((engagedSessions / sessions) * 100) : 0
     };
   }
-  return { users: 0, sessions: 0, pageViews: 0 };
+  return { users: 0, sessions: 0, pageViews: 0, engagementRate: 0 };
 }
 
 const countryNames = new Intl.DisplayNames(['ar'], { type: 'region' });

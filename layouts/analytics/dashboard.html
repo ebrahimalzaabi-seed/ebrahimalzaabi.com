@@ -91,7 +91,7 @@
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
       max-width: 800px;
       margin: 0 auto 2rem;
@@ -118,6 +118,7 @@
     .card:nth-child(1)::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
     .card:nth-child(2)::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
     .card:nth-child(3)::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .card:nth-child(4)::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
 
     .card-label {
       font-size: 0.8rem;
@@ -136,6 +137,7 @@
     .card:nth-child(1) .card-value { color: var(--accent-blue); }
     .card:nth-child(2) .card-value { color: var(--accent-purple); }
     .card:nth-child(3) .card-value { color: var(--accent-green); }
+    .card:nth-child(4) .card-value { color: #f59e0b; }
 
     .card-sub {
       font-size: 0.75rem;
@@ -351,7 +353,7 @@
       .header h1 { font-size: 1.25rem; }
       .period-selector { gap: 0.35rem; margin-bottom: 1.25rem; }
       .period-btn { padding: 0.4rem 0.75rem; font-size: 0.8rem; border-radius: 6px; }
-      .cards { grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
+      .cards { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
       .card { padding: 1rem; border-radius: 10px; }
       .card-value { font-size: 1.75rem; }
       .card-label { font-size: 0.75rem; }
@@ -470,6 +472,7 @@
       html += card('عدد الزوار', fmt(data.totals.users), label);
       html += card('عدد الزيارات', fmt(data.totals.sessions), label);
       html += card('الصفحات المشاهدة', fmt(data.totals.pageViews), label);
+      html += card('معدل التفاعل', fmt(data.totals.engagementRate) + '٪', label);
       html += '</div>';
 
       html += '<div class="lists">';
