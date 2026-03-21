@@ -459,7 +459,9 @@
       html += topPagesSection(data.topPages || []);
       html += countrySection(data.topCountries || []);
       html += trafficSourcesSection(data.topReferrals || []);
-      html += '<div id="channelDetail"></div>';
+      html += '<div id="channelDetail"><div class="list-section"><div class="list-empty">اضغط المصدر للعرض</div></div></div>';
+      html += devicesSection(data.topDevices || []);
+      html += '<div id="deviceDetail"><div class="list-section"><div class="list-empty">اضغط الجهاز للعرض</div></div></div>';
       html += '</div>';
 
       content.innerHTML = html;
@@ -468,13 +470,14 @@
         'من مواقع أخرى': data.topReferrers || [],
         'من محركات البحث': data.topSearchEngines || []
       };
+      window._osPerDevice = data.osPerDevice || {};
       document.querySelectorAll('.channel-link').forEach(el => {
         el.addEventListener('click', () => {
           const ch = el.dataset.channel;
           const panel = document.getElementById('channelDetail');
           const items = window._channelDetails[ch] || [];
           if (panel.dataset.active === ch) {
-            panel.innerHTML = ''; panel.dataset.active = '';
+            panel.innerHTML = '<div class="list-section"><div class="list-empty">اضغط المصدر للعرض</div></div>'; panel.dataset.active = '';
             document.querySelectorAll('.channel-link.active').forEach(e => e.classList.remove('active'));
             return;
           }
@@ -482,6 +485,33 @@
           el.classList.add('active');
           panel.dataset.active = ch;
           let h = '<div class="list-section"><div class="list-title">' + esc(ch) + '</div>';
+          if (items.length === 0) { h += '<div class="list-empty">لا توجد بيانات</div>'; }
+          else { items.forEach((item, i) => {
+            h += '<div class="list-row">';
+            h += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+            h += '<span class="list-name">' + esc(item.name) + '</span>';
+            h += '<span class="list-value">' + fmt(item.sessions) + ' زيارة</span>';
+            h += '</div>';
+          }); }
+          h += '</div>';
+          panel.innerHTML = h;
+        });
+      });
+
+      document.querySelectorAll('.device-link').forEach(el => {
+        el.addEventListener('click', () => {
+          const dev = el.dataset.device;
+          const panel = document.getElementById('deviceDetail');
+          const items = window._osPerDevice[dev] || [];
+          if (panel.dataset.active === dev) {
+            panel.innerHTML = '<div class="list-section"><div class="list-empty">اضغط الجهاز للعرض</div></div>'; panel.dataset.active = '';
+            document.querySelectorAll('.device-link.active').forEach(e => e.classList.remove('active'));
+            return;
+          }
+          document.querySelectorAll('.device-link.active').forEach(e => e.classList.remove('active'));
+          el.classList.add('active');
+          panel.dataset.active = dev;
+          let h = '<div class="list-section"><div class="list-title">أنظمة التشغيل' + '</div>';
           if (items.length === 0) { h += '<div class="list-empty">لا توجد بيانات</div>'; }
           else { items.forEach((item, i) => {
             h += '<div class="list-row">';
@@ -527,6 +557,26 @@
     }
 
     const EXPANDABLE_CHANNELS = ['من مواقع أخرى', 'من محركات البحث'];
+
+    const DEVICE_KEY_MAP = {'حاسوب': 'desktop', 'هاتف': 'mobile', 'جهاز لوحي': 'tablet'};
+
+    function devicesSection(items) {
+      let html = '<div class="list-section"><div class="list-title">الأجهزة</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          const key = DEVICE_KEY_MAP[item.name] || item.name;
+          html += '<div class="list-row clickable device-link" data-device="' + esc(key) + '">';
+          html += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+          html += '<span class="list-name">' + esc(item.name) + '</span>';
+          html += '<span class="list-value">' + fmt(item.sessions) + ' زيارة</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
 
     function trafficSourcesSection(items) {
       let html = '<div class="list-section"><div class="list-title">مصادر الزيارات</div>';
@@ -594,6 +644,7 @@
     }
 
     function esc(s) {
+      if (s === '(not set)') s = '\u063a\u064a\u0631 \u0645\u0635\u0646\u0641';
       const d = document.createElement('div');
       d.textContent = s;
       return d.innerHTML;

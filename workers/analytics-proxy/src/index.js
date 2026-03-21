@@ -47,7 +47,7 @@ async function handleAnalytics(url, ctx, env) {
     const headers = { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
     const dateRanges = [{ startDate, endDate }];
 
-    const [totalsRes, pagesRes, countriesRes, referralsRes, referrersRes, searchEnginesRes] = await Promise.all([
+    const [totalsRes, pagesRes, countriesRes, referralsRes, referrersRes, searchEnginesRes, devicesRes, osDesktopRes, osMobileRes, osTabletRes] = await Promise.all([
       fetch(apiUrl, {
         method: 'POST', headers,
         body: JSON.stringify({
@@ -120,6 +120,48 @@ async function handleAnalytics(url, ctx, env) {
           orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
           limit: 5
         })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'deviceCategory' }],
+          metrics: [{ name: 'sessions' }],
+          orderBys: [{ metric: { metricName: 'sessions' }, desc: true }]
+        })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'operatingSystem' }],
+          metrics: [{ name: 'sessions' }],
+          dimensionFilter: { filter: { fieldName: 'deviceCategory', stringFilter: { value: 'desktop', matchType: 'EXACT' } } },
+          orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+          limit: 5
+        })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'operatingSystem' }],
+          metrics: [{ name: 'sessions' }],
+          dimensionFilter: { filter: { fieldName: 'deviceCategory', stringFilter: { value: 'mobile', matchType: 'EXACT' } } },
+          orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+          limit: 5
+        })
+      }),
+      fetch(apiUrl, {
+        method: 'POST', headers,
+        body: JSON.stringify({
+          dateRanges,
+          dimensions: [{ name: 'operatingSystem' }],
+          metrics: [{ name: 'sessions' }],
+          dimensionFilter: { filter: { fieldName: 'deviceCategory', stringFilter: { value: 'tablet', matchType: 'EXACT' } } },
+          orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+          limit: 5
+        })
       })
     ]);
 
@@ -128,8 +170,8 @@ async function handleAnalytics(url, ctx, env) {
       return jsonResponse({ error: 'GA4 API error', status: totalsRes.status, details: err }, totalsRes.status);
     }
 
-    const [totalsData, pagesData, countriesData, referralsData, referrersData, searchEnginesData] = await Promise.all([
-      totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json(), referrersRes.json(), searchEnginesRes.json()
+    const [totalsData, pagesData, countriesData, referralsData, referrersData, searchEnginesData, devicesData, osDesktopData, osMobileData, osTabletData] = await Promise.all([
+      totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json(), referrersRes.json(), searchEnginesRes.json(), devicesRes.json(), osDesktopRes.json(), osMobileRes.json(), osTabletRes.json()
     ]);
 
     const totals = parseTotals(totalsData);
@@ -138,8 +180,14 @@ async function handleAnalytics(url, ctx, env) {
     const topReferrals = parseTopDimension(referralsData, 'sessions', true);
     const topReferrers = parseTopDimension(referrersData, 'sessions');
     const topSearchEngines = parseTopDimension(searchEnginesData, 'sessions');
+    const topDevices = parseTopDimension(devicesData, 'sessions', true);
+    const osPerDevice = {
+      desktop: parseTopDimension(osDesktopData, 'sessions'),
+      mobile: parseTopDimension(osMobileData, 'sessions'),
+      tablet: parseTopDimension(osTabletData, 'sessions')
+    };
 
-    const result = { period: label, startDate, endDate, totals, topPages, topCountries, topReferrals, topReferrers, topSearchEngines, fetchTime: new Date().toISOString() };
+    const result = { period: label, startDate, endDate, totals, topPages, topCountries, topReferrals, topReferrers, topSearchEngines, topDevices, osPerDevice, fetchTime: new Date().toISOString() };
 
     const responseToCache = new Response(JSON.stringify(result), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${CACHE_TTL}` }
@@ -229,7 +277,10 @@ const CHANNEL_AR = {
   'Display': 'إعلانات مرئية',
   'Affiliates': 'شركاء',
   'Unassigned': 'غير مصنّف',
-  '(not set)': 'غير محدد'
+  '(not set)': 'غير محدد',
+  'desktop': 'حاسوب',
+  'mobile': 'هاتف',
+  'tablet': 'جهاز لوحي'
 };
 
 function parseTopDimension(data, metricLabel, localize) {
