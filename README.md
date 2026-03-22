@@ -146,6 +146,18 @@ npx wrangler deploy   # deploy to Cloudflare
 - `NOTIFY_EMAIL_PRIMARY` — The sheikh's email that receives question notifications in production. Must match the value in `scripts/.env`.
 - `NOTIFY_EMAIL_DEV` — The developer email BCC on all notifications. Must match the value in `scripts/.env`.
 
+## Cloudflare Worker (`workers/embeded-tweet/`)
+
+Scrapes the latest pinned tweet from [@ebrahimuae1](https://x.com/ebrahimuae1) using Twitter's public guest token API and syndication CDN. Results are cached in KV for 1 hour.
+
+```bash
+cd workers/embeded-tweet
+npm install
+npx wrangler deploy   # deploy to Cloudflare
+```
+
+No secrets required — uses Twitter's public bearer token (hardcoded) and a KV namespace (`TWEET_CACHE`) for caching.
+
 ## Cloudflare Worker (`workers/analytics-proxy/`)
 
 Proxies the Google Analytics 4 Data API with 24-hour caching. Uses a GCP service account for JWT authentication.
