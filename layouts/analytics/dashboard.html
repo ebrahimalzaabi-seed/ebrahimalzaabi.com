@@ -91,7 +91,7 @@
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
       max-width: 800px;
       margin: 0 auto 2rem;
@@ -118,7 +118,6 @@
     .card:nth-child(1)::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
     .card:nth-child(2)::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
     .card:nth-child(3)::before { background: linear-gradient(90deg, #10b981, #34d399); }
-    .card:nth-child(4)::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
 
     .card-label {
       font-size: 0.8rem;
@@ -137,7 +136,6 @@
     .card:nth-child(1) .card-value { color: var(--accent-blue); }
     .card:nth-child(2) .card-value { color: var(--accent-purple); }
     .card:nth-child(3) .card-value { color: var(--accent-green); }
-    .card:nth-child(4) .card-value { color: #f59e0b; }
 
     .card-sub {
       font-size: 0.75rem;
@@ -471,9 +469,8 @@
       let html = '<div class="cards">';
       const nvr = data.newVsReturning || { new: 0, returning: 0 };
       html += card('عدد الزوار', fmt(data.totals.users), fmt(nvr.new) + ' جديد \u00B7 ' + fmt(nvr.returning) + ' عائد');
-      html += card('عدد الزيارات', fmt(data.totals.sessions), label);
+      html += card('عدد الزيارات', fmt(data.totals.sessions), fmtDuration(data.totals.avgSessionDuration) + ' متوسط مدة الزيارة');
       html += card('الصفحات المشاهدة', fmt(data.totals.pageViews), label);
-      html += card('متوسط مدة الزيارة', fmtDuration(data.totals.avgSessionDuration), label);
       html += '</div>';
 
       html += '<div class="lists">';
