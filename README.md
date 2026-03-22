@@ -9,17 +9,18 @@ graph TD
     Visitor((Website Visitor))
     Dev((Developer))
 
-    Visitor -->|browses| GHP[GitHub Pages<br/>Hugo SSG + Ananke theme<br/>ebrahimalzaabi.com]
-    GHP -->|submits question| CF[DNS + Cloudflare Worker<br/>send-question + KV store<br/>+ Turnstile CAPTCHA]
+    Visitor -->|browses| GHP[GitHub Pages<br/>Hugo SSG<br/>ebrahimalzaabi.com]
+    GHP -->|submits question| CF[DNS + Cloudflare Workers<br/>send-question+embeded-tweet+analytics proxy + KV store<br/>+ Turnstile CAPTCHA]
 
     GHP --- GA4[Google Analytics 4<br/>Website analytics]
     GHP --- Archive[Archive.org<br/>Legacy MP3s & PDFs]
     Dev -->|push to main| CICD[GitHub Actions CI/CD<br/>Hugo build → deploy]
+    Dev -->|manage content| Admin
     CICD -->|deploys| GHP
 
     CF -->|send acknowledgement of new question + notify sheikh| Resend[Resend Email API<br/>notifications.ebrahimalzaabi.com]
 
-    Admin[Admin Server - Node.js<br/>localhost:3111<br/>Create fatwa, notify, search] -->|fetches pending questions| CF
+    Admin[Admin Server - Node.js<br/>localhost:3111<br/>CRUD fatwa, notify, refresh search index] -->|fetches pending questions| CF
     Admin -->|notify user question has been answered| Resend
 
     style Dev fill:#e3fafc,stroke:#1e1e1e
