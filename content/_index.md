@@ -1,4 +1,4 @@
 ---
-title: "إبراهيم بن سيف الزعابي"
+title: "الرئيسية"
 featured_image: "images/hero.jpg"
 ---
