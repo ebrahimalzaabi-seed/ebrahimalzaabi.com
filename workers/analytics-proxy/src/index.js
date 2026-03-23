@@ -20,7 +20,7 @@ export default {
 async function handleAnalytics(url, ctx, env) {
   try {
     const period = url.searchParams.get('period') || '7d';
-    const { startDate, endDate, label } = parsePeriod(period);
+    const { startDate, endDate, prevStartDate, prevEndDate, label } = parsePeriod(period);
 
     if (!startDate) {
       return jsonResponse({ error: 'Invalid period. Use: today, yesterday, 7d, 30d, 90d' }, 400);
@@ -28,7 +28,7 @@ async function handleAnalytics(url, ctx, env) {
 
     const noCache = url.searchParams.get('nocache') === '1';
 
-    const cacheKey = `ga4-v8-${startDate}-${endDate}`;
+    const cacheKey = `ga4-v9-${startDate}-${endDate}`;
     const cacheUrl = new URL(url.toString());
     cacheUrl.searchParams.delete('nocache');
     cacheUrl.searchParams.set('_ck', cacheKey);
@@ -46,18 +46,20 @@ async function handleAnalytics(url, ctx, env) {
     const apiUrl = `https://analyticsdata.googleapis.com/v1beta/properties/${env.GA4_PROPERTY_ID}:runReport`;
     const headers = { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
     const dateRanges = [{ startDate, endDate }];
+    const comparisonDateRanges = [{ startDate, endDate }, { startDate: prevStartDate, endDate: prevEndDate }];
 
     const [totalsRes, pagesRes, countriesRes, referralsRes, referrersRes, searchEnginesRes, devicesRes, osDesktopRes, osMobileRes, osTabletRes, newVsReturningRes] = await Promise.all([
       fetch(apiUrl, {
         method: 'POST', headers,
         body: JSON.stringify({
-          dateRanges,
+          dateRanges: comparisonDateRanges,
           metrics: [
             { name: 'activeUsers' },
             { name: 'sessions' },
             { name: 'screenPageViews' },
             { name: 'averageSessionDuration' }
-          ]
+          ],
+          keepEmptyRows: true
         })
       }),
       fetch(apiUrl, {
@@ -183,7 +185,7 @@ async function handleAnalytics(url, ctx, env) {
       totalsRes.json(), pagesRes.json(), countriesRes.json(), referralsRes.json(), referrersRes.json(), searchEnginesRes.json(), devicesRes.json(), osDesktopRes.json(), osMobileRes.json(), osTabletRes.json(), newVsReturningRes.json()
     ]);
 
-    const totals = parseTotals(totalsData);
+    const { current: totals, previous: previousTotals } = parseTotalsWithComparison(totalsData);
     const topPages = parseTopPages(pagesData);
     const topCountries = parseTopCountries(countriesData);
     const topReferrals = parseTopDimension(referralsData, 'sessions', true);
@@ -198,7 +200,7 @@ async function handleAnalytics(url, ctx, env) {
 
     const newVsReturning = parseNewVsReturning(newVsReturningData);
 
-    const result = { period: label, startDate, endDate, totals, newVsReturning, topPages, topCountries, topReferrals, topReferrers, topSearchEngines, topDevices, osPerDevice, fetchTime: new Date().toISOString() };
+    const result = { period: label, startDate, endDate, totals, previousTotals, newVsReturning, topPages, topCountries, topReferrals, topReferrers, topSearchEngines, topDevices, osPerDevice, fetchTime: new Date().toISOString() };
 
     const responseToCache = new Response(JSON.stringify(result), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${CACHE_TTL}` }
@@ -216,45 +218,61 @@ function parsePeriod(period) {
   const today = new Date();
   const fmt = d => d.toISOString().split('T')[0];
 
+  function withPrev(startDate, endDate, label, days) {
+    const ps = new Date(startDate); ps.setDate(ps.getDate() - days);
+    const pe = new Date(startDate); pe.setDate(pe.getDate() - 1);
+    return { startDate: fmt(new Date(startDate)), endDate: fmt(new Date(endDate)), prevStartDate: fmt(ps), prevEndDate: fmt(pe), label };
+  }
+
   switch (period) {
     case 'today':
-      return { startDate: fmt(today), endDate: fmt(today), label: 'Today' };
+      return withPrev(today, today, 'Today', 1);
     case 'yesterday': {
       const d = new Date(today); d.setDate(d.getDate() - 1);
-      return { startDate: fmt(d), endDate: fmt(d), label: 'Yesterday' };
+      return withPrev(d, d, 'Yesterday', 1);
     }
     case '3d': {
       const d = new Date(today); d.setDate(d.getDate() - 2);
-      return { startDate: fmt(d), endDate: fmt(today), label: 'Last 3 days' };
+      return withPrev(d, today, 'Last 3 days', 3);
     }
     case '7d': {
       const d = new Date(today); d.setDate(d.getDate() - 6);
-      return { startDate: fmt(d), endDate: fmt(today), label: 'Last 7 days' };
+      return withPrev(d, today, 'Last 7 days', 7);
     }
     case '30d': {
       const d = new Date(today); d.setDate(d.getDate() - 29);
-      return { startDate: fmt(d), endDate: fmt(today), label: 'Last 30 days' };
+      return withPrev(d, today, 'Last 30 days', 30);
     }
     case '90d': {
       const d = new Date(today); d.setDate(d.getDate() - 89);
-      return { startDate: fmt(d), endDate: fmt(today), label: 'Last 90 days' };
+      return withPrev(d, today, 'Last 90 days', 90);
     }
     default:
-      return { startDate: null, endDate: null, label: null };
+      return { startDate: null, endDate: null, prevStartDate: null, prevEndDate: null, label: null };
   }
 }
 
-function parseTotals(data) {
-  if (data.rows && data.rows.length > 0) {
-    const row = data.rows[0];
-    return {
-      users: parseInt(row.metricValues[0].value || 0),
-      sessions: parseInt(row.metricValues[1].value || 0),
-      pageViews: parseInt(row.metricValues[2].value || 0),
-      avgSessionDuration: Math.round(parseFloat(row.metricValues[3].value || 0))
-    };
+function parseTotalsRow(row) {
+  return {
+    users: parseInt(row.metricValues[0].value || 0),
+    sessions: parseInt(row.metricValues[1].value || 0),
+    pageViews: parseInt(row.metricValues[2].value || 0),
+    avgSessionDuration: Math.round(parseFloat(row.metricValues[3].value || 0))
+  };
+}
+
+const EMPTY_TOTALS = { users: 0, sessions: 0, pageViews: 0, avgSessionDuration: 0 };
+
+function parseTotalsWithComparison(data) {
+  if (!data.rows || data.rows.length === 0) return { current: { ...EMPTY_TOTALS }, previous: { ...EMPTY_TOTALS } };
+  let current = { ...EMPTY_TOTALS };
+  let previous = { ...EMPTY_TOTALS };
+  for (const row of data.rows) {
+    const range = row.dimensionValues && row.dimensionValues[0] ? row.dimensionValues[0].value : 'date_range_0';
+    if (range === 'date_range_0') current = parseTotalsRow(row);
+    else if (range === 'date_range_1') previous = parseTotalsRow(row);
   }
-  return { users: 0, sessions: 0, pageViews: 0, avgSessionDuration: 0 };
+  return { current, previous };
 }
 
 function parseNewVsReturning(data) {
