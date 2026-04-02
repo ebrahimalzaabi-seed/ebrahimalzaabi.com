@@ -1,0 +1,153 @@
+{{ define "header" }}
+  <header class="cover bg-top" style="background-color: #333; border-top-left-radius: 12px; border-top-right-radius: 12px; overflow: hidden;">
+    <div class="bg-black-60">
+      {{ partial "site-navigation.html" . }}
+      <div class="tc-l pv4 pv6-l ph3 ph4-ns">
+        <h1 class="arabic-text f2 f-subheadline-l fw2 white-90 mb0 lh-title">
+          {{ .Title }}
+          
+        </h1>
+        {{ with .Params.description }}
+          <h2 class="fw1 f5 f3-l white-80 measure-wide-l center mt3">
+            {{ . }}
+          </h2>
+        {{ end }}
+      </div>
+    </div>
+  </header>
+{{ end }}
+
+{{ define "main" }}
+  <article class="flex-l flex-wrap justify-between mw8 ph3 arabic-text audios-page">
+    <header class="mt4 w-100">
+      <h1 class="arabic-text f1 mt3 mb1">
+        {{- .Title -}}
+      </h1>
+    </header>
+    
+    <div class="nested-copy-line-height lh-copy arabic-text f4 nested-links pr4-l w-100">
+      {{ .Content | safeHTML }}
+    </div>
+  </article>
+
+  <style>
+    .audios-page .audio-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+      gap: 2rem !important;
+      margin-bottom: 3rem !important;
+    }
+    
+    .audios-page .audio-card {
+      background: white !important;
+      border-radius: 10px !important;
+      padding: 1.5rem !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+      transition: transform 0.3s ease !important;
+      text-align: center !important;
+    }
+    
+    /* Category-specific gradients */
+    /* آداب طلب العلم - Reddish gradient */
+    h2:nth-of-type(1) + .audio-grid .audio-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fef5f5 50%, #fde8e8 100%) !important;
+    }
+    
+    /* أصول الفقه وقواعده - Green gradient */
+    h2:nth-of-type(2) + .audio-grid .audio-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f7fff7 50%, #edfced 100%) !important;
+    }
+    
+    /* الحديث وعلومه - Blue gradient */
+    h2:nth-of-type(3) + .audio-grid .audio-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f7f9ff 50%, #edf4ff 100%) !important;
+    }
+    
+    /* العقيدة - Orange gradient */
+    h2:nth-of-type(4) + .audio-grid .audio-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fff9f5 50%, #fff0e6 100%) !important;
+    }
+    
+    /* القرآن وعلومه - Pink gradient */
+    h2:nth-of-type(5) + .audio-grid .audio-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fff7f9 50%, #ffedf2 100%) !important;
+    }
+    
+    /* الفقه - Yellow gradient */
+    h2:nth-of-type(6) + .audio-grid .audio-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fffbf0 50%, #fff3e0 100%) !important;
+    }
+    
+    /* علوم اللغة - Red gradient */
+    h2:nth-of-type(7) + .audio-grid .audio-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fff5f5 50%, #fde8e8 100%) !important;
+    }
+    
+    .audios-page .audio-card:hover {
+      transform: translateY(-5px) !important;
+    }
+    
+    .audios-page .audio-card h3 {
+      margin-top: 0 !important;
+      margin-bottom: 1rem !important;
+      font-size: 1.25rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      height: 3em !important;
+    }
+    
+    .audios-page .card-content {
+      margin-top: 1rem !important;
+    }
+    
+    .audios-page .audio-link {
+      display: inline-block !important;
+      color: #3498db !important;
+      text-decoration: none !important;
+      font-weight: 500 !important;
+      padding: 0.5rem 1rem !important;
+      border-radius: 5px !important;
+      transition: background-color 0.3s ease !important;
+    }
+    
+    .audios-page .audio-link:hover {
+      background-color: #f8f9fa !important;
+      color: #2980b9 !important;
+    }
+    
+    @media (max-width: 768px) {
+      .audios-page .audio-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+        gap: 1rem !important;
+      }
+      
+      .audios-page .audio-card h3 {
+        font-size: 1rem !important;
+        height: 4em !important;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      /* Dark-mode overrides for audio cards */
+      .audios-page .audio-card {
+        background: #3a3a3a !important;
+        color: #e0e0e0 !important;
+      }
+
+      /* Override category gradients */
+      h2 + .audio-grid .audio-card {
+        background: #3a3a3a !important;
+      }
+
+      .audios-page .audio-link {
+        color: #87ceeb !important;
+      }
+
+      .audios-page .audio-link:hover {
+        background-color: #404040 !important;
+        color: #add8e6 !important;
+      }
+    }
+  </style>
+{{ end }}

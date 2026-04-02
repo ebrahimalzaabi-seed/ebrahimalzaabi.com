@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>الإحصائيات — {{ .Site.Title }}</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --bg-card: #1e293b;
+        --border: #334155;
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --text-dim: #475569;
+        --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .period-selector {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .period-btn {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .period-btn:hover {
+      border-color: var(--accent-blue);
+      color: var(--text);
+    }
+
+    .period-btn.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    .period-btn .edit-icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      vertical-align: -2px;
+      margin-right: 0.25rem;
+      opacity: 0.75;
+    }
+
+    .period-btn:hover .edit-icon { opacity: 1; }
+    .period-btn .edit-icon { cursor: pointer; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0;
+      height: 3px;
+    }
+
+    .card:nth-child(1)::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .card:nth-child(2)::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .card:nth-child(3)::before { background: linear-gradient(90deg, #10b981, #34d399); }
+
+    .card-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .card-value {
+      font-size: 2.25rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card:nth-child(1) .card-value { color: var(--accent-blue); }
+    .card:nth-child(2) .card-value { color: var(--accent-purple); }
+    .card:nth-child(3) .card-value { color: var(--accent-green); }
+
+    .card-delta {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 0.35rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .card-delta.up { color: #10b981; }
+    .card-delta.down { color: #ef4444; }
+    .card-delta.neutral { color: var(--text-dim); }
+
+    .card-sub {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.25rem;
+    }
+
+    .lists {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .list-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .list-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .list-row:last-child { border-bottom: none; }
+
+    .list-rank {
+      width: 24px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .list-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.85rem;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-left: 0.75rem;
+    }
+
+    .list-name a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .list-name a:hover {
+      color: var(--accent-blue);
+      text-decoration: underline;
+    }
+
+    .list-value {
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .list-empty {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    #channelDetail,
+    #deviceDetail {
+      display: flex;
+    }
+
+    #channelDetail > .list-section,
+    #deviceDetail > .list-section {
+      flex: 1;
+    }
+
+    #channelDetail > .list-section:has(> .list-empty:only-child),
+    #deviceDetail > .list-section:has(> .list-empty:only-child) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .list-row.clickable {
+      cursor: pointer;
+      transition: background 0.15s;
+      border-radius: 6px;
+      padding: 0.55rem 0.35rem;
+      margin: 0 -0.35rem;
+    }
+
+    .list-row.clickable:hover {
+      background: var(--border);
+    }
+
+    .list-row.clickable.active {
+      background: var(--accent-blue);
+    }
+
+    .list-row.clickable.active .list-name,
+    .list-row.clickable.active .list-rank,
+    .list-row.clickable.active .list-value {
+      color: #fff;
+    }
+
+    .list-row.clickable .list-name {
+      color: var(--accent-blue);
+    }
+
+
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+
+    .ai-btn-wrap {
+      position: absolute;
+      right: 0;
+      display: none;
+    }
+    .ai-btn-wrap.visible { display: flex; }
+
+    .ai-btn-group {
+      display: inline-flex;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-card);
+      box-shadow: var(--shadow);
+      overflow: visible;
+      position: relative;
+    }
+
+    .ai-btn-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.75rem 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-family: inherit;
+      transition: color 0.2s;
+    }
+    .ai-btn-main:hover { color: var(--ai-color, #10a37f); }
+    .ai-btn-main svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .ai-btn-divider {
+      width: 1px;
+      background: var(--border);
+      margin: 6px 0;
+    }
+
+    .ai-btn-toggle {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 0.55rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .ai-btn-toggle:hover { color: var(--text); }
+    .ai-btn-toggle svg { width: 12px; height: 12px; transition: transform 0.2s; }
+    .ai-btn-toggle.open svg { transform: rotate(180deg); }
+
+    .ai-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      min-width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-4px);
+      transition: all 0.15s ease;
+      z-index: 100;
+    }
+    .ai-dropdown.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .ai-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 0.85rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      width: 100%;
+      transition: background 0.15s, color 0.15s;
+    }
+    .ai-dropdown-item:first-child { border-radius: 10px 10px 0 0; }
+    .ai-dropdown-item:last-child { border-radius: 0 0 10px 10px; }
+    .ai-dropdown-item:hover { background: var(--bg); color: var(--text); }
+    .ai-dropdown-item.active { color: var(--text); font-weight: 600; }
+    .ai-dropdown-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 0.75rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      text-align: center;
+      padding: 2rem;
+      color: #ef4444;
+      font-size: 0.9rem;
+    }
+
+    .dev-toolbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .toggle input { display: none; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 10px;
+      transition: background 0.2s;
+    }
+
+    .toggle input:checked + .toggle-track { background: var(--accent-blue); }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      pointer-events: none;
+    }
+
+    .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
+
+    .custom-picker {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0 auto 2rem;
+      flex-wrap: wrap;
+      animation: fadeIn 0.2s ease;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      background: var(--bg-card);
+      width: fit-content;
+    }
+
+    .custom-picker.visible { display: flex; }
+
+    .custom-picker label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .custom-picker input[type="date"] {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .custom-picker input[type="date"]:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .custom-picker-btn {
+      padding: 0.4rem 1rem;
+      border: 1px solid var(--accent-blue);
+      border-radius: 8px;
+      background: var(--accent-blue);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-family: inherit;
+      transition: opacity 0.2s;
+    }
+
+    .custom-picker-btn:hover { opacity: 0.85; }
+
+    .custom-picker-dismiss {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      padding: 0;
+      margin-right: -0.25rem;
+    }
+
+    .custom-picker-dismiss:hover {
+      border-color: var(--text-dim);
+      color: var(--text);
+    }
+
+    .custom-picker-dismiss svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .chart-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      max-width: 800px;
+      margin: 0 auto 2rem;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .chart-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .chart-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .chart-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chart-svg-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .chart-svg-wrap svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .chart-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      color: var(--text);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+
+    .chart-tooltip.visible { opacity: 1; pointer-events: auto; }
+
+    .chart-tooltip-link {
+      display: block;
+      margin-top: 0.35rem;
+      padding-top: 0.35rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--accent-blue);
+      text-decoration: none;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .chart-tooltip-link:hover { text-decoration: underline; }
+
+    .chart-tooltip-date {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+
+    .chart-tooltip-row {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      line-height: 1.6;
+    }
+
+    .chart-axis-label {
+      font-size: 10px;
+      fill: var(--text-dim);
+    }
+
+    .chart-grid-line {
+      stroke: var(--border);
+      stroke-width: 0.5;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 0.75rem; }
+      .header { margin-bottom: 1.25rem; }
+      .header h1 { font-size: 1.25rem; }
+      .period-selector { gap: 0.35rem; margin-bottom: 1.25rem; }
+      .period-btn { padding: 0.4rem 0.75rem; font-size: 0.8rem; border-radius: 6px; }
+      .cards { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+      .card { padding: 1rem; border-radius: 10px; }
+      .card-value { font-size: 1.75rem; }
+      .card-label { font-size: 0.75rem; }
+      .lists { grid-template-columns: 1fr; gap: 0.75rem; }
+      .chart-section { padding: 1rem; border-radius: 10px; margin-bottom: 1.25rem; }
+      .chart-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .chart-legend { gap: 0.65rem; }
+      .list-section { padding: 1rem; border-radius: 10px; }
+      .list-name { font-size: 0.8rem; padding-left: 0.5rem; }
+      .list-value { font-size: 0.8rem; }
+      .footer { font-size: 0.7rem; margin-top: 1.25rem; }
+      .custom-picker { gap: 0.35rem; margin-bottom: 1.25rem; }
+      .custom-picker input[type="date"] { font-size: 0.8rem; padding: 0.35rem 0.5rem; }
+      .custom-picker-btn { font-size: 0.75rem; padding: 0.35rem 0.75rem; }
+    }
+
+    @media (max-width: 380px) {
+      .period-selector { gap: 0.25rem; }
+      .period-btn { padding: 0.35rem 0.5rem; font-size: 0.75rem; }
+      .card-value { font-size: 1.5rem; }
+      .list-rank { width: 20px; font-size: 0.7rem; }
+      .list-name { font-size: 0.75rem; padding-left: 0.35rem; }
+      .list-value { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="ai-btn-wrap" id="aiBtnWrap">
+      <div class="ai-btn-group">
+        <button class="ai-btn-main" id="aiMainBtn" title="تحليل البيانات بالذكاء الاصطناعي">
+          <svg class="ai-icon-chatgpt" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M37.532 16.87a9.963 9.963 0 0 0-.856-8.184 10.078 10.078 0 0 0-10.855-4.835A9.964 9.964 0 0 0 18.306.5a10.079 10.079 0 0 0-9.614 6.977 9.967 9.967 0 0 0-6.664 4.834 10.08 10.08 0 0 0 1.24 11.817 9.965 9.965 0 0 0 .856 8.185 10.079 10.079 0 0 0 10.855 4.835 9.965 9.965 0 0 0 7.516 3.35 10.078 10.078 0 0 0 9.617-6.981 9.967 9.967 0 0 0 6.663-4.834 10.079 10.079 0 0 0-1.243-11.813ZM22.498 37.886a7.474 7.474 0 0 1-4.799-1.735c.061-.033.168-.091.237-.134l7.964-4.6a1.294 1.294 0 0 0 .655-1.134V19.054l3.366 1.944a.12.12 0 0 1 .066.092v9.299a7.505 7.505 0 0 1-7.49 7.496ZM6.392 31.006a7.471 7.471 0 0 1-.894-5.023c.06.036.162.099.237.141l7.964 4.6a1.297 1.297 0 0 0 1.308 0l9.724-5.614v3.888a.12.12 0 0 1-.048.103l-8.051 4.649a7.504 7.504 0 0 1-10.24-2.744ZM4.297 13.62A7.469 7.469 0 0 1 8.2 10.333c0 .068-.004.19-.004.274v9.201a1.294 1.294 0 0 0 .654 1.132l9.723 5.614-3.366 1.944a.12.12 0 0 1-.114.012L7.04 23.856a7.504 7.504 0 0 1-2.744-10.237Zm27.658 6.437-9.724-5.615 3.367-1.943a.121.121 0 0 1 .113-.012l8.051 4.649a7.498 7.498 0 0 1-1.158 13.528v-9.476a1.293 1.293 0 0 0-.649-1.131Zm3.35-5.043c-.059-.037-.162-.099-.236-.141l-7.965-4.6a1.298 1.298 0 0 0-1.308 0l-9.723 5.614v-3.888a.12.12 0 0 1 .048-.103l8.05-4.645a7.497 7.497 0 0 1 11.135 7.763Zm-21.063 6.929-3.367-1.944a.12.12 0 0 1-.065-.092v-9.299a7.497 7.497 0 0 1 12.293-5.756 6.94 6.94 0 0 0-.236.134l-7.965 4.6a1.294 1.294 0 0 0-.654 1.132l-.006 11.225Zm1.829-3.943 4.33-2.501 4.332 2.5v5l-4.331 2.5-4.331-2.5V18Z" fill="currentColor"/></svg>
+          <svg class="ai-icon-claude" style="display:none" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212 2.736-.75.096-.324-.302.04-.496.154-.162 1.267-.871z"/></svg>
+          <svg class="ai-icon-grok" style="display:none" viewBox="60 70 400 370" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M213.235 306.019l178.976-180.002v.169l51.695-51.763c-.924 1.32-1.86 2.605-2.785 3.89-39.281 54.164-58.46 80.649-43.07 146.922l-.09-.101c10.61 45.11-.744 95.137-37.398 131.836-46.216 46.306-120.167 56.611-181.063 14.928l42.462-19.675c38.863 15.278 81.392 8.57 111.947-22.03 30.566-30.6 37.432-75.159 22.065-112.252-2.92-7.025-11.67-8.795-17.792-4.263l-124.947 92.341zm-25.786 22.437l-.033.034L68.094 435.217c7.565-10.429 16.957-20.294 26.327-30.149 26.428-27.803 52.653-55.359 36.654-94.302-21.422-52.112-8.952-113.177 30.724-152.898 41.243-41.254 101.98-51.661 152.706-30.758 11.23 4.172 21.016 10.114 28.638 15.639l-42.359 19.584c-39.44-16.563-84.629-5.299-112.207 22.313-37.298 37.308-44.84 102.003-1.128 143.81z"/></svg>
+          <svg class="ai-icon-perplexity" style="display:none" viewBox="113 87 290 340" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M348.851 128.063l-68.946 58.302h68.946v-58.302zm-83.908 48.709l100.931-85.349v94.942h32.244v143.421h-38.731v90.004l-94.442-86.662v83.946h-17.023v-83.906l-96.596 86.246v-89.628h-37.445V186.365h38.732V90.768l95.309 84.958v-83.16h17.023l-.002 84.206zm-29.209 26.616c-34.955.02-69.893 0-104.83 0v109.375h20.415v-27.121l84.415-82.254zm41.445 0l82.208 82.324v27.051h21.708V203.388c-34.617 0-69.274.02-103.916 0zm-42.874-17.023l-64.669-57.646v57.646h64.669zm13.617 124.076v-95.2l-79.573 77.516v88.731l79.573-71.047zm17.252-95.022v94.863l77.19 70.83c0-29.485-.012-58.943-.012-88.425l-77.178-77.268z"/></svg>
+          <span id="aiLabel">اشرح في ChatGPT</span>
+        </button>
+        <div class="ai-btn-divider"></div>
+        <button class="ai-btn-toggle" id="aiToggleBtn" title="اختر مزود الذكاء الاصطناعي">
+          <svg viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="ai-dropdown" id="aiDropdown">
+          <button class="ai-dropdown-item active" data-provider="chatgpt">
+            <svg viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M37.532 16.87a9.963 9.963 0 0 0-.856-8.184 10.078 10.078 0 0 0-10.855-4.835A9.964 9.964 0 0 0 18.306.5a10.079 10.079 0 0 0-9.614 6.977 9.967 9.967 0 0 0-6.664 4.834 10.08 10.08 0 0 0 1.24 11.817 9.965 9.965 0 0 0 .856 8.185 10.079 10.079 0 0 0 10.855 4.835 9.965 9.965 0 0 0 7.516 3.35 10.078 10.078 0 0 0 9.617-6.981 9.967 9.967 0 0 0 6.663-4.834 10.079 10.079 0 0 0-1.243-11.813ZM22.498 37.886a7.474 7.474 0 0 1-4.799-1.735c.061-.033.168-.091.237-.134l7.964-4.6a1.294 1.294 0 0 0 .655-1.134V19.054l3.366 1.944a.12.12 0 0 1 .066.092v9.299a7.505 7.505 0 0 1-7.49 7.496ZM6.392 31.006a7.471 7.471 0 0 1-.894-5.023c.06.036.162.099.237.141l7.964 4.6a1.297 1.297 0 0 0 1.308 0l9.724-5.614v3.888a.12.12 0 0 1-.048.103l-8.051 4.649a7.504 7.504 0 0 1-10.24-2.744ZM4.297 13.62A7.469 7.469 0 0 1 8.2 10.333c0 .068-.004.19-.004.274v9.201a1.294 1.294 0 0 0 .654 1.132l9.723 5.614-3.366 1.944a.12.12 0 0 1-.114.012L7.04 23.856a7.504 7.504 0 0 1-2.744-10.237Zm27.658 6.437-9.724-5.615 3.367-1.943a.121.121 0 0 1 .113-.012l8.051 4.649a7.498 7.498 0 0 1-1.158 13.528v-9.476a1.293 1.293 0 0 0-.649-1.131Zm3.35-5.043c-.059-.037-.162-.099-.236-.141l-7.965-4.6a1.298 1.298 0 0 0-1.308 0l-9.723 5.614v-3.888a.12.12 0 0 1 .048-.103l8.05-4.645a7.497 7.497 0 0 1 11.135 7.763Zm-21.063 6.929-3.367-1.944a.12.12 0 0 1-.065-.092v-9.299a7.497 7.497 0 0 1 12.293-5.756 6.94 6.94 0 0 0-.236.134l-7.965 4.6a1.294 1.294 0 0 0-.654 1.132l-.006 11.225Zm1.829-3.943 4.33-2.501 4.332 2.5v5l-4.331 2.5-4.331-2.5V18Z" fill="currentColor"/></svg>
+            ChatGPT
+          </button>
+          <button class="ai-dropdown-item" data-provider="perplexity">
+            <svg viewBox="113 87 290 340" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M348.851 128.063l-68.946 58.302h68.946v-58.302zm-83.908 48.709l100.931-85.349v94.942h32.244v143.421h-38.731v90.004l-94.442-86.662v83.946h-17.023v-83.906l-96.596 86.246v-89.628h-37.445V186.365h38.732V90.768l95.309 84.958v-83.16h17.023l-.002 84.206zm-29.209 26.616c-34.955.02-69.893 0-104.83 0v109.375h20.415v-27.121l84.415-82.254zm41.445 0l82.208 82.324v27.051h21.708V203.388c-34.617 0-69.274.02-103.916 0zm-42.874-17.023l-64.669-57.646v57.646h64.669zm13.617 124.076v-95.2l-79.573 77.516v88.731l79.573-71.047zm17.252-95.022v94.863l77.19 70.83c0-29.485-.012-58.943-.012-88.425l-77.178-77.268z"/></svg>
+            Perplexity
+          </button>
+          <button class="ai-dropdown-item" data-provider="grok">
+            <svg viewBox="60 70 400 370" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M213.235 306.019l178.976-180.002v.169l51.695-51.763c-.924 1.32-1.86 2.605-2.785 3.89-39.281 54.164-58.46 80.649-43.07 146.922l-.09-.101c10.61 45.11-.744 95.137-37.398 131.836-46.216 46.306-120.167 56.611-181.063 14.928l42.462-19.675c38.863 15.278 81.392 8.57 111.947-22.03 30.566-30.6 37.432-75.159 22.065-112.252-2.92-7.025-11.67-8.795-17.792-4.263l-124.947 92.341zm-25.786 22.437l-.033.034L68.094 435.217c7.565-10.429 16.957-20.294 26.327-30.149 26.428-27.803 52.653-55.359 36.654-94.302-21.422-52.112-8.952-113.177 30.724-152.898 41.243-41.254 101.98-51.661 152.706-30.758 11.23 4.172 21.016 10.114 28.638 15.639l-42.359 19.584c-39.44-16.563-84.629-5.299-112.207 22.313-37.298 37.308-44.84 102.003-1.128 143.81z"/></svg>
+            Grok
+          </button>
+          <button class="ai-dropdown-item" data-provider="claude">
+            <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212 2.736-.75.096-.324-.302.04-.496.154-.162 1.267-.871z"/></svg>
+            Claude
+          </button>
+        </div>
+      </div>
+    </div>
+    <h1>إحصائيات الموقع</h1>
+  </div>
+
+  <div class="period-selector">
+    <button class="period-btn" data-period="today">اليوم</button>
+    <button class="period-btn" data-period="yesterday">أمس</button>
+    <button class="period-btn" data-period="7d">٧ أيام</button>
+    <button class="period-btn" data-period="30d">٣٠ يوم</button>
+    <button class="period-btn" data-period="90d">٩٠ يوم</button>
+    <button class="period-btn" id="customBtn" data-period="custom">مخصص</button>
+  </div>
+
+  <div class="custom-picker" id="customPicker">
+    <label>من</label>
+    <input type="date" id="customStart">
+    <label>إلى</label>
+    <input type="date" id="customEnd">
+    <button class="custom-picker-btn" id="customGo">عرض</button>
+    <button class="custom-picker-dismiss" id="customDismiss" title="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+  </div>
+
+  <div class="dev-toolbar" id="devToolbar" style="display:none;">
+    <label class="toggle">
+      <input type="checkbox" id="cacheToggle">
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+    <span id="cacheLabel">Cache: off</span>
+  </div>
+
+  <div id="content">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <div>جارٍ التحميل...</div>
+    </div>
+  </div>
+
+  <div class="footer" id="footer" style="display:none;"></div>
+
+  <script>
+    let lastData = null;
+    const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const WORKER_URL = isDev ? 'http://localhost:8787' : 'https://analytics-proxy.ebrahimalzaabi-seed.workers.dev';
+    const periodLabels = { today: 'اليوم', yesterday: 'أمس', '7d': 'آخر ٧ أيام', '30d': 'آخر ٣٠ يوم', '90d': 'آخر ٩٠ يوم', custom: 'مخصص' };
+    const VALID_PERIODS = ['today', 'yesterday', '7d', '30d', '90d', 'custom'];
+    const savedPeriod = localStorage.getItem('analytics_period');
+    let currentPeriod = VALID_PERIODS.includes(savedPeriod) ? savedPeriod : '7d';
+    let customStart = localStorage.getItem('analytics_custom_start') || '';
+    let customEnd = localStorage.getItem('analytics_custom_end') || '';
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const customStartEl = document.getElementById('customStart');
+    const customEndEl = document.getElementById('customEnd');
+    const customPicker = document.getElementById('customPicker');
+    const customGoBtn = document.getElementById('customGo');
+    const customBtn = document.getElementById('customBtn');
+    const CUSTOM_DEFAULT_LABEL = '\u0645\u062e\u0635\u0635';
+    const EDIT_ICON = '<svg class="edit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>';
+    customStartEl.max = todayStr;
+    customEndEl.max = todayStr;
+
+    function customBtnLabel(s, e) {
+      var fmtD = function(ds) { return new Date(ds + 'T00:00:00').toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' }); };
+      var text = (s === e) ? fmtD(s) : fmtD(s) + ' - ' + fmtD(e);
+      return '<span class="custom-btn-text">' + text + '</span> ' + EDIT_ICON;
+    }
+
+    if (customStart && customEnd) {
+      customStartEl.value = customStart;
+      customEndEl.value = customEnd;
+      customBtn.innerHTML = customBtnLabel(customStart, customEnd);
+    }
+    if (currentPeriod === 'custom' && (!customStart || !customEnd)) {
+      currentPeriod = '7d';
+    }
+
+    // Set the correct button active on load
+    document.querySelectorAll('.period-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.period === currentPeriod);
+    });
+
+    let cacheEnabled = localStorage.getItem('analytics_cache') === 'true';
+
+    if (isDev) {
+      const toolbar = document.getElementById('devToolbar');
+      const toggle = document.getElementById('cacheToggle');
+      const label = document.getElementById('cacheLabel');
+      toolbar.style.display = 'flex';
+      toggle.checked = cacheEnabled;
+      label.textContent = 'Cache: ' + (cacheEnabled ? 'on' : 'off');
+      toggle.addEventListener('change', () => {
+        cacheEnabled = toggle.checked;
+        localStorage.setItem('analytics_cache', cacheEnabled);
+        label.textContent = 'Cache: ' + (cacheEnabled ? 'on' : 'off');
+        fetchData(currentPeriod);
+      });
+    }
+
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPeriod = btn.dataset.period;
+        localStorage.setItem('analytics_period', currentPeriod);
+
+        if (currentPeriod === 'custom') {
+          if (customStart && customEnd) {
+            customPicker.classList.remove('visible');
+            fetchData('custom');
+          } else {
+            customPicker.classList.add('visible');
+            if (!customStartEl.value) {
+              const d = new Date(); d.setDate(d.getDate() - 6);
+              customStartEl.value = d.toISOString().split('T')[0];
+              customEndEl.value = todayStr;
+            }
+          }
+          return;
+        }
+        customPicker.classList.remove('visible');
+        fetchData(currentPeriod);
+      });
+    });
+
+    document.getElementById('customDismiss').addEventListener('click', () => {
+      customPicker.classList.remove('visible');
+    });
+
+    customBtn.addEventListener('click', (e) => {
+      const icon = e.target.closest('.edit-icon');
+      if (icon) {
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        customPicker.classList.toggle('visible');
+        return;
+      }
+    }, true);
+
+    customGoBtn.addEventListener('click', () => {
+      const s = customStartEl.value;
+      const e = customEndEl.value;
+      if (!s || !e) return;
+      if (s > e) { customEndEl.value = s; }
+      customStart = customStartEl.value;
+      customEnd = customEndEl.value;
+      localStorage.setItem('analytics_custom_start', customStart);
+      localStorage.setItem('analytics_custom_end', customEnd);
+      customPicker.classList.remove('visible');
+      customBtn.innerHTML = customBtnLabel(customStart, customEnd);
+      fetchData('custom');
+    });
+
+    async function fetchData(period) {
+      const content = document.getElementById('content');
+      const footer = document.getElementById('footer');
+      content.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>جاري التحميل...</div></div>';
+      footer.style.display = 'none';
+
+      try {
+        const nocache = isDev && !cacheEnabled ? '&nocache=1' : '';
+        let url = WORKER_URL + '/analytics?period=' + period + nocache;
+        if (period === 'custom') {
+          url += '&start=' + encodeURIComponent(customStart) + '&end=' + encodeURIComponent(customEnd);
+        }
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('API returned ' + res.status);
+        const data = await res.json();
+        lastData = data;
+        render(data);
+      } catch (err) {
+        content.innerHTML = '<div class="error-msg">فشل تحميل الإحصائيات: ' + err.message + '</div>';
+      }
+    }
+
+    function render(data) {
+      const content = document.getElementById('content');
+      const footer = document.getElementById('footer');
+      let label = periodLabels[currentPeriod] || data.period;
+      if (currentPeriod === 'custom' && data.startDate && data.endDate) {
+        const fmtDate = (ds) => new Date(ds + 'T00:00:00').toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', year: 'numeric' });
+        label = fmtDate(data.startDate) + ' - ' + fmtDate(data.endDate);
+      }
+
+      let html = '<div class="cards">';
+      const nvr = data.newVsReturning || { new: 0, returning: 0 };
+      const prev = data.previousTotals || { users: 0, sessions: 0, pageViews: 0 };
+      html += card('عدد الزوار', fmt(data.totals.users), delta(data.totals.users, prev.users), fmt(nvr.new) + ' جديد \u00B7 ' + fmt(nvr.returning) + ' عائد');
+      html += card('عدد الزيارات', fmt(data.totals.sessions), delta(data.totals.sessions, prev.sessions), fmtDuration(data.totals.avgSessionDuration) + ' متوسط مدة الزيارة');
+      const ppu = data.totals.users > 0 ? Math.round(data.totals.pageViews / data.totals.users) : 0;
+      html += card('\u0627\u0644\u0635\u0641\u062d\u0627\u062a \u0627\u0644\u0645\u0634\u0627\u0647\u062f\u0629', fmt(data.totals.pageViews), delta(data.totals.pageViews, prev.pageViews), fmt(ppu) + ' \u0635\u0641\u062d\u0629 / \u0632\u0627\u0626\u0631');
+      html += '</div>';
+
+      const dailyBreakdown = data.dailyBreakdown || [];
+      if (dailyBreakdown.length >= 2) {
+        html += '<div class="chart-section">';
+        html += '<div class="chart-header">';
+        html += '<div class="chart-title">النشاط عبر الوقت</div>';
+        html += '<div class="chart-legend">';
+        html += '<div class="chart-legend-item"><div class="chart-legend-dot" style="background:#3b82f6"></div><span>الزوار</span></div>';
+        html += '<div class="chart-legend-item"><div class="chart-legend-dot" style="background:#8b5cf6"></div><span>الزيارات</span></div>';
+        html += '<div class="chart-legend-item"><div class="chart-legend-dot" style="background:#10b981"></div><span>المشاهدات</span></div>';
+        html += '</div></div>';
+        html += '<div class="chart-svg-wrap" id="chartWrap"></div>';
+        html += '</div>';
+      }
+
+      html += '<div class="lists">';
+      html += topPagesSection(data.topPages || []);
+      html += countrySection(data.topCountries || []);
+      html += trafficSourcesSection(data.topReferrals || []);
+      html += '<div id="channelDetail"><div class="list-section"><div class="list-empty">اضغط المصدر للعرض</div></div></div>';
+      html += devicesSection(data.topDevices || []);
+      html += '<div id="deviceDetail"><div class="list-section"><div class="list-empty">اضغط الجهاز للعرض</div></div></div>';
+      html += '</div>';
+
+      content.innerHTML = html;
+
+      if (dailyBreakdown.length >= 2) {
+        renderChart(dailyBreakdown);
+      }
+
+      window._channelDetails = {
+        'من مواقع أخرى': data.topReferrers || [],
+        'من محركات البحث': data.topSearchEngines || [],
+        'فيديو مجاني': data.topVideoSources || []
+      };
+      window._osPerDevice = data.osPerDevice || {};
+      document.querySelectorAll('.channel-link').forEach(el => {
+        el.addEventListener('click', () => {
+          const ch = el.dataset.channel;
+          const panel = document.getElementById('channelDetail');
+          const items = window._channelDetails[ch] || [];
+          if (panel.dataset.active === ch) {
+            panel.innerHTML = '<div class="list-section"><div class="list-empty">اضغط المصدر للعرض</div></div>'; panel.dataset.active = '';
+            document.querySelectorAll('.channel-link.active').forEach(e => e.classList.remove('active'));
+            return;
+          }
+          document.querySelectorAll('.channel-link.active').forEach(e => e.classList.remove('active'));
+          el.classList.add('active');
+          panel.dataset.active = ch;
+          let h = '<div class="list-section"><div class="list-title">' + esc(ch) + '</div>';
+          if (items.length === 0) { h += '<div class="list-empty">لا توجد بيانات</div>'; }
+          else { items.forEach((item, i) => {
+            h += '<div class="list-row">';
+            h += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+            h += '<span class="list-name">' + esc(item.name) + '</span>';
+            h += '<span class="list-value">' + fmt(item.sessions) + ' زيارة</span>';
+            h += '</div>';
+          }); }
+          h += '</div>';
+          panel.innerHTML = h;
+        });
+      });
+
+      document.querySelectorAll('.device-link').forEach(el => {
+        el.addEventListener('click', () => {
+          const dev = el.dataset.device;
+          const panel = document.getElementById('deviceDetail');
+          const items = window._osPerDevice[dev] || [];
+          if (panel.dataset.active === dev) {
+            panel.innerHTML = '<div class="list-section"><div class="list-empty">اضغط الجهاز للعرض</div></div>'; panel.dataset.active = '';
+            document.querySelectorAll('.device-link.active').forEach(e => e.classList.remove('active'));
+            return;
+          }
+          document.querySelectorAll('.device-link.active').forEach(e => e.classList.remove('active'));
+          el.classList.add('active');
+          panel.dataset.active = dev;
+          let h = '<div class="list-section"><div class="list-title">أنظمة التشغيل' + '</div>';
+          if (items.length === 0) { h += '<div class="list-empty">لا توجد بيانات</div>'; }
+          else { items.forEach((item, i) => {
+            h += '<div class="list-row">';
+            h += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+            h += '<span class="list-name">' + esc(item.name) + '</span>';
+            h += '<span class="list-value">' + fmt(item.sessions) + ' زيارة</span>';
+            h += '</div>';
+          }); }
+          h += '</div>';
+          panel.innerHTML = h;
+        });
+      });
+
+      const cached = data.cached ? ' (مخزّن)' : '';
+      const fetchTime = new Date(data.fetchTime).toLocaleString('ar-AE', {
+        month: 'short', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+      });
+      footer.textContent = '\u0622\u062e\u0631 \u062a\u062d\u062f\u064a\u062b: ' + fetchTime + cached + ' \u00B7 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a \u0645\u062e\u0632\u0651\u0646\u0629 \u0644\u0645\u062f\u0629 \u0663 \u0633\u0627\u0639\u0627\u062a';
+      footer.style.display = 'block';
+      document.getElementById('aiBtnWrap').classList.add('visible');
+    }
+
+    function card(label, value, deltaHtml, sub) {
+      return '<div class="card"><div class="card-label">' + label + '</div><div class="card-value">' + value + '</div>' + deltaHtml + '<div class="card-sub">' + sub + '</div></div>';
+    }
+
+    function delta(current, previous) {
+      if (!previous || previous === 0) {
+        if (current > 0) return '<div class="card-delta neutral">--</div>';
+        return '<div class="card-delta neutral">--</div>';
+      }
+      const pct = Math.round(((current - previous) / previous) * 100);
+      if (pct === 0) return '<div class="card-delta neutral">--</div>';
+      const arrow = pct > 0 ? '\u25B2' : '\u25BC';
+      const cls = pct > 0 ? 'up' : 'down';
+      return '<div class="card-delta ' + cls + '">' + arrow + ' ' + fmt(Math.abs(pct)) + '\u066A</div>';
+    }
+
+    function topPagesSection(items) {
+      let html = '<div class="list-section"><div class="list-title">أكثر الصفحات زيارة</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          const pageUrl = 'https://ebrahimalzaabi.com' + esc(item.path);
+          html += '<div class="list-row">';
+          html += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+          html += '<span class="list-name"><a href="' + pageUrl + '" target="_blank">' + esc(item.name) + '</a></span>';
+          html += '<span class="list-value">' + fmt(item.pageViews) + ' مشاهدة</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+
+    const EXPANDABLE_CHANNELS = ['من مواقع أخرى', 'من محركات البحث', 'فيديو مجاني'];
+
+    const DEVICE_KEY_MAP = {'حاسوب': 'desktop', 'هاتف': 'mobile', 'جهاز لوحي': 'tablet'};
+
+    function devicesSection(items) {
+      let html = '<div class="list-section"><div class="list-title">الأجهزة</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          const key = DEVICE_KEY_MAP[item.name] || item.name;
+          html += '<div class="list-row clickable device-link" data-device="' + esc(key) + '">';
+          html += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+          html += '<span class="list-name">' + esc(item.name) + '</span>';
+          html += '<span class="list-value">' + fmt(item.sessions) + ' زيارة</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function trafficSourcesSection(items) {
+      let html = '<div class="list-section"><div class="list-title">مصادر الزيارات</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          const expandable = EXPANDABLE_CHANNELS.includes(item.name);
+          html += '<div class="list-row' + (expandable ? ' clickable channel-link" data-channel="' + esc(item.name) : '') + '">';
+          html += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+          html += '<span class="list-name">' + esc(item.name) + '</span>';
+          html += '<span class="list-value">' + fmt(item.sessions) + ' زيارة</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function countrySection(items) {
+      let html = '<div class="list-section"><div class="list-title">أكثر الدول زيارة</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          html += '<div class="list-row">';
+          html += '<span class="list-rank">' + countryFlag(item.code) + '</span>';
+          html += '<span class="list-name">' + esc(item.name) + '</span>';
+          html += '<span class="list-value">' + fmt(item.users) + ' زائر</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function countryFlag(code) {
+      if (!code || code.length !== 2) return '';
+      return [...code.toUpperCase()].map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join('');
+    }
+
+    function listSection(title, items, key, suffix) {
+      let html = '<div class="list-section"><div class="list-title">' + title + '</div>';
+      if (items.length === 0) {
+        html += '<div class="list-empty">لا توجد بيانات</div>';
+      } else {
+        items.forEach((item, i) => {
+          html += '<div class="list-row">';
+          html += '<span class="list-rank">' + arNum(i + 1) + '.</span>';
+          html += '<span class="list-name">' + esc(item.name) + '</span>';
+          html += '<span class="list-value">' + fmt(item[key]) + ' ' + suffix + '</span>';
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function fmt(n) {
+      return (n || 0).toLocaleString('ar-EG');
+    }
+
+    function fmtDuration(seconds) {
+      const s = seconds || 0;
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return fmt(m) + ':' + String(sec).padStart(2, '0').replace(/[0-9]/g, d => String.fromCharCode(0x0660 + +d));
+    }
+
+    function arNum(n) {
+      return String(n).replace(/[0-9]/g, d => String.fromCharCode(0x0660 + +d));
+    }
+
+    function esc(s) {
+      if (s === '(not set)') s = '\u063a\u064a\u0631 \u0645\u0635\u0646\u0641';
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function renderChart(dailyData) {
+      const wrap = document.getElementById('chartWrap');
+      if (!wrap || dailyData.length < 2) return;
+
+      const W = 760, H = 220;
+      const pad = { top: 16, right: 16, bottom: 32, left: 44 };
+      const cw = W - pad.left - pad.right;
+      const ch = H - pad.top - pad.bottom;
+
+      const allVals = dailyData.flatMap(d => [d.users, d.sessions, d.pageViews]);
+      const maxVal = Math.max(...allVals, 1);
+      const niceMax = ceilNice(maxVal);
+
+      const xStep = cw / (dailyData.length - 1);
+      const yScale = (v) => pad.top + ch - (v / niceMax) * ch;
+      const xPos = (i) => pad.left + i * xStep;
+
+      const series = [
+        { key: 'users', color: '#3b82f6', label: 'الزوار' },
+        { key: 'sessions', color: '#8b5cf6', label: 'الزيارات' },
+        { key: 'pageViews', color: '#10b981', label: 'المشاهدات' }
+      ];
+
+      let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
+
+      const gridLines = 4;
+      for (let i = 0; i <= gridLines; i++) {
+        const val = Math.round((niceMax / gridLines) * i);
+        const y = yScale(val);
+        svg += '<line x1="' + pad.left + '" y1="' + y + '" x2="' + (W - pad.right) + '" y2="' + y + '" class="chart-grid-line"/>';
+        svg += '<text x="' + (pad.left - 8) + '" y="' + (y + 3) + '" text-anchor="end" class="chart-axis-label">' + arNum(val) + '</text>';
+      }
+
+      const labelCount = dailyData.length <= 10 ? dailyData.length : (dailyData.length <= 35 ? 7 : 10);
+      const labelStep = Math.max(1, Math.floor((dailyData.length - 1) / (labelCount - 1)));
+      for (let i = 0; i < dailyData.length; i += labelStep) {
+        const d = new Date(dailyData[i].date + 'T00:00:00');
+        const lbl = d.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' });
+        svg += '<text x="' + xPos(i) + '" y="' + (H - 4) + '" text-anchor="middle" class="chart-axis-label">' + lbl + '</text>';
+      }
+      if ((dailyData.length - 1) % labelStep !== 0) {
+        const last = dailyData.length - 1;
+        const d = new Date(dailyData[last].date + 'T00:00:00');
+        const lbl = d.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' });
+        svg += '<text x="' + xPos(last) + '" y="' + (H - 4) + '" text-anchor="middle" class="chart-axis-label">' + lbl + '</text>';
+      }
+
+      series.forEach(function(s) {
+        let points = dailyData.map(function(d, i) { return xPos(i) + ',' + yScale(d[s.key]); }).join(' ');
+        svg += '<polyline fill="none" stroke="' + s.color + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="' + points + '"/>';
+
+        const gradId = 'grad_' + s.key;
+        const lastX = xPos(dailyData.length - 1);
+        const firstX = xPos(0);
+        svg += '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">';
+        svg += '<stop offset="0%" stop-color="' + s.color + '" stop-opacity="0.12"/>';
+        svg += '<stop offset="100%" stop-color="' + s.color + '" stop-opacity="0.01"/>';
+        svg += '</linearGradient></defs>';
+        const areaPoints = firstX + ',' + yScale(0) + ' ' + points + ' ' + lastX + ',' + yScale(0);
+        svg += '<polygon fill="url(#' + gradId + ')" points="' + areaPoints + '"/>';
+      });
+
+      svg += '<rect id="chartHover" x="' + pad.left + '" y="' + pad.top + '" width="' + cw + '" height="' + ch + '" fill="transparent" style="cursor:pointer"/>';
+      svg += '<line id="chartCursor" x1="0" y1="' + pad.top + '" x2="0" y2="' + (H - pad.bottom) + '" stroke="var(--text-dim)" stroke-width="0.75" stroke-dasharray="3,3" style="display:none"/>';
+
+      series.forEach(function(s) {
+        svg += '<circle id="dot_' + s.key + '" cx="0" cy="0" r="4" fill="' + s.color + '" stroke="var(--bg-card)" stroke-width="2" style="display:none"/>';
+      });
+
+      svg += '</svg>';
+
+      svg += '<div class="chart-tooltip" id="chartTooltip"><div class="chart-tooltip-date" id="ttDate"></div>';
+      series.forEach(function(s) {
+        svg += '<div class="chart-tooltip-row"><div class="chart-legend-dot" style="background:' + s.color + '"></div><span id="tt_' + s.key + '"></span></div>';
+      });
+      svg += '<a class="chart-tooltip-link" id="ttDayLink" data-date="">\u0639\u0631\u0636 \u0647\u0630\u0627 \u0627\u0644\u064a\u0648\u0645</a>';
+      svg += '</div>';
+
+      wrap.innerHTML = svg;
+
+      var hoverRect = document.getElementById('chartHover');
+      var cursor = document.getElementById('chartCursor');
+      var tooltip = document.getElementById('chartTooltip');
+      var activeIdx = -1;
+
+      function showTooltip(e) {
+        var rect = wrap.querySelector('svg').getBoundingClientRect();
+        var mouseX = (e.clientX || e.touches[0].clientX) - rect.left;
+        var svgScale = W / rect.width;
+        var svgX = mouseX * svgScale;
+        var idx = Math.round((svgX - pad.left) / xStep);
+        if (idx < 0) idx = 0;
+        if (idx >= dailyData.length) idx = dailyData.length - 1;
+
+        activeIdx = idx;
+        var cx = xPos(idx);
+        cursor.setAttribute('x1', cx);
+        cursor.setAttribute('x2', cx);
+        cursor.style.display = '';
+
+        series.forEach(function(s) {
+          var dot = document.getElementById('dot_' + s.key);
+          dot.setAttribute('cx', cx);
+          dot.setAttribute('cy', yScale(dailyData[idx][s.key]));
+          dot.style.display = '';
+        });
+
+        var d = new Date(dailyData[idx].date + 'T00:00:00');
+        document.getElementById('ttDate').textContent = d.toLocaleDateString('ar-EG', { weekday: 'short', month: 'short', day: 'numeric' });
+        document.getElementById('tt_users').textContent = fmt(dailyData[idx].users) + ' زائر';
+        document.getElementById('tt_sessions').textContent = fmt(dailyData[idx].sessions) + ' زيارة';
+        document.getElementById('tt_pageViews').textContent = fmt(dailyData[idx].pageViews) + ' مشاهدة';
+        document.getElementById('ttDayLink').dataset.date = dailyData[idx].date;
+
+        tooltip.classList.add('visible');
+        var pxX = mouseX;
+        var tooltipW = tooltip.offsetWidth;
+        var wrapW = wrap.offsetWidth;
+        if (pxX + tooltipW + 12 > wrapW) {
+          tooltip.style.left = (pxX - tooltipW - 12) + 'px';
+        } else {
+          tooltip.style.left = (pxX + 12) + 'px';
+        }
+        tooltip.style.top = '8px';
+      }
+
+      function hideTooltip() {
+        activeIdx = -1;
+        cursor.style.display = 'none';
+        series.forEach(function(s) {
+          document.getElementById('dot_' + s.key).style.display = 'none';
+        });
+        tooltip.classList.remove('visible');
+      }
+
+      hoverRect.addEventListener('click', function(e) {
+        e.stopPropagation();
+        showTooltip(e);
+      });
+
+      hoverRect.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        showTooltip(e.changedTouches ? { clientX: e.changedTouches[0].clientX, touches: [e.changedTouches[0]] } : e);
+      });
+
+      document.addEventListener('click', function(e) {
+        if (activeIdx < 0) return;
+        if (!tooltip.contains(e.target) && e.target !== hoverRect) {
+          hideTooltip();
+        }
+      });
+
+      document.getElementById('ttDayLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var date = this.dataset.date;
+        if (!date) return;
+        customStart = date;
+        customEnd = date;
+        customStartEl.value = date;
+        customEndEl.value = date;
+        localStorage.setItem('analytics_custom_start', date);
+        localStorage.setItem('analytics_custom_end', date);
+        currentPeriod = 'custom';
+        localStorage.setItem('analytics_period', 'custom');
+        document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.period === 'custom'); });
+        customPicker.classList.remove('visible');
+        customBtn.innerHTML = customBtnLabel(date, date);
+        fetchData('custom');
+      });
+    }
+
+    function ceilNice(val) {
+      if (val <= 10) return 10;
+      var mag = Math.pow(10, Math.floor(Math.log10(val)));
+      var norm = val / mag;
+      if (norm <= 1) return mag;
+      if (norm <= 2) return 2 * mag;
+      if (norm <= 5) return 5 * mag;
+      return 10 * mag;
+    }
+
+    var aiProviders = {
+      chatgpt:    { label: 'ChatGPT',    color: '#10a37f', url: function(p) { return 'https://chatgpt.com/?q=' + encodeURIComponent(p); } },
+      perplexity: { label: 'Perplexity',  color: '#22b8cd', url: function(p) { return 'https://www.perplexity.ai/search?q=' + encodeURIComponent(p); } },
+      grok:       { label: 'Grok',        color: '#f55036', url: function(p) { return 'https://grok.com/c?q=' + encodeURIComponent(p); } },
+      claude:     { label: 'Claude',      color: '#d97706', url: function(p) { return 'https://claude.ai/new?q=' + encodeURIComponent(p); } }
+    };
+    var currentProvider = localStorage.getItem('aiProvider') || 'chatgpt';
+
+    function setProvider(key) {
+      currentProvider = key;
+      localStorage.setItem('aiProvider', key);
+      var prov = aiProviders[key];
+      document.getElementById('aiLabel').textContent = '\u0627\u0634\u0631\u062d \u0641\u064a ' + prov.label;
+      document.querySelector('.ai-btn-group').style.setProperty('--ai-color', prov.color);
+      document.querySelector('.ai-icon-chatgpt').style.display = key === 'chatgpt' ? '' : 'none';
+      document.querySelector('.ai-icon-perplexity').style.display = key === 'perplexity' ? '' : 'none';
+      document.querySelector('.ai-icon-grok').style.display = key === 'grok' ? '' : 'none';
+      document.querySelector('.ai-icon-claude').style.display = key === 'claude' ? '' : 'none';
+      document.querySelectorAll('.ai-dropdown-item').forEach(function(el) {
+        el.classList.toggle('active', el.dataset.provider === key);
+      });
+    }
+
+    if (currentProvider !== 'chatgpt') setProvider(currentProvider);
+
+    document.getElementById('aiMainBtn').addEventListener('click', function() {
+      if (!lastData) return;
+      var prompt = buildChatGPTPrompt(lastData);
+      window.open(aiProviders[currentProvider].url(prompt), '_blank');
+    });
+
+    document.getElementById('aiToggleBtn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      var dd = document.getElementById('aiDropdown');
+      var open = dd.classList.toggle('open');
+      this.classList.toggle('open', open);
+    });
+
+    document.querySelectorAll('.ai-dropdown-item').forEach(function(item) {
+      item.addEventListener('click', function(e) {
+        e.stopPropagation();
+        setProvider(this.dataset.provider);
+        document.getElementById('aiDropdown').classList.remove('open');
+        document.getElementById('aiToggleBtn').classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', function() {
+      document.getElementById('aiDropdown').classList.remove('open');
+      document.getElementById('aiToggleBtn').classList.remove('open');
+    });
+
+    function buildChatGPTPrompt(data) {
+      var period = periodLabels[currentPeriod] || data.period;
+      if (currentPeriod === 'custom' && data.startDate && data.endDate) {
+        period = data.startDate + ' to ' + data.endDate;
+      }
+      var prev = data.previousTotals || { users: 0, sessions: 0, pageViews: 0 };
+      var nvr = data.newVsReturning || { new: 0, returning: 0 };
+      var lines = [];
+      lines.push('Analyze the following website visitor data for ebrahimalzaabi.com (a religious scholar\'s website). Respond entirely in Arabic.');
+      lines.push('Write as if explaining to a non-technical person. Avoid jargon like SEO, bounce rate, organic traffic, CTR, conversion, etc.');
+      lines.push('IMPORTANT: Respond in plain text only. Do NOT create charts, graphs, tables, diagrams, HTML, or any visual recreations of the data. Just write a simple text analysis.');
+      lines.push('Provide:');
+      lines.push('1. A short plain-language summary: are things going well or not?');
+      lines.push('2. What changed compared to last period and why it might matter');
+      lines.push('3. Anything unusual or worth paying attention to');
+      lines.push('4. 2-3 simple, practical suggestions (e.g. "post more on Tuesdays since that\'s when most people visit") — no technical recommendations');
+      lines.push('');
+      lines.push('Period: ' + period);
+      lines.push('Date range: ' + (data.startDate || '') + ' to ' + (data.endDate || ''));
+      lines.push('');
+      lines.push('== Totals (current vs previous period) ==');
+      lines.push('Users: ' + data.totals.users + ' (prev: ' + prev.users + ')');
+      lines.push('Sessions: ' + data.totals.sessions + ' (prev: ' + prev.sessions + ')');
+      lines.push('Page Views: ' + data.totals.pageViews + ' (prev: ' + prev.pageViews + ')');
+      lines.push('Avg Session Duration: ' + (data.totals.avgSessionDuration || 0) + 's');
+      lines.push('New users: ' + nvr.new + ', Returning: ' + nvr.returning);
+      lines.push('');
+      var daily = data.dailyBreakdown || [];
+      if (daily.length > 0) {
+        lines.push('== Daily Breakdown ==');
+        lines.push('Date | Users | Sessions | PageViews');
+        daily.forEach(function(d) {
+          lines.push(d.date + ' | ' + d.users + ' | ' + d.sessions + ' | ' + d.pageViews);
+        });
+        lines.push('');
+      }
+      var pages = data.topPages || [];
+      if (pages.length > 0) {
+        lines.push('== Top Pages ==');
+        pages.forEach(function(p) { lines.push(p.path + ' - ' + p.name + ': ' + p.pageViews + ' views'); });
+        lines.push('');
+      }
+      var countries = data.topCountries || [];
+      if (countries.length > 0) {
+        lines.push('== Top Countries ==');
+        countries.forEach(function(c) { lines.push(c.name + ' (' + c.code + '): ' + c.users + ' users'); });
+        lines.push('');
+      }
+      var referrals = data.topReferrals || [];
+      if (referrals.length > 0) {
+        lines.push('== Traffic Sources ==');
+        referrals.forEach(function(r) { lines.push(r.name + ': ' + r.sessions + ' sessions'); });
+        lines.push('');
+      }
+      var devices = data.topDevices || [];
+      if (devices.length > 0) {
+        lines.push('== Devices ==');
+        devices.forEach(function(d) { lines.push(d.name + ': ' + d.sessions + ' sessions'); });
+        lines.push('');
+      }
+      return lines.join('\n');
+    }
+
+    if (currentPeriod === 'custom' && customStart && customEnd) {
+      fetchData('custom');
+    } else {
+      fetchData(currentPeriod);
+    }
+  </script>
+
+</body>
+</html>

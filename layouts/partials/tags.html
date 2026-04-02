@@ -1,0 +1,12 @@
+{{ with .Params.tags }}
+<div class="pa3">
+  <div class="f6 w-100 mt2 arabic-text tags-display">
+    <span class="fw6 ml0 mr1">{{ i18n "tags" | default "الوسوم:" }}</span>
+    {{ range . }}
+      <a href="{{ "tags" | relURL }}/{{ . | urlize }}/" class="tag-link link dark-gray hover-blue ba b--dotted br2 ph2 mr1 mb2 dib">
+        #{{ . }}
+      </a>
+    {{ end }}
+  </div>
+</div>
+{{ end }} 

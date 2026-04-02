@@ -1,0 +1,80 @@
+<!-- List all categories sorted alphabetically with post counts -->
+<div class="category-chips-cloud">
+  {{ range .Site.Taxonomies.categories.Alphabetical }}
+    {{ if gt .Count 0 }}
+      <a href="{{ .Page.RelPermalink }}" class="category-chip">
+        <span class="chip-label">{{ .Page.Title }}</span>
+        <span class="chip-count">{{ .Count }}</span>
+      </a>
+    {{ end }}
+  {{ end }}
+</div>
+
+<style>
+  .category-chips-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+  }
+
+  .category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    background: linear-gradient(135deg, #f0f4f8 0%, #e8edf2 100%);
+    border: 1px solid #dce3ea;
+    border-radius: 20px;
+    color: #3a4a5c !important;
+    text-decoration: none !important;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .category-chip:hover {
+    background: linear-gradient(135deg, #d0d4da 0%, #c2c7ce 100%);
+    border-color: #b8bcc3;
+    color: #2c3e50 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-chip:hover .chip-count {
+    background: rgba(0, 0, 0, 0.1);
+    color: #444;
+  }
+
+  .chip-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5em;
+    padding: 0.1rem 0.4rem;
+    background: rgba(0, 0, 0, 0.07);
+    border-radius: 10px;
+    font-size: 0.75em;
+    color: #667;
+    transition: all 0.25s ease;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .category-chip {
+      background: linear-gradient(135deg, #3a3a3a 0%, #444 100%);
+      border-color: #555;
+      color: #e0e0e0 !important;
+    }
+
+    .chip-count {
+      background: rgba(255, 255, 255, 0.1);
+      color: #bbb;
+    }
+
+    .category-chip:hover {
+      background: linear-gradient(135deg, #555 0%, #4a4a4a 100%);
+      border-color: #666;
+      color: #fff !important;
+    }
+  }
+</style> 

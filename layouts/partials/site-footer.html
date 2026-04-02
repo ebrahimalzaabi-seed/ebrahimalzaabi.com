@@ -1,0 +1,115 @@
+<footer class="{{ .Site.Params.background_color_class | compare.Default "bg-black" }} bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between items-center">
+    <div>
+      <a class="f5 fw4 hover-white footer-text pv2 ph3 no-underline" href="{{ .Site.Home.RelPermalink }}" >
+        &copy; {{ with .Site.Copyright | compare.Default .Site.Title }} {{ . | safe.HTML }} <span class="copyright-year">{{ now.Year }}</span> {{ end }}
+      </a>
+    </div>
+    <div style="display:flex;align-items:center;gap:1.25rem;">
+      <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" aria-label="X" style="display:inline-block;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22" class="footer-social-icon"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@ebrahim_alzaabi" target="_blank" rel="noopener noreferrer" aria-label="YouTube" style="display:inline-block;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="22" height="22" class="footer-social-icon"><path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"/></svg>
+      </a>
+    </div>
+    <div class="footer-text pv2 ph3">
+      <span class="f5 fw4">تم تطوير الموقع بواسطة <a class="footer-link no-underline" href="https://digidub.ae" target="_blank">ديجي دب</a> 🇦🇪</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+/* Footer text styling for light/dark mode */
+.footer-text {
+  color: #333 !important; /* Dark text for light mode */
+}
+
+.footer-link {
+  color: #333 !important; /* Dark text for light mode */
+  text-decoration: underline !important;
+}
+
+.footer-social-icon {
+  width: 22px;
+  height: 22px;
+  fill: #333;
+}
+
+/* Dark mode override */
+@media (prefers-color-scheme: dark) {
+  .footer-text, .footer-link {
+    color: rgba(255, 255, 255, 0.7) !important; /* white-70 equivalent */
+  }
+  .footer-social-icon {
+    fill: rgba(255, 255, 255, 0.7);
+  }
+}
+</style>
+
+<script>
+(function() {
+  var toArabic = function(str) {
+    return str.replace(/[0-9]/g, function(d) {
+      return '٠١٢٣٤٥٦٧٨٩'[d];
+    });
+  };
+
+  var formatDate = function(str) {
+    // Reformat YYYY-MM-DD to YYYY/MM/DD (RTL order), strip leading zeros
+    return toArabic(str.replace(/(\d{4})-(\d{2})-(\d{2})/g, function(_, y, m, d) {
+      return y + '/' + parseInt(m, 10) + '/' + parseInt(d, 10);
+    }));
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Convert and reformat dates in <time> elements
+    document.querySelectorAll('time').forEach(function(el) {
+      el.textContent = formatDate(el.textContent);
+    });
+    // Convert category counts in .categories-list links
+    document.querySelectorAll('.categories-list a').forEach(function(el) {
+      el.textContent = toArabic(el.textContent);
+    });
+    // Convert counts in .chip-count spans (categories cloud on homepage)
+    document.querySelectorAll('.chip-count').forEach(function(el) {
+      el.textContent = toArabic(el.textContent);
+    });
+    // Convert counts in .tag-link anchors (tags cloud on homepage)
+    document.querySelectorAll('.tag-link').forEach(function(el) {
+      el.textContent = toArabic(el.textContent);
+    });
+    // Convert copyright year to Arabic numerals
+    document.querySelectorAll('.copyright-year').forEach(function(el) {
+      el.textContent = toArabic(el.textContent);
+    });
+
+    // Hijri date with localStorage caching (1 API call per day)
+    var hijriEl = document.getElementById('hijri-date');
+    if (hijriEl) {
+      var now = new Date();
+      var todayKey = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+      var cacheKey = 'hijriDate';
+      var cached = null;
+      try { cached = JSON.parse(localStorage.getItem(cacheKey)); } catch(e) {}
+
+      if (cached && cached.g === todayKey) {
+        hijriEl.textContent = toArabic(cached.h);
+      } else {
+        var dd = String(now.getDate()).padStart(2,'0');
+        var mm = String(now.getMonth()+1).padStart(2,'0');
+        var yyyy = now.getFullYear();
+        fetch('https://api.aladhan.com/v1/gToH/' + dd + '-' + mm + '-' + yyyy)
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            var h = data.data.hijri;
+            var text = h.day + ' ' + h.month.ar + ' ' + h.year + ' \u0647\u0640';
+            hijriEl.textContent = toArabic(text);
+            try { localStorage.setItem(cacheKey, JSON.stringify({ g: todayKey, h: text })); } catch(e) {}
+          })
+          .catch(function() {});
+      }
+    }
+  });
+})();
+</script>

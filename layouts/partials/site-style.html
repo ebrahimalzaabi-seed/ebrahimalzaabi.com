@@ -1,0 +1,14 @@
+<!-- Preload self-hosted fonts for instant rendering (no FOUT) -->
+<link rel="preload" href="/fonts/NotoNaskhArabic-arabic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/NotoNaskhArabic-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+
+{{ with partials.IncludeCached "func/style/GetMainCSS.html" "style/GetMainCSS" }}
+<link rel="stylesheet" href="{{ .RelPermalink }}">
+{{ end }}
+
+{{ range site.Params.custom_css }}
+  {{ with partials.IncludeCached "func/style/GetResource.html" . . }}{{ else }}
+    <link rel="stylesheet" href="{{ urls.RelURL (.) }}">
+  {{ end }}
+{{ end }} 
