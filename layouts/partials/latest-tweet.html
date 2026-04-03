@@ -6,94 +6,189 @@
       <span class="arabic-text">تغريدات</span>
     </span>
   </div>
-  <div class="tweet-cards-container">
-    <!-- Latest Tweet Card -->
-    <div id="tweet-card-latest" class="tweet-card" style="display:none;">
-      <div class="tweet-card-header">
-        <div class="tweet-card-label-row">
-          <span class="tweet-card-label tweet-card-label--latest arabic-text">آخر تغريدة</span>
-          <div id="tweet-profile-latest" class="tweet-profile"></div>
-        </div>
-        <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" class="tweet-icon-link link dim">
-          <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
-            <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
-          </svg>
-        </a>
+  <div class="tweet-layout" dir="rtl">
+    <!-- Pinned Tweet (right side in RTL) -->
+    <div id="tweet-pinned-col" class="tweet-pinned-col" style="display:none;"></div>
+    <!-- Carousel (left side in RTL) -->
+    <div class="tweet-carousel-col">
+      <div class="tweet-carousel-wrapper">
+        <div id="tweet-carousel" class="tweet-carousel"></div>
       </div>
-      <blockquote id="tweet-text-latest" class="tweet-text arabic-text"></blockquote>
-    </div>
-    <!-- Pinned Tweet Card -->
-    <div id="tweet-card-pinned" class="tweet-card" style="display:none;">
-      <div class="tweet-card-header">
-        <div class="tweet-card-label-row">
-          <span class="tweet-card-label tweet-card-label--pinned arabic-text">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tweet-pin-icon"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>
-            تغريدة مثبتة
-          </span>
-          <div id="tweet-profile-pinned" class="tweet-profile"></div>
-        </div>
-        <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" class="tweet-icon-link link dim">
-          <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
-            <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
-          </svg>
-        </a>
+      <div class="tweet-carousel-nav">
+        <button id="tweet-nav-prev" class="tweet-nav-btn" aria-label="السابق">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span id="tweet-nav-counter" class="tweet-nav-counter arabic-text"></span>
+        <button id="tweet-nav-next" class="tweet-nav-btn" aria-label="التالي">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
       </div>
-      <blockquote id="tweet-text-pinned" class="tweet-text arabic-text"></blockquote>
     </div>
   </div>
 </section>
+
+<!-- Tweet Modal -->
+<div id="tweet-modal" class="tweet-modal" style="display:none;">
+  <div class="tweet-modal-backdrop"></div>
+  <div class="tweet-modal-content" dir="rtl">
+    <button id="tweet-modal-close" class="tweet-modal-close" aria-label="إغلاق">&times;</button>
+    <div id="tweet-modal-header" class="tweet-modal-profile"></div>
+    <div id="tweet-modal-body" class="tweet-modal-body arabic-text"></div>
+    <a id="tweet-modal-link" href="#" target="_blank" rel="noopener noreferrer" class="tweet-modal-btn arabic-text">
+      المزيد..
+    </a>
+  </div>
+</div>
 
 <script>
 (function() {
   var endpoint = document.getElementById("tweet-widget").dataset.workerUrl;
   var profileLink = 'https://x.com/ebrahimuae1';
+  var xLogoSvg = '<svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>';
+  var pinIconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tweet-pin-icon"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>';
 
-  function renderProfileHtml(p, t) {
-    var html = "";
-    if (p.imageUrl) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-avatar-link link dim"><img src="' + p.imageUrl + '" alt="' + (p.name || "") + '" class="tweet-profile-img" loading="lazy"/></a>';
-    if (p.name) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-name link dim">' + p.name + '</a>';
-    if (p.handle) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-handle link dim">' + p.handle + '</a>';
+  function formatDate(dt) {
+    if (!dt) return "";
+    var d = new Date(dt);
+    return d.toISOString().split("T")[0];
+  }
+
+  function toArabicNum(n) {
+    var arabic = ["\u0660","\u0661","\u0662","\u0663","\u0664","\u0665","\u0666","\u0667","\u0668","\u0669"];
+    return String(n).replace(/[0-9]/g, function(d) { return arabic[+d]; });
+  }
+
+  function profileHtml(p, t) {
+    var h = "";
+    if (p.imageUrl) h += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-avatar-link link dim"><img src="' + p.imageUrl + '" alt="' + (p.name || "") + '" class="tweet-profile-img" loading="lazy"/></a>';
+    if (p.name) h += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-name link dim">' + p.name + '</a>';
+    if (p.handle) h += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-handle link dim">' + p.handle + '</a>';
     if (t && t.datetime) {
-      var d = new Date(t.datetime);
-      var dateOnly = d.toISOString().split("T")[0];
-      html += '<span class="tweet-meta-dot"> &middot; </span>';
-      html += '<a href="' + (t.url || "#") + '" target="_blank" rel="noopener noreferrer" class="tweet-date link dim">' + dateOnly + '</a>';
+      h += '<span class="tweet-meta-dot"> &middot; </span>';
+      h += '<a href="' + (t.url || "#") + '" target="_blank" rel="noopener noreferrer" class="tweet-date link dim">' + formatDate(t.datetime) + '</a>';
     }
-    return html;
+    return h;
   }
 
-  function renderTweetCard(cardId, profileId, textId, profile, tweet) {
-    if (!tweet) return;
-    var card = document.getElementById(cardId);
-    var profileEl = document.getElementById(profileId);
-    var textEl = document.getElementById(textId);
-    profileEl.innerHTML = renderProfileHtml(profile, tweet);
-    textEl.textContent = tweet.text || "";
-    if (tweet.isLongTweet && tweet.url) {
-      var readMore = document.createElement("a");
-      readMore.href = tweet.url;
-      readMore.target = "_blank";
-      readMore.rel = "noopener noreferrer";
-      readMore.className = "tweet-read-more link";
-      readMore.textContent = "\u0627\u0642\u0631\u0623 \u0627\u0644\u0645\u0632\u064A\u062F...";
-      textEl.parentNode.insertBefore(readMore, textEl.nextSibling);
-    }
-    card.style.display = "";
+  function buildCard(tweet, profile, label, labelClass, isPinned) {
+    var card = document.createElement("div");
+    card.className = "tweet-card";
+
+    var header = document.createElement("div");
+    header.className = "tweet-card-header";
+
+    var labelRow = document.createElement("div");
+    labelRow.className = "tweet-card-label-row";
+
+    var badge = document.createElement("span");
+    badge.className = "tweet-card-label " + labelClass + " arabic-text";
+    badge.innerHTML = (isPinned ? pinIconSvg + " " : "") + label;
+    labelRow.appendChild(badge);
+
+    var prof = document.createElement("div");
+    prof.className = "tweet-profile";
+    prof.innerHTML = profileHtml(profile, tweet);
+    labelRow.appendChild(prof);
+
+    header.appendChild(labelRow);
+
+    var iconLink = document.createElement("a");
+    iconLink.href = profileLink;
+    iconLink.target = "_blank";
+    iconLink.rel = "noopener noreferrer";
+    iconLink.className = "tweet-icon-link link dim";
+    iconLink.innerHTML = xLogoSvg;
+    header.appendChild(iconLink);
+
+    card.appendChild(header);
+
+    var text = document.createElement("blockquote");
+    text.className = "tweet-text arabic-text";
+    text.textContent = tweet.text || "";
+    card.appendChild(text);
+
+    var showMore = document.createElement("button");
+    showMore.className = "tweet-show-more arabic-text";
+    showMore.textContent = "\u0639\u0631\u0636 \u0627\u0644\u0645\u0632\u064A\u062F";
+    showMore.addEventListener("click", function() { openModal(tweet, profile); });
+    card.appendChild(showMore);
+
+    return card;
   }
 
+  // -- Modal --
+  var modal = document.getElementById("tweet-modal");
+  var modalBackdrop = modal.querySelector(".tweet-modal-backdrop");
+  var modalClose = document.getElementById("tweet-modal-close");
+  var modalHeader = document.getElementById("tweet-modal-header");
+  var modalBody = document.getElementById("tweet-modal-body");
+  var modalLink = document.getElementById("tweet-modal-link");
+
+  function openModal(tweet, profile) {
+    modalHeader.innerHTML = '<div class="tweet-profile">' + profileHtml(profile, tweet) + '</div>';
+    modalBody.textContent = tweet.text || "";
+    modalLink.href = tweet.url || "#";
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+    document.body.style.overflow = "";
+  }
+  modalClose.addEventListener("click", closeModal);
+  modalBackdrop.addEventListener("click", closeModal);
+  document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeModal(); });
+
+  // -- Carousel --
+  var currentSlide = 0;
+  var totalSlides = 0;
+  var carousel = document.getElementById("tweet-carousel");
+
+  function goToSlide(idx) {
+    if (idx < 0 || idx >= totalSlides) return;
+    currentSlide = idx;
+    carousel.style.transform = "translateX(" + (currentSlide * 100) + "%)";
+    document.getElementById("tweet-nav-counter").textContent = toArabicNum(currentSlide + 1) + " / " + toArabicNum(totalSlides);
+    document.getElementById("tweet-nav-prev").disabled = currentSlide === 0;
+    document.getElementById("tweet-nav-next").disabled = currentSlide === totalSlides - 1;
+  }
+
+  document.getElementById("tweet-nav-prev").addEventListener("click", function() { goToSlide(currentSlide - 1); });
+  document.getElementById("tweet-nav-next").addEventListener("click", function() { goToSlide(currentSlide + 1); });
+
+  // -- Fetch & Render --
   fetch(endpoint)
     .then(function(res) { return res.json(); })
     .then(function(data) {
       var p = data.profile || {};
-      if (data.latest) {
-        renderTweetCard("tweet-card-latest", "tweet-profile-latest", "tweet-text-latest", p, data.latest);
+      var tweets = data.tweets || [];
+      var pinned = data.pinned || null;
+
+      // Render pinned card
+      if (pinned) {
+        var pinnedCol = document.getElementById("tweet-pinned-col");
+        var pinnedCard = buildCard(pinned, p, "\u062A\u063A\u0631\u064A\u062F\u0629 \u0645\u062B\u0628\u062A\u0629", "tweet-card-label--pinned", true);
+        pinnedCol.appendChild(pinnedCard);
+        pinnedCol.style.display = "";
       }
-      if (data.pinned) {
-        // Don't show pinned if it's the same as latest
-        if (!data.latest || data.pinned.id !== data.latest.id) {
-          renderTweetCard("tweet-card-pinned", "tweet-profile-pinned", "tweet-text-pinned", p, data.pinned);
-        }
+
+      // Render carousel tweets (skip if same as pinned)
+      var carouselTweets = tweets.filter(function(t) { return !pinned || t.id !== pinned.id; });
+      totalSlides = carouselTweets.length;
+
+      carouselTweets.forEach(function(tweet, i) {
+        var slide = document.createElement("div");
+        slide.className = "tweet-carousel-slide";
+        var card = buildCard(tweet, p, "\u062A\u063A\u0631\u064A\u062F\u0629 " + (i + 1), "tweet-card-label--latest", false);
+        slide.appendChild(card);
+        carousel.appendChild(slide);
+      });
+
+      if (totalSlides > 0) {
+        goToSlide(0);
       }
+
       document.getElementById("tweet-widget").style.display = "";
     })
     .catch(function(err) {
@@ -103,7 +198,6 @@
 </script>
 
 <style>
-  /* Tweet widget custom styling */
   .tweet-widget {
     margin-bottom: 2rem;
   }
@@ -132,19 +226,82 @@
     height: 1.1em;
     fill: currentColor;
   }
-  .tweet-cards-container {
+  /* Layout: pinned right, carousel left (RTL) */
+  .tweet-layout {
     display: flex;
     gap: 1rem;
     margin-top: 0.75rem;
+    align-items: flex-start;
   }
+  .tweet-pinned-col {
+    flex: 0 0 45%;
+    min-width: 0;
+  }
+  .tweet-carousel-col {
+    flex: 1;
+    min-width: 0;
+  }
+  .tweet-carousel-wrapper {
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .tweet-carousel {
+    display: flex;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    direction: ltr;
+  }
+  .tweet-carousel-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    direction: rtl;
+  }
+  .tweet-carousel-slide .tweet-card {
+    border-radius: 12px;
+  }
+  .tweet-carousel-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.6rem;
+    direction: ltr;
+  }
+  .tweet-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+    color: #555;
+    transition: all 0.2s;
+    padding: 0;
+  }
+  .tweet-nav-btn:hover:not(:disabled) {
+    background: #f5f5f5;
+    border-color: #C5A059;
+    color: #C5A059;
+  }
+  .tweet-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .tweet-nav-counter {
+    font-size: 0.85rem;
+    color: #536471;
+    min-width: 3rem;
+    text-align: center;
+  }
+  /* Card */
   .tweet-card {
     background: #ffffff;
     border: 1px solid #e1e8ed;
     border-radius: 12px;
     padding: 1rem 1.25rem;
     transition: box-shadow 0.2s ease;
-    flex: 1;
-    min-width: 0;
   }
   .tweet-card:hover {
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
@@ -239,21 +396,130 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .tweet-read-more {
+  .tweet-show-more {
     display: block;
-    margin-top: 0.4rem;
+    margin-top: 0.5rem;
     font-size: 0.9rem;
     color: #C5A059;
-    text-decoration: none;
     font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
   }
-  .tweet-read-more:hover {
+  .tweet-show-more:hover {
     text-decoration: underline;
+  }
+  /* Modal */
+  .tweet-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .tweet-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+  .tweet-modal-content {
+    position: relative;
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    max-width: 600px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: tweet-modal-in 0.25s ease-out;
+  }
+  @keyframes tweet-modal-in {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .tweet-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    left: 1rem;
+    right: auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #f0f0f0;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    line-height: 1;
+    transition: background 0.2s;
+  }
+  .tweet-modal-close:hover {
+    background: #ddd;
+  }
+  .tweet-modal-body {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #0f1419;
+    margin-top: 0.5rem;
+    white-space: pre-wrap;
+  }
+  .tweet-modal-profile {
+    margin-bottom: 0.75rem;
+  }
+  .tweet-modal-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    background: #C5A059;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .tweet-modal-btn:hover {
+    background: #b08a3e;
+    color: #fff;
   }
   /* Stack on mobile */
   @media (max-width: 640px) {
-    .tweet-cards-container {
+    .tweet-layout {
       flex-direction: column;
+    }
+    .tweet-pinned-col {
+      flex: none;
+      width: 100%;
+    }
+    .tweet-carousel-col {
+      width: 100%;
+    }
+    .tweet-card {
+      padding: 0.75rem 1rem;
+    }
+    .tweet-profile-name,
+    .tweet-profile-handle {
+      font-size: 0.8rem;
+    }
+    .tweet-profile-img {
+      width: 30px;
+      height: 30px;
+    }
+    .tweet-profile {
+      overflow: hidden;
+      flex-wrap: nowrap;
+    }
+    .tweet-text {
+      font-size: 1rem;
     }
   }
   /* Dark mode */
@@ -290,6 +556,39 @@
     .tweet-card-label--pinned {
       background: #bf360c;
       color: #ffcc80;
+    }
+    .tweet-nav-btn {
+      background: #2a2a2a;
+      border-color: #444;
+      color: #aaa;
+    }
+    .tweet-nav-btn:hover:not(:disabled) {
+      background: #333;
+      border-color: #C5A059;
+      color: #C5A059;
+    }
+    .tweet-nav-counter {
+      color: #71767b;
+    }
+    .tweet-modal-content {
+      background: #1a1a1a;
+    }
+    .tweet-modal-body {
+      color: #e7e9ea;
+    }
+    .tweet-modal-close {
+      background: #333;
+      color: #ccc;
+    }
+    .tweet-modal-close:hover {
+      background: #444;
+    }
+    .tweet-modal-btn {
+      background: #C5A059;
+      color: #fff;
+    }
+    .tweet-modal-btn:hover {
+      background: #b08a3e;
     }
   }
 </style> 

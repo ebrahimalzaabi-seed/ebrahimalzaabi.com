@@ -8,7 +8,7 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-const CACHE_KEY = "tweets_v2";
+const CACHE_KEY = "tweets_v3";
 const CACHE_TTL = 3600; // 1 hour in seconds
 
 export default {
@@ -74,17 +74,16 @@ async function fetchTweets() {
 
   // Find pinned tweet (Nitter marks it with "Pinned:" prefix in the title)
   const pinnedItem = items.find((item) => item.title.startsWith("Pinned:"));
-  // Latest tweet is the first non-pinned item
-  const latestItem = items.find((item) => !item.title.startsWith("Pinned:"));
+  // All non-pinned tweets in chronological order (newest first)
+  const tweetItems = items.filter((item) => !item.title.startsWith("Pinned:"));
 
   const result = { profile };
 
-  if (latestItem) {
-    result.latest = formatTweet(latestItem);
-  }
   if (pinnedItem) {
     result.pinned = formatTweet(pinnedItem);
   }
+
+  result.tweets = tweetItems.map((item) => formatTweet(item));
 
   return result;
 }
