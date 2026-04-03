@@ -53,19 +53,6 @@
         {{- end -}}
       </aside>
       {{- partials.IncludeCached "social/share.html" . . -}}
-      {{ with .Params.author | default .Site.Params.author }}
-      <p class="tracked">
-        {{- if compare.Eq $.Site.Language.Lang "de" "en" "es" "fr" "it" "no" "pt" -}}
-          {{- lang.Translate "by" -}}
-        {{ end -}} <strong>
-        {{- if reflect.IsSlice . -}}
-            {{ collections.Delimit . ", " | transform.Markdownify }}
-        {{- else -}}
-            {{ . | transform.Markdownify }}
-        {{- end -}}
-        </strong>
-      </p>
-      {{ end }}
       {{/* Hugo uses Go's date formatting is set by example. Here are two formats */}}
       {{ if not .Date.IsZero }}
       <time class="f6 mv4 dib tracked" {{ printf `datetime="%s"` (.Date.Format "2006-01-02T15:04:05Z07:00") | safeHTMLAttr }}>
