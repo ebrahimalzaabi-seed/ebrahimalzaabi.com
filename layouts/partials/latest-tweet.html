@@ -1,4 +1,4 @@
-<!-- Latest Tweet Widget -->
+<!-- Tweets Widget -->
 <section id="tweet-widget" class="tweet-widget mt4" style="display:none;" data-worker-url="{{ if hugo.IsProduction }}{{ .Site.Params.workers.tweet.prod }}{{ else }}{{ .Site.Params.workers.tweet.dev }}{{ end }}">
   <div class="tweet-section-header">
     <span class="tweet-section-badge">
@@ -6,48 +6,93 @@
       <span class="arabic-text">تغريدات</span>
     </span>
   </div>
-  <div class="tweet-card">
-    <div class="tweet-card-header">
-      <div id="tweet-profile" class="tweet-profile"></div>
-      <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" class="tweet-icon-link link dim">
-        <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
-          <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
-        </svg>
-      </a>
+  <div class="tweet-cards-container">
+    <!-- Latest Tweet Card -->
+    <div id="tweet-card-latest" class="tweet-card" style="display:none;">
+      <div class="tweet-card-header">
+        <div class="tweet-card-label-row">
+          <span class="tweet-card-label tweet-card-label--latest arabic-text">آخر تغريدة</span>
+          <div id="tweet-profile-latest" class="tweet-profile"></div>
+        </div>
+        <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" class="tweet-icon-link link dim">
+          <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
+            <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+          </svg>
+        </a>
+      </div>
+      <blockquote id="tweet-text-latest" class="tweet-text arabic-text"></blockquote>
     </div>
-    <blockquote id="tweet-text" class="tweet-text arabic-text"></blockquote>
+    <!-- Pinned Tweet Card -->
+    <div id="tweet-card-pinned" class="tweet-card" style="display:none;">
+      <div class="tweet-card-header">
+        <div class="tweet-card-label-row">
+          <span class="tweet-card-label tweet-card-label--pinned arabic-text">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tweet-pin-icon"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>
+            تغريدة مثبتة
+          </span>
+          <div id="tweet-profile-pinned" class="tweet-profile"></div>
+        </div>
+        <a href="https://x.com/ebrahimuae1" target="_blank" rel="noopener noreferrer" class="tweet-icon-link link dim">
+          <svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img">
+            <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+          </svg>
+        </a>
+      </div>
+      <blockquote id="tweet-text-pinned" class="tweet-text arabic-text"></blockquote>
+    </div>
   </div>
 </section>
 
 <script>
 (function() {
   var endpoint = document.getElementById("tweet-widget").dataset.workerUrl;
+  var profileLink = 'https://x.com/ebrahimuae1';
+
+  function renderProfileHtml(p, t) {
+    var html = "";
+    if (p.imageUrl) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-avatar-link link dim"><img src="' + p.imageUrl + '" alt="' + (p.name || "") + '" class="tweet-profile-img" loading="lazy"/></a>';
+    if (p.name) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-name link dim">' + p.name + '</a>';
+    if (p.handle) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-handle link dim">' + p.handle + '</a>';
+    if (t && t.datetime) {
+      var d = new Date(t.datetime);
+      var dateOnly = d.toISOString().split("T")[0];
+      html += '<span class="tweet-meta-dot"> &middot; </span>';
+      html += '<a href="' + (t.url || "#") + '" target="_blank" rel="noopener noreferrer" class="tweet-date link dim">' + dateOnly + '</a>';
+    }
+    return html;
+  }
+
+  function renderTweetCard(cardId, profileId, textId, profile, tweet) {
+    if (!tweet) return;
+    var card = document.getElementById(cardId);
+    var profileEl = document.getElementById(profileId);
+    var textEl = document.getElementById(textId);
+    profileEl.innerHTML = renderProfileHtml(profile, tweet);
+    textEl.textContent = tweet.text || "";
+    if (tweet.isLongTweet && tweet.url) {
+      var readMore = document.createElement("a");
+      readMore.href = tweet.url;
+      readMore.target = "_blank";
+      readMore.rel = "noopener noreferrer";
+      readMore.className = "tweet-read-more link";
+      readMore.textContent = "\u0627\u0642\u0631\u0623 \u0627\u0644\u0645\u0632\u064A\u062F...";
+      textEl.parentNode.insertBefore(readMore, textEl.nextSibling);
+    }
+    card.style.display = "";
+  }
+
   fetch(endpoint)
     .then(function(res) { return res.json(); })
     .then(function(data) {
       var p = data.profile || {};
-      var t = data.tweet || {};
-      var profileEl = document.getElementById("tweet-profile");
-      var html = "";
-      var profileLink = 'https://x.com/ebrahimuae1';
-      if (p.imageUrl) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-avatar-link link dim"><img src="' + p.imageUrl + '" alt="' + (p.name || "") + '" class="tweet-profile-img" loading="lazy"/></a>';
-      if (p.name) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-name link dim">' + p.name + '</a>';
-      if (p.handle) html += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-handle link dim">' + p.handle + '</a>';
-      if (t.datetime) {
-        var dateOnly = t.datetime.split("T")[0];
-        html += '<span class="tweet-meta-dot"> · </span>';
-        html += '<a href="' + (t.url || "#") + '" target="_blank" rel="noopener noreferrer" class="tweet-date link dim">' + dateOnly + '</a>';
+      if (data.latest) {
+        renderTweetCard("tweet-card-latest", "tweet-profile-latest", "tweet-text-latest", p, data.latest);
       }
-      profileEl.innerHTML = html;
-      document.getElementById("tweet-text").textContent = t.text || "";
-      if (t.isLongTweet && t.url) {
-        var readMore = document.createElement("a");
-        readMore.href = t.url;
-        readMore.target = "_blank";
-        readMore.rel = "noopener noreferrer";
-        readMore.className = "tweet-read-more link";
-        readMore.textContent = "اقرأ المزيد...";
-        document.getElementById("tweet-text").parentNode.insertBefore(readMore, document.getElementById("tweet-text").nextSibling);
+      if (data.pinned) {
+        // Don't show pinned if it's the same as latest
+        if (!data.latest || data.pinned.id !== data.latest.id) {
+          renderTweetCard("tweet-card-pinned", "tweet-profile-pinned", "tweet-text-pinned", p, data.pinned);
+        }
       }
       document.getElementById("tweet-widget").style.display = "";
     })
@@ -87,12 +132,19 @@
     height: 1.1em;
     fill: currentColor;
   }
+  .tweet-cards-container {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
   .tweet-card {
     background: #ffffff;
     border: 1px solid #e1e8ed;
     border-radius: 12px;
     padding: 1rem 1.25rem;
     transition: box-shadow 0.2s ease;
+    flex: 1;
+    min-width: 0;
   }
   .tweet-card:hover {
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
@@ -102,6 +154,34 @@
     align-items: flex-start;
     justify-content: space-between;
     margin-bottom: 0.5rem;
+  }
+  .tweet-card-label-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .tweet-card-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    width: fit-content;
+  }
+  .tweet-card-label--latest {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+  .tweet-card-label--pinned {
+    background: #fff3e0;
+    color: #e65100;
+  }
+  .tweet-pin-icon {
+    width: 0.85em;
+    height: 0.85em;
   }
   .tweet-icon {
     width: 22px;
@@ -170,6 +250,12 @@
   .tweet-read-more:hover {
     text-decoration: underline;
   }
+  /* Stack on mobile */
+  @media (max-width: 640px) {
+    .tweet-cards-container {
+      flex-direction: column;
+    }
+  }
   /* Dark mode */
   @media (prefers-color-scheme: dark) {
     .tweet-card {
@@ -196,6 +282,14 @@
     }
     .tweet-icon {
       color: #e7e9ea;
+    }
+    .tweet-card-label--latest {
+      background: #1b5e20;
+      color: #a5d6a7;
+    }
+    .tweet-card-label--pinned {
+      background: #bf360c;
+      color: #ffcc80;
     }
   }
 </style> 

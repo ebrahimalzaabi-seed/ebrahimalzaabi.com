@@ -1,6 +1,6 @@
 const HANDLE = "ebrahimuae1";
-const BEARER_TOKEN =
-  "AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs=1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA";
+const NITTER_BASE = "https://nitter.net";
+const NITTER_RSS_URL = `${NITTER_BASE}/${HANDLE}/rss`;
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -8,22 +8,7 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-// GraphQL features required by UserByScreenName
-const USER_FEATURES = {
-  hidden_profile_likes_enabled: true,
-  hidden_profile_subscriptions_enabled: true,
-  responsive_web_graphql_exclude_directive_enabled: true,
-  verified_phone_label_enabled: false,
-  subscriptions_verification_info_is_identity_verified_enabled: true,
-  subscriptions_verification_info_verified_since_enabled: true,
-  highlights_tweets_tab_ui_enabled: true,
-  responsive_web_twitter_article_notes_tab_enabled: true,
-  creator_subscriptions_tweet_preview_api_enabled: true,
-  responsive_web_graphql_skip_user_profile_image_extensions_enabled: false,
-  responsive_web_graphql_timeline_navigation_enabled: true,
-};
-
-const CACHE_KEY = "latest_tweet_v1";
+const CACHE_KEY = "tweets_v2";
 const CACHE_TTL = 3600; // 1 hour in seconds
 
 export default {
@@ -36,33 +21,15 @@ export default {
     const cached = await kv.get(CACHE_KEY, { type: "json" });
 
     if (cached) {
-      console.log("[CACHE HIT] Serving tweet from KV cache");
-      return new Response(
-        JSON.stringify(cached, null, 2),
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "public, max-age=3600",
-            ...CORS_HEADERS,
-          },
-        }
-      );
+      console.log("[CACHE HIT] Serving tweets from KV cache");
+      return jsonResponse(cached);
     }
 
     try {
-      const data = await fetchPinnedTweet();
-      console.log("[CACHE MISS] Fetched fresh tweet from Twitter, storing in KV");
+      const data = await fetchTweets();
+      console.log("[CACHE MISS] Fetched fresh tweets from Nitter RSS, storing in KV");
       ctx.waitUntil(kv.put(CACHE_KEY, JSON.stringify(data), { expirationTtl: CACHE_TTL }));
-      return new Response(
-        JSON.stringify(data, null, 2),
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "public, max-age=3600",
-            ...CORS_HEADERS,
-          },
-        }
-      );
+      return jsonResponse(data);
     } catch (err) {
       console.error("[ERROR] Tweet fetch failed:", err.message);
       return new Response(
@@ -76,95 +43,128 @@ export default {
   },
 };
 
-// Step 1: Get a guest token from Twitter
-async function getGuestToken() {
-  const res = await fetch("https://api.twitter.com/1.1/guest/activate.json", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${BEARER_TOKEN}` },
-  });
-  if (!res.ok) throw new Error(`Guest token request failed: ${res.status}`);
-  const json = await res.json();
-  return json.guest_token;
-}
-
-// Step 2: Look up the user profile to get the pinned tweet ID
-async function getUserProfile(guestToken) {
-  const variables = JSON.stringify({
-    screen_name: HANDLE,
-    withSafetyModeUserFields: true,
-  });
-  const features = JSON.stringify(USER_FEATURES);
-  const url =
-    `https://twitter.com/i/api/graphql/G3KGOASz96M-Qu0nwmGXNg/UserByScreenName` +
-    `?variables=${encodeURIComponent(variables)}` +
-    `&features=${encodeURIComponent(features)}`;
-
-  const res = await fetch(url, {
+function jsonResponse(data) {
+  return new Response(JSON.stringify(data, null, 2), {
     headers: {
-      Authorization: `Bearer ${BEARER_TOKEN}`,
-      "x-guest-token": guestToken,
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=3600",
+      ...CORS_HEADERS,
     },
   });
-  if (!res.ok) throw new Error(`UserByScreenName failed: ${res.status}`);
-  return res.json();
 }
 
-// Step 3: Fetch tweet details via the syndication CDN (no auth needed)
-async function getTweetDetail(tweetId) {
-  const url = `https://cdn.syndication.twimg.com/tweet-result?id=${tweetId}&lang=en&token=0`;
-  const res = await fetch(url, {
+// Fetch and parse the Nitter RSS feed
+async function fetchTweets() {
+  const res = await fetch(NITTER_RSS_URL, {
     headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      Accept: "application/json, text/javascript, */*; q=0.01",
-      Referer: "https://platform.twitter.com/",
+      "User-Agent": "Mozilla/5.0 (compatible; TweetWidget/1.0)",
     },
   });
-  if (!res.ok) throw new Error(`Tweet detail fetch failed: ${res.status}`);
-  return res.json();
+  if (!res.ok) throw new Error(`Nitter RSS fetch failed: ${res.status}`);
+
+  const xml = await res.text();
+  const items = parseRssItems(xml);
+
+  if (items.length === 0) {
+    throw new Error("No tweets found in RSS feed");
+  }
+
+  // Extract profile info from the RSS channel
+  const profile = parseProfile(xml);
+
+  // Find pinned tweet (Nitter marks it with "Pinned:" prefix in the title)
+  const pinnedItem = items.find((item) => item.title.startsWith("Pinned:"));
+  // Latest tweet is the first non-pinned item
+  const latestItem = items.find((item) => !item.title.startsWith("Pinned:"));
+
+  const result = { profile };
+
+  if (latestItem) {
+    result.latest = formatTweet(latestItem);
+  }
+  if (pinnedItem) {
+    result.pinned = formatTweet(pinnedItem);
+  }
+
+  return result;
 }
 
-// Orchestrator
-async function fetchPinnedTweet() {
-  const guestToken = await getGuestToken();
-  const profileData = await getUserProfile(guestToken);
-
-  const user = profileData?.data?.user?.result;
-  if (!user) throw new Error("User not found");
-
-  const legacy = user.legacy;
-  const pinnedIds = legacy?.pinned_tweet_ids_str || [];
-
-  if (pinnedIds.length === 0) {
-    throw new Error("No pinned tweet found for this user");
+// Parse RSS <item> elements from the XML string
+function parseRssItems(xml) {
+  const items = [];
+  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+  let match;
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const block = match[1];
+    items.push({
+      title: extractTag(block, "title"),
+      link: extractTag(block, "link"),
+      description: extractTag(block, "description"),
+      pubDate: extractTag(block, "pubDate"),
+    });
   }
+  return items;
+}
 
-  const tweetId = pinnedIds[0];
-  const tweet = await getTweetDetail(tweetId);
+// Extract profile info from the RSS <channel>
+function parseProfile(xml) {
+  const channelMatch = xml.match(/<channel>([\s\S]*?)<item>/);
+  const channel = channelMatch ? channelMatch[1] : xml;
 
-  if (!tweet || !tweet.text) {
-    throw new Error("Could not fetch tweet detail");
+  const rawTitle = extractTag(channel, "title");
+  // Title format: "Name / @handle"
+  const namePart = rawTitle.split(" / ")[0] || HANDLE;
+  const handlePart = rawTitle.split(" / ")[1] || `@${HANDLE}`;
+
+  // Profile image from RSS <image><url>
+  const imageMatch = channel.match(/<image>[\s\S]*?<url>([\s\S]*?)<\/url>[\s\S]*?<\/image>/);
+  let imageUrl = imageMatch ? imageMatch[1].trim() : "";
+  // Convert Nitter proxy URL to direct Twitter CDN URL with higher res
+  if (imageUrl.includes("/pic/")) {
+    const encoded = imageUrl.split("/pic/")[1];
+    imageUrl = decodeURIComponent(encoded).replace("_normal.", "_400x400.");
   }
-
-  // Get the higher-res profile image (replace _normal with _400x400)
-  const profileImg = (
-    tweet.user?.profile_image_url_https ||
-    legacy?.profile_image_url_https ||
-    ""
-  ).replace("_normal.", "_400x400.");
 
   return {
-    profile: {
-      name: tweet.user?.name || legacy?.name || HANDLE,
-      handle: `@${tweet.user?.screen_name || legacy?.screen_name || HANDLE}`,
-      imageUrl: profileImg,
-    },
-    tweet: {
-      id: tweet.id_str || tweetId,
-      text: tweet.text,
-      url: `https://x.com/${HANDLE}/status/${tweet.id_str || tweetId}`,
-      datetime: tweet.created_at || "",
-      isLongTweet: !!tweet.note_tweet,
-    },
+    name: namePart.trim(),
+    handle: handlePart.trim(),
+    imageUrl,
   };
+}
+
+// Format a parsed RSS item into our tweet structure
+function formatTweet(item) {
+  // Extract tweet ID from nitter link: https://nitter.net/user/status/ID#m
+  const idMatch = item.link.match(/\/status\/(\d+)/);
+  const tweetId = idMatch ? idMatch[1] : "";
+
+  // Clean HTML from description to get plain text
+  let text = item.title || "";
+  // Remove "Pinned: " prefix if present
+  if (text.startsWith("Pinned:")) {
+    text = text.substring(7).trim();
+  }
+
+  // A tweet longer than 280 chars is a long-form tweet
+  const isLongTweet = text.length > 280;
+
+  return {
+    id: tweetId,
+    text: text,
+    url: `https://x.com/${HANDLE}/status/${tweetId}`,
+    datetime: item.pubDate || "",
+    isLongTweet,
+  };
+}
+
+// Strip HTML tags from a string
+function stripHtml(html) {
+  return html.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
+}
+
+// Extract text content of an XML tag
+function extractTag(xml, tag) {
+  const match = xml.match(new RegExp(`<${tag}><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}>([\\s\\S]*?)<\\/${tag}>`));
+  if (!match) return "";
+  return (match[1] || match[2] || "").trim();
 }
