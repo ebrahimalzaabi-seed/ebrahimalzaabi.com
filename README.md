@@ -9,14 +9,13 @@ graph TD
     Visitor((Website Visitor))
     Dev((Developer))
 
-    Visitor -->|browses| GHP[GitHub Pages<br/>Hugo SSG<br/>ebrahimalzaabi.com]
-    GHP -->|submits question| CF[DNS + Cloudflare Workers<br/>send-question+embeded-tweet+analytics proxy + KV store<br/>+ Turnstile CAPTCHA]
+    Visitor -->|browses| CFP[Cloudflare Pages<br/>Hugo SSG<br/>ebrahimalzaabi.com<br/>ebrahimalzaabi-com.pages.dev]
+    CFP -->|submits question| CF[Cloudflare Workers<br/>send-question+embeded-tweet+analytics proxy + KV store<br/>+ Turnstile CAPTCHA]
 
-    GHP --- GA4[Google Analytics 4<br/>Website analytics]
-    GHP --- Archive[Archive.org<br/>Legacy MP3s & PDFs]
-    Dev -->|push to main| CICD[GitHub Actions CI/CD<br/>Hugo build → deploy]
+    CFP --- GA4[Google Analytics 4<br/>Website analytics]
+    CFP --- Archive[Archive.org<br/>Legacy MP3s & PDFs]
+    Dev -->|push to main| CFP
     Dev -->|manage content| Admin
-    CICD -->|deploys| GHP
 
     CF -->|send acknowledgement of new question + notify sheikh| Resend[Resend Email API<br/>notifications.ebrahimalzaabi.com]
 
@@ -25,11 +24,10 @@ graph TD
 
     style Dev fill:#e3fafc,stroke:#1e1e1e
     style Visitor fill:#a5d8ff,stroke:#1e1e1e
-    style GHP fill:#b2f2bb,stroke:#2f9e44
+    style CFP fill:#b2f2bb,stroke:#2f9e44
     style CF fill:#ffec99,stroke:#e67700
     style Admin fill:#d0bfff,stroke:#862e9c
     style Resend fill:#ffa8a8,stroke:#c92a2a
-    style CICD fill:#a5d8ff,stroke:#1971c2
     style GA4 fill:#99e9f2,stroke:#0c8599
     style Archive fill:#dee2e6,stroke:#495057
 ```
@@ -38,7 +36,8 @@ graph TD
 
 | Service | Purpose |
 |---|---|
-| [GitHub](https://github.com/) | Source code, GitHub Pages hosting, GitHub Actions CI/CD |
+| [GitHub](https://github.com/) | Source code repository |
+| [Cloudflare Pages](https://pages.cloudflare.com/) | Static site hosting (auto-deploys on push to main) |
 | [Cloudflare Workers](https://workers.cloudflare.com/) | Question submission backend |
 | [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) | CAPTCHA for the question form |
 | [Cloudflare KV](https://developers.cloudflare.com/kv/) | Stores pending questions for admin review |
@@ -107,17 +106,19 @@ The site will be available at `http://localhost:1313`.
 
 ## Deployment
 
-Deployment is automated via GitHub Actions on every push to `main`.
+Deployment is automated via **Cloudflare Pages** on every push to `main`. No GitHub Actions workflow is needed — Cloudflare Pages watches the repo directly.
 
-The workflow at `.github/workflows/hugo-deploy.yml`:
-1. Builds the site with `hugo --minify --baseURL "https://ebrahimalzaabi.com/"`
-2. Deploys the `./public` output to **GitHub Pages**
+Build configuration (set in Cloudflare Pages dashboard):
+- **Build command**: `npm install && npm run build-index && hugo --gc --minify`
+- **Output directory**: `public`
+- **Environment variables**: `HUGO_VERSION=0.147.1`, `HUGO_ENVIRONMENT=production`, `TZ=Asia/Dubai`
 
-To trigger a manual deploy, use the **Run workflow** button in the GitHub Actions tab (`workflow_dispatch` is enabled).
+### Production URLs
 
-### Production URL
+- `https://ebrahimalzaabi.com` (custom domain)
+- `https://ebrahimalzaabi-com.pages.dev` (Cloudflare Pages subdomain)
 
-`https://ebrahimalzaabi.com`
+Both URLs serve the site independently with no redirects.
 
 ## Admin Panel
 
