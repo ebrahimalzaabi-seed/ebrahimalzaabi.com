@@ -45,7 +45,7 @@
   var endpoint = document.getElementById("tweet-widget").dataset.workerUrl;
   var profileLink = 'https://x.com/ebrahimuae1';
   var xLogoSvg = '<svg class="tweet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="X logo" role="img"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>';
-  var pinIconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tweet-pin-icon"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>';
+  var pinIconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="tweet-pin-icon"><path d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5a.5.5 0 0 1-1 0V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189a6 6 0 0 1 .83-.603v-4.43a2 2 0 0 1-.354-.299C4.342 1.674 4 1.179 4 .5a.5.5 0 0 1 .146-.354"/></svg>';
 
   function formatDate(dt) {
     if (!dt) return "";
@@ -77,20 +77,11 @@
     var header = document.createElement("div");
     header.className = "tweet-card-header";
 
-    var labelRow = document.createElement("div");
-    labelRow.className = "tweet-card-label-row";
-
-    var badge = document.createElement("span");
-    badge.className = "tweet-card-label " + labelClass + " arabic-text";
-    badge.innerHTML = (isPinned ? pinIconSvg + " " : "") + label;
-    labelRow.appendChild(badge);
-
     var prof = document.createElement("div");
     prof.className = "tweet-profile";
-    prof.innerHTML = profileHtml(profile, tweet);
-    labelRow.appendChild(prof);
+    prof.innerHTML = (isPinned ? '<span class="tweet-pin-badge">' + pinIconSvg + '</span>' : '') + profileHtml(profile, tweet);
 
-    header.appendChild(labelRow);
+    header.appendChild(prof);
 
     var iconLink = document.createElement("a");
     iconLink.href = profileLink;
@@ -308,37 +299,21 @@
   }
   .tweet-card-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     margin-bottom: 0.5rem;
+    overflow: hidden;
   }
-  .tweet-card-label-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    min-width: 0;
-  }
-  .tweet-card-label {
+  .tweet-pin-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    width: fit-content;
-  }
-  .tweet-card-label--latest {
-    background: #e8f5e9;
-    color: #2e7d32;
-  }
-  .tweet-card-label--pinned {
-    background: #fff3e0;
-    color: #e65100;
+    color: #bbb;
+    flex-shrink: 0;
+    margin-left: -0.3rem;
   }
   .tweet-pin-icon {
-    width: 0.85em;
-    height: 0.85em;
+    width: 1em;
+    height: 1em;
   }
   .tweet-icon {
     width: 22px;
@@ -355,7 +330,11 @@
   .tweet-profile-img {
     width: 36px;
     height: 36px;
+    min-width: 36px;
+    min-height: 36px;
     border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
   }
   .tweet-profile-name {
     font-size: 0.9rem;
@@ -549,13 +528,8 @@
     .tweet-icon {
       color: #e7e9ea;
     }
-    .tweet-card-label--latest {
-      background: #1b5e20;
-      color: #a5d6a7;
-    }
-    .tweet-card-label--pinned {
-      background: #bf360c;
-      color: #ffcc80;
+    .tweet-pin-badge {
+      color: #666;
     }
     .tweet-nav-btn {
       background: #2a2a2a;
