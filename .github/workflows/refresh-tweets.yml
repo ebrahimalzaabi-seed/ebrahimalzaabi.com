@@ -1,0 +1,110 @@
+name: Refresh Tweets Cache
+on:
+  schedule:
+    - cron: '0 */1 * * *' # every hour
+  workflow_dispatch: # manual trigger
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Nitter RSS
+        run: |
+          curl -sL -o /tmp/rss.xml --max-time 15 \
+            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
+            -H "Accept: application/rss+xml,application/xml,text/xml" \
+            "https://nitter.net/ebrahimuae1/rss"
+          ITEMS=$(grep -c '<item>' /tmp/rss.xml || echo 0)
+          echo "Found $ITEMS items"
+          if [ "$ITEMS" -eq 0 ]; then
+            echo "No items found, skipping KV update"
+            exit 1
+          fi
+
+      - name: Parse RSS to JSON
+        run: |
+          python3 << 'PYEOF'
+          import re, json, html
+
+          HANDLE = "ebrahimuae1"
+
+          with open("/tmp/rss.xml", "r") as f:
+              xml = f.read()
+
+          def extract_tag(block, tag):
+              m = re.search(rf"<{tag}><!\[CDATA\[(.*?)\]\]></{tag}>|<{tag}>(.*?)</{tag}>", block, re.DOTALL)
+              return (m.group(1) or m.group(2) or "").strip() if m else ""
+
+          # Parse channel info
+          chan = re.search(r"<channel>(.*?)<item>", xml, re.DOTALL)
+          chan_text = chan.group(1) if chan else xml
+          raw_title = extract_tag(chan_text, "title")
+          parts = raw_title.split(" / ")
+          name = parts[0].strip() if parts else HANDLE
+          handle_str = parts[1].strip() if len(parts) > 1 else f"@{HANDLE}"
+
+          img_match = re.search(r"<image>.*?<url>(.*?)</url>.*?</image>", chan_text, re.DOTALL)
+          image_url = img_match.group(1).strip() if img_match else ""
+          if "/pic/" in image_url:
+              encoded = image_url.split("/pic/")[1]
+              from urllib.parse import unquote
+              image_url = unquote(encoded).replace("_normal.", "_400x400.")
+
+          profile = {"name": name, "handle": handle_str, "imageUrl": image_url}
+
+          # Parse items
+          items = []
+          for m in re.finditer(r"<item>(.*?)</item>", xml, re.DOTALL):
+              block = m.group(1)
+              items.append({
+                  "title": extract_tag(block, "title"),
+                  "link": extract_tag(block, "link"),
+                  "description": extract_tag(block, "description"),
+                  "pubDate": extract_tag(block, "pubDate"),
+              })
+
+          def format_tweet(item):
+              id_match = re.search(r"/status/(\d+)", item["link"])
+              tweet_id = id_match.group(1) if id_match else ""
+              text = item["title"]
+              if text.startswith("Pinned:"):
+                  text = text[7:].strip()
+              return {
+                  "id": tweet_id,
+                  "text": text,
+                  "url": f"https://x.com/{HANDLE}/status/{tweet_id}",
+                  "datetime": item["pubDate"],
+                  "isLongTweet": len(text) > 280,
+              }
+
+          pinned_item = next((i for i in items if i["title"].startswith("Pinned:")), None)
+          tweet_items = [i for i in items if not i["title"].startswith("Pinned:")]
+
+          result = {"profile": profile}
+          if pinned_item:
+              result["pinned"] = format_tweet(pinned_item)
+          result["tweets"] = [format_tweet(i) for i in tweet_items]
+
+          with open("/tmp/tweets.json", "w") as f:
+              json.dump(result, f, ensure_ascii=False, indent=2)
+
+          print(f"Parsed {len(result['tweets'])} tweets, pinned: {bool(pinned_item)}")
+          PYEOF
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Write to Cloudflare KV
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          wrangler kv key put "tweets_v3" --namespace-id="8d0089feba3848548b989d46f04029b4" --remote --path /tmp/tweets.json
+          echo "KV cache updated"
