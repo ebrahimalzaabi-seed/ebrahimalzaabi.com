@@ -1,5 +1,5 @@
 <!-- Custom YouTube Videos Widget -->
-<div class="custom-youtube-widget">
+<div class="custom-youtube-widget" data-worker-url="{{ if hugo.IsProduction }}{{ .Site.Params.workers.youtube.prod }}{{ else }}{{ .Site.Params.workers.youtube.dev }}{{ end }}">
   <div class="youtube-section-header">
     <span class="youtube-section-badge">
       <span class="youtube-badge-icon"></span>
@@ -234,9 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const videosContainer = document.getElementById('youtubeVideos');
   
   // Fetch videos from the serverless function
-  const workerUrl = window.location.hostname === 'localhost'
-    ? 'http://localhost:8789'
-    : 'https://youtube-videos.ebrahimalzaabi-seed.workers.dev';
+  const workerUrl = document.querySelector('.custom-youtube-widget').dataset.workerUrl;
   fetch(workerUrl)
     .then(response => response.json())
     .then(data => {

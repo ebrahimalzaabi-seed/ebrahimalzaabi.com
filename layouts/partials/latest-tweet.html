@@ -1,5 +1,5 @@
 <!-- Latest Tweet Widget -->
-<section id="tweet-widget" class="tweet-widget mt4" style="display:none;">
+<section id="tweet-widget" class="tweet-widget mt4" style="display:none;" data-worker-url="{{ if hugo.IsProduction }}{{ .Site.Params.workers.tweet.prod }}{{ else }}{{ .Site.Params.workers.tweet.dev }}{{ end }}">
   <div class="tweet-section-header">
     <span class="tweet-section-badge">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="tweet-section-badge-icon" aria-hidden="true"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
@@ -21,7 +21,7 @@
 
 <script>
 (function() {
-  var endpoint = {{ if hugo.IsProduction }}"https://embeded-tweet.ebrahimalzaabi-seed.workers.dev"{{ else }}"http://localhost:8787"{{ end }};
+  var endpoint = document.getElementById("tweet-widget").dataset.workerUrl;
   fetch(endpoint)
     .then(function(res) { return res.json(); })
     .then(function(data) {

@@ -753,7 +753,7 @@
     <span id="cacheLabel">Cache: off</span>
   </div>
 
-  <div id="content">
+  <div id="content" data-worker-url="{{ if hugo.IsProduction }}{{ .Site.Params.workers.analytics.prod }}{{ else }}{{ .Site.Params.workers.analytics.dev }}{{ end }}">
     <div class="loading">
       <div class="loading-spinner"></div>
       <div>جارٍ التحميل...</div>
@@ -764,8 +764,7 @@
 
   <script>
     let lastData = null;
-    const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    const WORKER_URL = isDev ? 'http://localhost:8787' : 'https://analytics-proxy.ebrahimalzaabi-seed.workers.dev';
+    const WORKER_URL = document.getElementById('content').dataset.workerUrl;
     const periodLabels = { today: 'اليوم', yesterday: 'أمس', '7d': 'آخر ٧ أيام', '30d': 'آخر ٣٠ يوم', '90d': 'آخر ٩٠ يوم', custom: 'مخصص' };
     const VALID_PERIODS = ['today', 'yesterday', '7d', '30d', '90d', 'custom'];
     const savedPeriod = localStorage.getItem('analytics_period');

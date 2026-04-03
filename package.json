@@ -5,7 +5,12 @@
   "scripts": {
     "build-index": "node scripts/build-search-index.js",
     "admin": "node scripts/admin-server.js",
-    "fatwa": "node scripts/fatwa-cli.js"
+    "fatwa": "node scripts/fatwa-cli.js",
+    "workers": "npm run worker:tweet & npm run worker:analytics & npm run worker:youtube & npm run worker:question & wait",
+    "worker:tweet": "npm --prefix workers/embeded-tweet run dev",
+    "worker:analytics": "npm --prefix workers/analytics-proxy run dev",
+    "worker:youtube": "npm --prefix workers/youtube-videos run dev",
+    "worker:question": "npm --prefix workers/send-question run dev"
   },
   "dependencies": {
     "dotenv": "^17.3.1",

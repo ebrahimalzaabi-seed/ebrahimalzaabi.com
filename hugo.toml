@@ -37,6 +37,20 @@ theme = "ananke"
     pageRef = "/search/"
     weight = 2
 
+[params.workers]
+  [params.workers.youtube]
+    dev = "http://localhost:8789"
+    prod = "https://youtube-videos.ebrahimalzaabi-seed.workers.dev"
+  [params.workers.tweet]
+    dev = "http://localhost:8787"
+    prod = "https://embeded-tweet.ebrahimalzaabi-seed.workers.dev"
+  [params.workers.analytics]
+    dev = "http://localhost:8788"
+    prod = "https://analytics-proxy.ebrahimalzaabi-seed.workers.dev"
+  [params.workers.sendQuestion]
+    dev = "http://localhost:8790"
+    prod = "https://blue-dew-502c.ebrahimalzaabi-seed.workers.dev"
+
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
