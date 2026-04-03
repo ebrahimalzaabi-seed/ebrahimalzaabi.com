@@ -8,7 +8,7 @@ theme = "ananke"
   description = "الموقع الرسمي للشيخ إبراهيم بن سيف الزعابي - فتاوى شرعية ومؤلفات ودروس علمية"
   author = "الشيخ إبراهيم بن سيف الزعابي"
   favicon = "/favicon.png"
-  custom_css = ["/css/custom.css", "css/custom-theme-override.css"]  # Add our custom CSS files
+  custom_css = ["/css/custom.css"]  # Add our custom CSS files
 
 [menu]
   [[menu.main]]
