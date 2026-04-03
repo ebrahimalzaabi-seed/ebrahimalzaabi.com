@@ -152,6 +152,7 @@ async function listQuestions(env) {
 
 const ALLOWED_ORIGINS = [
   'https://ebrahimalzaabi.com',
+  'https://ebrahimalzaabi-com.pages.dev',
   'http://localhost:1313',
 ];
 
