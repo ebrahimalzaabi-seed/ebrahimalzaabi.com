@@ -50,7 +50,9 @@ jobs:
           if "/pic/" in image_url:
               encoded = image_url.split("/pic/")[1]
               from urllib.parse import unquote
-              image_url = "https://" + unquote(encoded).replace("_normal.", "_400x400.")
+              image_url = unquote(encoded).replace("_normal.", "_400x400.")
+              if not image_url.startswith("http"):
+                  image_url = "https://" + image_url
 
           profile = {"name": name, "handle": handle_str, "imageUrl": image_url}
 

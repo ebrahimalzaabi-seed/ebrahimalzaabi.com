@@ -81,6 +81,7 @@
     // Pick random
     var idx = Math.floor(Math.random() * items.length);
     items[idx].style.display = 'block';
+    document.dispatchEvent(new CustomEvent('seasonalFatwa:updated'));
   }
 
   var activePool = null;

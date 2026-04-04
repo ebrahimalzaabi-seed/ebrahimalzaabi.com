@@ -135,6 +135,36 @@
   var currentSlide = 0;
   var totalSlides = 0;
   var carousel = document.getElementById("tweet-carousel");
+  var resizeSyncTimer = null;
+
+  function getVisibleFatwaCard() {
+    var items = document.querySelectorAll('.homepage-top-col--fatwa .seasonal-fatwa-item');
+    for (var i = 0; i < items.length; i++) {
+      if (window.getComputedStyle(items[i]).display !== 'none') {
+        return items[i].querySelector('.latest-fatawa-card');
+      }
+    }
+    return null;
+  }
+
+  function syncFatwaCardHeight() {
+    var row = document.getElementById('homepage-top-row');
+    var tweetCol = document.querySelector('.homepage-top-col--tweet');
+    var fatwaCard = getVisibleFatwaCard();
+
+    if (row) row.style.visibility = 'visible';
+    if (!tweetCol || !fatwaCard) return;
+
+    var headerEl = document.querySelector('.homepage-top-col--fatwa .latest-fatawa-header');
+    var headerH = headerEl ? headerEl.offsetHeight + parseFloat(getComputedStyle(headerEl).marginBottom) : 0;
+    var maxHeight = Math.max(0, tweetCol.offsetHeight - headerH);
+    fatwaCard.style.maxHeight = maxHeight + 'px';
+  }
+
+  function scheduleFatwaHeightSync() {
+    syncFatwaCardHeight();
+    window.requestAnimationFrame(syncFatwaCardHeight);
+  }
 
   function goToSlide(idx) {
     if (idx < 0 || idx >= totalSlides) return;
@@ -143,6 +173,8 @@
     document.getElementById("tweet-nav-counter").textContent = toArabicNum(currentSlide + 1) + " / " + toArabicNum(totalSlides);
     document.getElementById("tweet-nav-prev").disabled = currentSlide === 0;
     document.getElementById("tweet-nav-next").disabled = currentSlide === totalSlides - 1;
+    scheduleFatwaHeightSync();
+    window.setTimeout(syncFatwaCardHeight, 420);
   }
 
   document.getElementById("tweet-nav-prev").addEventListener("click", function() { goToSlide(currentSlide - 1); });
@@ -182,23 +214,24 @@
 
       document.getElementById("tweet-widget").style.display = "";
 
-      // Match fatwa card height to tweet widget height, then reveal
-      setTimeout(function() {
-        var row = document.getElementById('homepage-top-row');
-        var tweetCol = document.querySelector('.homepage-top-col--tweet');
-        var fatwaCard = document.querySelector('.homepage-top-col--fatwa .seasonal-fatwa-item[style*="block"] .latest-fatawa-card');
-        if (!fatwaCard) fatwaCard = document.querySelector('.homepage-top-col--fatwa .latest-fatawa-card');
-        if (tweetCol && fatwaCard) {
-          var headerEl = document.querySelector('.homepage-top-col--fatwa .latest-fatawa-header');
-          var headerH = headerEl ? headerEl.offsetHeight + parseFloat(getComputedStyle(headerEl).marginBottom) : 0;
-          fatwaCard.style.maxHeight = (tweetCol.offsetHeight - headerH) + 'px';
-        }
-        if (row) row.style.visibility = 'visible';
-      }, 50);
+      scheduleFatwaHeightSync();
+      window.setTimeout(syncFatwaCardHeight, 120);
+      window.setTimeout(syncFatwaCardHeight, 320);
     })
     .catch(function(err) {
       console.error("Tweet fetch error:", err);
+      var row = document.getElementById('homepage-top-row');
+      if (row) row.style.visibility = 'visible';
     });
+
+  document.addEventListener('seasonalFatwa:updated', scheduleFatwaHeightSync);
+  window.addEventListener('resize', function() {
+    window.clearTimeout(resizeSyncTimer);
+    resizeSyncTimer = window.setTimeout(syncFatwaCardHeight, 80);
+  });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(scheduleFatwaHeightSync).catch(function() {});
+  }
 })();
 </script>
 

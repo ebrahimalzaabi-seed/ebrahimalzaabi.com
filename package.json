@@ -10,7 +10,9 @@
     "worker:tweet": "npm --prefix workers/embeded-tweet run dev",
     "worker:analytics": "npm --prefix workers/analytics-proxy run dev",
     "worker:youtube": "npm --prefix workers/youtube-videos run dev",
-    "worker:question": "npm --prefix workers/send-question run dev"
+    "worker:question": "npm --prefix workers/send-question run dev",
+    "kv:delete-tweets": "wrangler kv key delete tweets_v3 --namespace-id=8d0089feba3848548b989d46f04029b4",
+    "tweets:refresh": "gh workflow run refresh-tweets.yml && echo 'Workflow triggered. Run: gh run list -w refresh-tweets.yml -L 1'"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
