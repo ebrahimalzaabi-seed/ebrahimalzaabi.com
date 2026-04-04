@@ -2,6 +2,16 @@
 
 Hugo-based website for Sheikh Ibrahim Saif Al-Zaabi.
 
+## Philosophy
+
+This project is built around three principles:
+
+1. **Zero cost, maximum sustainability** — Every service used is free-tier. No credit card is attached to any account. The only paid component is the domain name `ebrahimalzaabi.com` (paid through 2031), but the site remains permanently accessible at https://ebrahimalzaabi-com.pages.dev/ regardless of domain renewal. If funding ever stops, nothing breaks — the site keeps running indefinitely.
+
+2. **Ready for handoff** — A new developer should be able to clone the repo and have a working local site in minutes. All infrastructure is documented in this README, all secrets are listed explicitly, and the architecture is intentionally simple (static site + lightweight workers). There is no complex CI/CD pipeline, no containers, no databases — just `git clone`, `npm install`, and `hugo server`.
+
+3. **One credential for everything** — All third-party services (GitHub, Cloudflare, Google Analytics, Resend, GCP, Archive.org) are registered under a single shared Google account: **ebrahimalzaabi.seed@gmail.com**. One login, one password, one 2FA — no scavenger hunt across accounts when it's time to hand over the project.
+
 ## Architecture
 
 ```mermaid
@@ -22,6 +32,10 @@ graph TD
     Admin[Admin Server - Node.js<br/>localhost:3111<br/>CRUD fatwa, notify, refresh search index] -->|fetches pending questions| CF
     Admin -->|notify user question has been answered| Resend
 
+    GHA[GitHub Actions<br/>Hourly cron] -->|fetches RSS| Nitter[Nitter<br/>nitter.net]
+    GHA -->|writes tweets JSON| KV[Cloudflare KV<br/>TWEET_CACHE]
+    CF -->|reads cached tweets| KV
+
     style Dev fill:#e3fafc,stroke:#1e1e1e
     style Visitor fill:#a5d8ff,stroke:#1e1e1e
     style CFP fill:#b2f2bb,stroke:#2f9e44
@@ -30,13 +44,16 @@ graph TD
     style Resend fill:#ffa8a8,stroke:#c92a2a
     style GA4 fill:#99e9f2,stroke:#0c8599
     style Archive fill:#dee2e6,stroke:#495057
+    style GHA fill:#c3fae8,stroke:#087f5b
+    style Nitter fill:#ffe8cc,stroke:#e8590c
+    style KV fill:#fff3bf,stroke:#e67700
 ```
 
 ### Tech Stack
 
 | Service | Purpose |
 |---|---|
-| [GitHub](https://github.com/) | Source code repository |
+| [GitHub](https://github.com/) | Source code repository + Actions cron for tweet refresh |
 | [Cloudflare Pages](https://pages.cloudflare.com/) | Static site hosting (auto-deploys on push to main) |
 | [Cloudflare Workers](https://workers.cloudflare.com/) | Question submission backend |
 | [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) | CAPTCHA for the question form |
@@ -98,11 +115,19 @@ NOTIFY_EMAIL_DEV=...
 
 ### 5. Run the dev server
 
+In one terminal, start Hugo:
+
 ```bash
 hugo server
 ```
 
-The site will be available at `http://localhost:1313`.
+In another terminal, start all Cloudflare Workers locally:
+
+```bash
+npm run workers
+```
+
+The site will be available at `http://localhost:1313`. The workers run on their respective local ports (see each worker's `wrangler.toml` for details).
 
 ## Deployment
 
@@ -149,7 +174,7 @@ npx wrangler deploy   # deploy to Cloudflare
 
 ## Cloudflare Worker (`workers/embeded-tweet/`)
 
-Scrapes the latest pinned tweet from [@ebrahimuae1](https://x.com/ebrahimuae1) using Twitter's public guest token API and syndication CDN. Results are cached in KV for 1 hour.
+Thin KV reader that serves the latest tweets from [@ebrahimuae1](https://x.com/ebrahimuae1). The worker itself does no fetching — it simply reads pre-populated JSON from the `TWEET_CACHE` KV namespace (written by the GitHub Actions cron below).
 
 ```bash
 cd workers/embeded-tweet
@@ -157,7 +182,22 @@ npm install
 npx wrangler deploy   # deploy to Cloudflare
 ```
 
-No secrets required — uses Twitter's public bearer token (hardcoded) and a KV namespace (`TWEET_CACHE`) for caching.
+No secrets required — reads from KV namespace `TWEET_CACHE`.
+
+## GitHub Actions — Tweet Refresh (`.github/workflows/refresh-tweets.yml`)
+
+A scheduled workflow that runs **every hour** to keep the tweet cache fresh. Cloudflare Workers cannot fetch from Nitter directly (both sit behind Cloudflare, causing 520 errors), so GitHub Actions runners handle the fetch instead.
+
+**How it works:**
+1. Fetches the Nitter RSS feed for `@ebrahimuae1`
+2. Parses the XML into a JSON structure (profile, pinned tweet, recent tweets) via an inline Python script
+3. Writes the JSON to Cloudflare KV (`TWEET_CACHE` namespace, key `tweets_v3`) using Wrangler
+
+**GitHub Secrets required:**
+- `CLOUDFLARE_API_TOKEN` — Cloudflare API token with Workers KV write permission
+- `CLOUDFLARE_ACCOUNT_ID` — Cloudflare account ID
+
+The workflow can also be triggered manually from the Actions tab (`workflow_dispatch`).
 
 ## Cloudflare Worker (`workers/analytics-proxy/`)
 
@@ -175,6 +215,18 @@ npx wrangler deploy   # deploy to Cloudflare
 - `GCP_PRIVATE_KEY` — GCP service account private key (PEM format)
 
 For local development, create `workers/analytics-proxy/.dev.vars` with these values (already gitignored).
+
+## Cloudflare Worker (`workers/youtube-videos/`)
+
+Fetches the latest videos from the sheikh's YouTube channel via the public YouTube RSS feed. Results are cached at the edge for 1 hour.
+
+```bash
+cd workers/youtube-videos
+npm install
+npx wrangler deploy   # deploy to Cloudflare
+```
+
+No secrets required — uses YouTube's public RSS feed.
 
 ## Dry Run Mode
 
