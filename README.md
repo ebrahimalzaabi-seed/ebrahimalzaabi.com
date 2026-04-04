@@ -197,7 +197,12 @@ A scheduled workflow that runs **every hour** to keep the tweet cache fresh. Clo
 - `CLOUDFLARE_API_TOKEN` — Cloudflare API token with Workers KV write permission
 - `CLOUDFLARE_ACCOUNT_ID` — Cloudflare account ID
 
-The workflow can also be triggered manually from the Actions tab (`workflow_dispatch`).
+The workflow can also be triggered manually from the Actions tab (`workflow_dispatch`), or via the CLI:
+
+```bash
+npm run tweets:refresh        # trigger the GitHub Action
+npm run kv:delete-tweets      # delete the cached tweets from KV
+```
 
 ## Cloudflare Worker (`workers/analytics-proxy/`)
 
