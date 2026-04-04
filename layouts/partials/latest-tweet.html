@@ -60,7 +60,7 @@
 
   function profileHtml(p, t) {
     var h = "";
-    if (p.imageUrl) h += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-avatar-link link dim"><img src="' + p.imageUrl + '" alt="' + (p.name || "") + '" class="tweet-profile-img" loading="lazy"/></a>';
+    if (p.imageUrl) h += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-avatar-link link dim"><img src="' + p.imageUrl + '" alt="' + (p.name || "") + '" class="tweet-profile-img" loading="lazy" referrerpolicy="no-referrer"/></a>';
     if (p.name) h += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-name link dim">' + p.name + '</a>';
     if (p.handle) h += '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-profile-handle link dim">' + p.handle + '</a>';
     if (t && t.datetime) {
