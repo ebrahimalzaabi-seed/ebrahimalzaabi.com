@@ -54,7 +54,15 @@
         {{ partial "tags-cloud.html" . }}
       </div>
 
-      {{ partial "latest-tweet.html" . }}
+      <!-- Two-column: Tweets (right) + Seasonal Fatwa (left) -->
+      <div class="homepage-top-row mt4 mb4" id="homepage-top-row" style="visibility:hidden;">
+        <div class="homepage-top-col homepage-top-col--tweet">
+          {{ partial "latest-tweet.html" . }}
+        </div>
+        <div class="homepage-top-col homepage-top-col--fatwa">
+          {{ partial "seasonal-fatwa.html" . }}
+        </div>
+      </div>
 
       <!-- Custom YouTube Videos Widget -->
       <div class="custom-youtube-section mt5 mb5">

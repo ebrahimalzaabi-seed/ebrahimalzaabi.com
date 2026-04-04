@@ -105,7 +105,7 @@
             var h = data.data.hijri;
             var text = h.day + ' ' + h.month.ar + ' ' + h.year + ' \u0647\u0640';
             hijriEl.textContent = toArabic(text);
-            try { localStorage.setItem(cacheKey, JSON.stringify({ g: todayKey, h: text })); } catch(e) {}
+            try { localStorage.setItem(cacheKey, JSON.stringify({ g: todayKey, h: text, month: parseInt(h.month.number, 10) })); } catch(e) {}
           })
           .catch(function() {});
       }

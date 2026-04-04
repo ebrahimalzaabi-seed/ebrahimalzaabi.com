@@ -1,0 +1,135 @@
+{{ $rules := .Site.Data.seasonal_fatawa }}
+{{ if $rules }}
+
+{{/* Pre-render all rule pools at build time */}}
+{{ range $ruleIdx, $rule := $rules }}
+  {{ $matched := slice }}
+  {{ range $cat := $rule.categories }}
+    {{ range where $.Site.RegularPages "Section" "fatawa" }}
+      {{ if in .Params.categories $cat }}
+        {{ $matched = $matched | append . }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
+  {{/* Deduplicate by permalink */}}
+  {{ $seen := dict }}
+  {{ $unique := slice }}
+  {{ range $matched }}
+    {{ if not (index $seen .RelPermalink) }}
+      {{ $seen = merge $seen (dict .RelPermalink true) }}
+      {{ $unique = $unique | append . }}
+    {{ end }}
+  {{ end }}
+
+  {{ if $unique }}
+  <div class="seasonal-fatwa-pool" data-rule-idx="{{ $ruleIdx }}" data-from="{{ $rule.from_month }}" data-to="{{ $rule.to_month }}" style="display:none;">
+    <div class="seasonal-fatwa-section latest-fatawa-section">
+      <div class="latest-fatawa-header">
+        <span class="latest-fatawa-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm50.7-186.9L162.4 380.6c-19.4 7.5-38.5-11.6-31-31l55.5-144.3c3.3-8.5 9.2-15.8 17-21.2l135.3-93.5c3.8-2.6 8.8 1.4 7.2 5.7l-45.6 128.7c-2.9 8.2-8.6 15.2-16.1 19.9l-55.3 34.8 9.2 6.4c5 3.5 8.3 8.9 9 15l4.1 35.8c.6 5-5.1 8.2-9 5.2zM256 288a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"/></svg>
+          <span class="arabic-text">{{ $rule.title }}</span>
+        </span>
+      </div>
+
+      <div class="seasonal-fatwa-items">
+        {{ range $unique }}
+        <div class="seasonal-fatwa-item" style="display:none;">
+          <a href="{{ .RelPermalink }}" class="latest-fatawa-card">
+            <div class="latest-fatawa-card-inner">
+              <h3 class="arabic-text">{{ .Title }}</h3>
+              {{ with .Params.question }}
+              <p class="latest-fatawa-excerpt arabic-text">{{ . | plainify | truncate 120 }}</p>
+              {{ end }}
+              {{ with .Params.answer }}
+              <div class="seasonal-fatwa-answer arabic-text">{{ . | plainify }}</div>
+              {{ end }}
+              <div class="latest-fatawa-meta">
+                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+                {{ with $.Params.categories }}
+                  {{ range first 2 . }}
+                  <span class="latest-fatawa-cat">{{ . }}</span>
+                  {{ end }}
+                {{ end }}
+              </div>
+            </div>
+          </a>
+        </div>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+  {{ end }}
+{{ end }}
+
+
+<script>
+(function() {
+  function monthInRange(month, from, to) {
+    if (from <= to) {
+      return month >= from && month <= to;
+    }
+    // Wrapping range (e.g., from=11 to=1 means 11,12,1)
+    return month >= from || month <= to;
+  }
+
+  function showRandomFatwa(pool) {
+    var items = pool.querySelectorAll('.seasonal-fatwa-item');
+    if (!items.length) return;
+    // Hide all
+    for (var i = 0; i < items.length; i++) items[i].style.display = 'none';
+    // Pick random
+    var idx = Math.floor(Math.random() * items.length);
+    items[idx].style.display = 'block';
+  }
+
+  var activePool = null;
+
+  function activate(hijriMonth) {
+    var pools = document.querySelectorAll('.seasonal-fatwa-pool');
+    for (var i = 0; i < pools.length; i++) {
+      var from = parseInt(pools[i].getAttribute('data-from'), 10);
+      var to = parseInt(pools[i].getAttribute('data-to'), 10);
+      if (monthInRange(hijriMonth, from, to)) {
+        pools[i].style.display = 'block';
+        activePool = pools[i];
+        showRandomFatwa(pools[i]);
+        return;
+      }
+    }
+    // No match - all pools stay hidden
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Reuse the hijri cache from the footer Aladhan API call
+    var cacheKey = 'hijriDate';
+    var cached = null;
+    try { cached = JSON.parse(localStorage.getItem(cacheKey)); } catch(e) {}
+
+    if (cached && cached.month) {
+      activate(cached.month);
+    } else {
+      var now = new Date();
+      var dd = String(now.getDate()).padStart(2, '0');
+      var mm = String(now.getMonth() + 1).padStart(2, '0');
+      var yyyy = now.getFullYear();
+      fetch('https://api.aladhan.com/v1/gToH/' + dd + '-' + mm + '-' + yyyy)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var h = data.data.hijri;
+          var hijriMonth = parseInt(h.month.number, 10);
+          // Store month in the same cache for reuse
+          var todayKey = yyyy + '-' + mm + '-' + dd;
+          var text = h.day + ' ' + h.month.ar + ' ' + h.year + ' \u0647\u0640';
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify({ g: todayKey, h: text, month: hijriMonth }));
+          } catch(e) {}
+          activate(hijriMonth);
+        })
+        .catch(function() {});
+    }
+  });
+})();
+</script>
+
+{{ end }}

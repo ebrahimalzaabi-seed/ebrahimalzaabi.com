@@ -594,4 +594,92 @@ nav.breadcrumbs {
   .latest-fatawa-card h3 {
     font-size: 1.05rem;
   }
-} 
+}
+
+/* --- Homepage Two-Column Top Row (Tweets right + Seasonal Fatwa left) --- */
+.homepage-top-row {
+  display: flex;
+  direction: rtl;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.homepage-top-col {
+  min-width: 0;
+}
+
+.homepage-top-col--tweet {
+  flex: 1 1 55%;
+}
+
+.homepage-top-col--fatwa {
+  flex: 1 1 45%;
+}
+
+.homepage-top-col--fatwa .latest-fatawa-card {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Remove tweet widget margins inside the top row */
+.homepage-top-col--tweet .tweet-widget {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+/* Match the fatwa header to tweet header height inside top row */
+.homepage-top-col--fatwa .latest-fatawa-header {
+  margin-bottom: 0.75rem;
+}
+
+.homepage-top-col--tweet .tweet-section-header {
+  margin-bottom: 0.75rem;
+}
+
+/* Seasonal fatwa answer excerpt */
+.seasonal-fatwa-answer {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.7;
+  overflow: hidden;
+  position: relative;
+}
+
+.seasonal-fatwa-answer::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rem;
+  background: linear-gradient(transparent, #fff);
+  pointer-events: none;
+  border-radius: 0 0 12px 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .seasonal-fatwa-answer {
+    color: #aaa;
+  }
+
+  .seasonal-fatwa-answer::after {
+    background: linear-gradient(transparent, #1e1e1e);
+  }
+}
+
+@media (max-width: 768px) {
+  .homepage-top-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .homepage-top-col--tweet,
+  .homepage-top-col--fatwa {
+    flex: none;
+    width: 100%;
+  }
+
+  .homepage-top-col--fatwa .latest-fatawa-card {
+    max-height: none !important;
+  }
+}

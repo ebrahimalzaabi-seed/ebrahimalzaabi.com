@@ -1,0 +1,14 @@
+[
+  {
+    "from_month": 10,
+    "to_month": 11,
+    "categories": ["الحج", "الزكاة"],
+    "title": "فتاوى مختارة"
+  },
+  {
+    "from_month": 9,
+    "to_month": 9,
+    "categories": ["رمضان"],
+    "title": "فتاوى رمضان"
+  }
+]
