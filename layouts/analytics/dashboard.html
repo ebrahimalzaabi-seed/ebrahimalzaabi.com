@@ -805,7 +805,8 @@
 
     let cacheEnabled = localStorage.getItem('analytics_cache') === 'true';
 
-    if (isDev) {
+    {{ if not hugo.IsProduction }}
+    {
       const toolbar = document.getElementById('devToolbar');
       const toggle = document.getElementById('cacheToggle');
       const label = document.getElementById('cacheLabel');
@@ -819,6 +820,7 @@
         fetchData(currentPeriod);
       });
     }
+    {{ end }}
 
     document.querySelectorAll('.period-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -881,7 +883,7 @@
       footer.style.display = 'none';
 
       try {
-        const nocache = isDev && !cacheEnabled ? '&nocache=1' : '';
+        const nocache = {{ if not hugo.IsProduction }}!cacheEnabled ? '&nocache=1' : ''{{ else }}''{{ end }};
         let url = WORKER_URL + '/analytics?period=' + period + nocache;
         if (period === 'custom') {
           url += '&start=' + encodeURIComponent(customStart) + '&end=' + encodeURIComponent(customEnd);
