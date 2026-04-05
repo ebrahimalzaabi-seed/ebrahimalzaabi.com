@@ -776,4 +776,21 @@ nav.breadcrumbs {
   .latest-fatawa-list {
     gap: 0.5rem !important;
   }
+
+  /* Mobile footer: stacked, centered layout */
+  footer .flex.justify-between.items-center {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 0.5rem !important;
+  }
+
+  footer .flex.justify-between.items-center > div {
+    text-align: center;
+  }
+
+  footer .flex.justify-between.items-center > div:last-child .f5 {
+    font-size: 0.8rem !important;
+    color: #888 !important;
+  }
 }
