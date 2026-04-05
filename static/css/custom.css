@@ -709,6 +709,12 @@ nav.breadcrumbs {
     margin-bottom: 1.5rem !important;
   }
 
+  /* Hide Twitter handle on tweet cards on mobile */
+  .tweet-profile-handle,
+  .tweet-meta-dot {
+    display: none !important;
+  }
+
   /* Show only first 3 YouTube videos on mobile */
   .youtube-video-card:nth-child(n+4) {
     display: none !important;
