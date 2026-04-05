@@ -487,6 +487,10 @@ html body.boxed-layout.ma0.avenir.bg-near-white .center {
 }
 
 @media screen and (max-width: 768px) {
+  html {
+    font-size: 110%;
+  }
+
   /* Hide hero header on mobile — replaced by mobile-header partial */
   .boxed-container > header {
     display: none !important;
