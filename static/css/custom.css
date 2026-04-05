@@ -224,7 +224,7 @@ input#search::placeholder {
 /* --- Horizontal Navigation Bar --- */
 .nav-bar-container {
   background: #fff;
-  border-top: 3px solid #C5A059;
+  border-top: 3px solid #9e6800;
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
@@ -259,26 +259,26 @@ input#search::placeholder {
 }
 
 .nav-bar-item.nav-bar-active {
-  border-bottom: 3px solid #C5A059;
-  color: #C5A059;
+  border-bottom: 3px solid #9e6800;
+  color: #9e6800;
   background: #fdf8f0;
 }
 
 .nav-bar-item:hover {
   background: #fdf8f0;
-  color: #C5A059;
+  color: #9e6800;
 }
 
 .nav-bar-item:hover .nav-bar-icon {
   transform: scale(1.12);
-  color: #C5A059;
+  color: #9e6800;
 }
 
 .nav-bar-icon {
   font-size: 1.6rem;
   margin-bottom: 0.35rem;
   transition: all 0.2s ease;
-  color: #C5A059;
+  color: #9e6800;
 }
 
 .nav-bar-label {
@@ -292,7 +292,7 @@ input#search::placeholder {
 @media (prefers-color-scheme: dark) {
   .nav-bar-container {
     background: #1e1e1e;
-    border-top-color: #C5A059;
+    border-top-color: #9e6800;
     border-bottom-color: #333;
   }
   .nav-bar-item {
@@ -303,7 +303,7 @@ input#search::placeholder {
     border-right-color: #333;
   }
   .nav-bar-item.nav-bar-active {
-    border-bottom-color: #C5A059;
+    border-bottom-color: #9e6800;
     color: #d4b06a;
     background: #2e2a1e;
   }
@@ -312,7 +312,7 @@ input#search::placeholder {
     color: #d4b06a;
   }
   .nav-bar-icon {
-    color: #C5A059;
+    color: #9e6800;
   }
   .nav-bar-item:hover .nav-bar-icon {
     color: #d4b06a;
@@ -394,11 +394,11 @@ nav.breadcrumbs {
 }
 
 .breadcrumb-link:hover {
-  color: #C5A059;
+  color: #9e6800;
 }
 
 .breadcrumb-home {
-  color: #C5A059;
+  color: #9e6800;
   display: inline-flex;
   align-items: center;
 }
@@ -431,7 +431,7 @@ nav.breadcrumbs {
     color: #d4b06a;
   }
   .breadcrumb-home {
-    color: #C5A059;
+    color: #9e6800;
   }
   .breadcrumb-sep {
     color: #666;
@@ -459,7 +459,7 @@ nav.breadcrumbs {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #C5A059;
+  background-color: #9e6800;
   color: white;
   padding: 0.6rem 1.25rem;
   border-radius: 8px 8px 0 0;
@@ -482,7 +482,7 @@ nav.breadcrumbs {
 }
 
 .latest-fatawa-more:hover {
-  color: #C5A059;
+  color: #9e6800;
 }
 
 .latest-fatawa-list {
@@ -498,7 +498,7 @@ nav.breadcrumbs {
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  border-right: 4px solid #C5A059;
+  border-right: 4px solid #9e6800;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -549,7 +549,7 @@ nav.breadcrumbs {
   }
 
   .latest-fatawa-more:hover {
-    color: #C5A059;
+    color: #9e6800;
   }
 
   .latest-fatawa-card {
@@ -754,7 +754,7 @@ nav.breadcrumbs {
   .youtube-section-more::after {
     content: '\2190';
     font-size: 1.2rem;
-    color: #C5A059;
+    color: #9e6800;
   }
 
   /* Align header flex items to center so arrow aligns with badge */

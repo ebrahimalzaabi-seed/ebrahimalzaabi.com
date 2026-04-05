@@ -118,7 +118,7 @@ function buildHtmlEmail() {
           
           <!-- Header -->
           <tr>
-            <td style="background:linear-gradient(135deg,#C5A059 0%,#a8864a 100%);padding:30px 40px;text-align:center;">
+            <td style="background:linear-gradient(135deg,#9e6800 0%,#a8864a 100%);padding:30px 40px;text-align:center;">
               <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,0.2);">
                 موقع الشيخ إبراهيم سيف الزعابي
               </h1>
@@ -146,8 +146,8 @@ function buildHtmlEmail() {
           <!-- Question Box -->
           <tr>
             <td style="padding:0 40px 25px;">
-              <div style="background:#fdf8f0;border-right:4px solid #C5A059;border-radius:8px;padding:20px 25px;text-align:right;direction:rtl;">
-                <p style="margin:0 0 10px;color:#C5A059;font-size:14px;font-weight:600;text-align:right;">السؤال:</p>
+              <div style="background:#fdf8f0;border-right:4px solid #9e6800;border-radius:8px;padding:20px 25px;text-align:right;direction:rtl;">
+                <p style="margin:0 0 10px;color:#9e6800;font-size:14px;font-weight:600;text-align:right;">السؤال:</p>
                 <p style="margin:0;color:#555;font-size:16px;line-height:1.8;text-align:right;direction:rtl;">
                   ${questionText}
                 </p>
@@ -161,7 +161,7 @@ function buildHtmlEmail() {
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
                   <td style="padding:5px;">
-                    <a href="${fatwaUrl}" style="display:inline-block;background:#C5A059;color:#fff;padding:14px 35px;border-radius:8px;text-decoration:none;font-size:17px;font-weight:600;box-shadow:0 4px 12px rgba(197,160,89,0.4);">
+                    <a href="${fatwaUrl}" style="display:inline-block;background:#9e6800;color:#fff;padding:14px 35px;border-radius:8px;text-decoration:none;font-size:17px;font-weight:600;box-shadow:0 4px 12px rgba(197,160,89,0.4);">
                       قراءة الفتوى كاملة
                     </a>
                   </td>
@@ -181,7 +181,7 @@ function buildHtmlEmail() {
               <p style="margin:0 0 10px;color:#888;font-size:14px;">
                 جزاكم الله خيراً 
               </p>
-              <a href="https://ebrahimalzaabi.com" style="color:#C5A059;text-decoration:none;font-size:14px;font-weight:600;">
+              <a href="https://ebrahimalzaabi.com" style="color:#9e6800;text-decoration:none;font-size:14px;font-weight:600;">
                 ebrahimalzaabi.com
               </a>
             </td>

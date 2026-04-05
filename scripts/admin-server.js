@@ -242,7 +242,7 @@ function buildAdminHTML() {
     }
 
     :root {
-      --gold: #C5A059;
+      --gold: #9e6800;
       --gold-dark: #a8864a;
       --bg: #e0e0e0;
       --card-bg: #ffffff;
