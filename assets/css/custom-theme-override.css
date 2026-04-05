@@ -488,6 +488,16 @@ html body.boxed-layout.ma0.avenir.bg-near-white .center {
 }
 
 @media screen and (max-width: 768px) {
+  /* Hide hero header on mobile — replaced by mobile-header partial */
+  .boxed-container > header {
+    display: none !important;
+  }
+
+  /* Hide nav-bar strip on mobile — navigation lives in hamburger drawer */
+  .nav-bar-container {
+    display: none !important;
+  }
+
   /* Reduce body padding on mobile */
   html,
   html body.boxed-layout.ma0.avenir.bg-near-white {

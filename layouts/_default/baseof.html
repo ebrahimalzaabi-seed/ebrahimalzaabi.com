@@ -58,6 +58,7 @@
 
   <body class="ma0 {{ $.Param "body_classes" | default "avenir bg-near-white"}} arabic-text boxed-layout">
     <div class="boxed-container">
+      {{ partial "mobile-header.html" . }}
       {{ block "header" . }}{{ partial "site-header.html" .}}{{ end }}
       <main class="pb7" role="main">
         {{ partial "nav-bar.html" . }}
