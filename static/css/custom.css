@@ -709,6 +709,11 @@ nav.breadcrumbs {
     margin-bottom: 1.5rem !important;
   }
 
+  /* Show only first 3 YouTube videos on mobile */
+  .youtube-video-card:nth-child(n+4) {
+    display: none !important;
+  }
+
   /* Tighten all section header tabs on mobile */
   .latest-fatawa-badge,
   .youtube-section-badge,
