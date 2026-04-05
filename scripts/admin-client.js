@@ -86,7 +86,17 @@ function renderManageList(filter) {
       '</div>';
     row.addEventListener('click', function() { selectFatwaRow(f.id, f.title, f.email || '', row); });
     row.querySelector('.btn-edit').addEventListener('click', function(e) { e.stopPropagation(); openEditModal(f.id); });
-    row.querySelector('.btn-notify-row').addEventListener('click', function(e) { e.stopPropagation(); selectFatwaRow(f.id, f.title, f.email || '', row); openNotifyModal(); });
+    row.querySelector('.btn-notify-row').addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Force-select (no toggle) so the notify modal always has a fatwa
+      selectedFatwaId = f.id;
+      selectedFatwaTitle = f.title;
+      selectedFatwaEmail = f.email || '';
+      document.querySelectorAll('#manage-list .fatwa-row').forEach(function(r) { r.classList.remove('selected'); });
+      row.classList.add('selected');
+      document.getElementById('fatwa-email').value = f.email || '';
+      openNotifyModal();
+    });
     row.querySelector('.btn-del-row').addEventListener('click', function(e) { e.stopPropagation(); quickDelete(f.id, f.title); });
     row.querySelector('.open-in-sel').addEventListener('click', function(e) { e.stopPropagation(); });
     row.querySelector('.open-in-sel').addEventListener('change', function(e) {
