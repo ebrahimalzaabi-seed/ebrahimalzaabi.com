@@ -527,6 +527,19 @@ html body.boxed-layout.ma0.avenir.bg-near-white .center {
     border-radius: 8px !important;
   }
 
+  /* Override 2rem main content padding to minimal on mobile */
+  .boxed-container > main > *:not(.nav-bar-container):not(nav.breadcrumbs) {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  /* Reduce article side padding on mobile */
+  article.ph3,
+  article.ph4-ns {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
   /* Adjust header background on mobile */
   header.cover .bg-black-60,
   header.cover > div {

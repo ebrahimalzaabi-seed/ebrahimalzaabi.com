@@ -32,6 +32,14 @@ This causes inconsistencies: changes made to the project-level `baseof.html` (li
 
 6. **Font Awesome** is loaded via JS (`defer`) in `site-style.html`. On some pages it may not render in time. For critical icons (like breadcrumb home), use inline SVGs instead.
 
+## Mobile Breakpoint Convention
+
+The **mobile-optimized breakpoint** for this site is **≤768px** (`max-width: 768px`).
+
+- All "isMobile" CSS rules must use `@media (max-width: 768px)` — never 640px or other values as the primary mobile boundary.
+- The `480px` breakpoint may be used for additional fine-tuning **within** mobile, but 768px is the canonical threshold.
+- On mobile (≤768px): hero header is hidden, nav-bar strip is hidden, and the mobile-header partial (hamburger + title + hijri date) is shown instead.
+
 ## Quick Check Command
 
 To verify all baseof files are in sync:
