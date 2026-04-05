@@ -250,6 +250,14 @@ html body.boxed-layout.ma0.avenir.bg-near-white {
   box-shadow:
     0 0 15px 8px rgba(200, 200, 200, 0.9),
     0 0 40px 15px rgba(200, 200, 200, 0.5) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100vh !important;
+}
+
+/* Main content grows to push footer to bottom */
+.boxed-container > main {
+  flex: 1 !important;
 }
 
 /* Main content, footer, and header: white background */
