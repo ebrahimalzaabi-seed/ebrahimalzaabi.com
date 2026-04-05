@@ -682,4 +682,11 @@ nav.breadcrumbs {
   .homepage-top-col--fatwa .latest-fatawa-card {
     max-height: none !important;
   }
+
+  /* Seasonal fatwa: show only title on mobile */
+  .seasonal-fatwa-item .latest-fatawa-excerpt,
+  .seasonal-fatwa-item .seasonal-fatwa-answer,
+  .seasonal-fatwa-item .latest-fatawa-meta {
+    display: none !important;
+  }
 }
