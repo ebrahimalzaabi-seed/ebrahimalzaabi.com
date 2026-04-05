@@ -581,12 +581,6 @@ nav.breadcrumbs {
 }
 
 @media (max-width: 480px) {
-  .latest-fatawa-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
   .latest-fatawa-card-inner {
     padding: 1rem;
   }
@@ -688,5 +682,87 @@ nav.breadcrumbs {
   .seasonal-fatwa-item .seasonal-fatwa-answer,
   .seasonal-fatwa-item .latest-fatawa-meta {
     display: none !important;
+  }
+
+  /* Tighten YouTube video cards on mobile */
+  .youtube-video-card {
+    padding: 0.75rem !important;
+    border-radius: 8px !important;
+  }
+
+  .youtube-grid {
+    gap: 0.75rem !important;
+    margin-top: 1rem !important;
+  }
+
+  .youtube-title {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .youtube-meta {
+    font-size: 0.75rem !important;
+  }
+
+  .custom-youtube-widget {
+    padding: 0.75rem 0 !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Tighten all section header tabs on mobile */
+  .latest-fatawa-badge,
+  .youtube-section-badge,
+  .tweet-section-badge,
+  .categories-section-badge {
+    padding: 0.4rem 0.9rem !important;
+    font-size: 1rem !important;
+  }
+
+  .latest-fatawa-header,
+  .youtube-section-header,
+  .tweet-section-header,
+  .categories-section-header {
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* Replace "المزيد" text with arrow icon on mobile */
+  .latest-fatawa-more,
+  .youtube-section-more {
+    font-size: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0 !important;
+    margin-bottom: -2px;
+    align-self: center;
+  }
+
+  .latest-fatawa-more::after,
+  .youtube-section-more::after {
+    content: '\2190';
+    font-size: 1.2rem;
+    color: #C5A059;
+  }
+
+  /* Align header flex items to center so arrow aligns with badge */
+  .latest-fatawa-header,
+  .youtube-section-header {
+    align-items: center !important;
+  }
+
+  /* Latest fatawa: show only title on mobile */
+  .latest-fatawa-excerpt,
+  .latest-fatawa-meta {
+    display: none !important;
+  }
+
+  .latest-fatawa-card-inner {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .latest-fatawa-list {
+    gap: 0.5rem !important;
   }
 }
