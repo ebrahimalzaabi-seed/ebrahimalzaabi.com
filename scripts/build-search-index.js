@@ -28,6 +28,7 @@ function walk(dir) {
     if (entry.isDirectory()) {
       walk(fullPath);
     } else if (entry.isFile()) {
+      if (entry.name === "_index.md") return;
       if (entry.name.endsWith(".md") || entry.name.endsWith(".html")) {
         const doc = processFile(fullPath, entry.name);
         if (doc) pagesIndex.push(doc);

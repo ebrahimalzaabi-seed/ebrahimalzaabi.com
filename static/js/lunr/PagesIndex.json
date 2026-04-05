@@ -1,23 +1,5 @@
 [
   {
-    "title": "الرئيسية",
-    "tags": [],
-    "href": "/_",
-    "content": "الرئيسية images/hero jpg"
-  },
-  {
-    "title": "Analytics",
-    "tags": [],
-    "href": "/analytics/_",
-    "content": "Analytics analytics dashboard"
-  },
-  {
-    "title": "الفتاوى",
-    "tags": [],
-    "href": "/fatawa/_",
-    "content": "الفتاوى /images/hero jpg أرسل سؤالك الشرعي الاسم البريد الإلكتروني (لإشعارك عند الإجابة) عنوان السؤال تفاصيل السؤال إرسال if (window location hostname === 'localhost') { var devNote = document createElement('div'); var isDark = window matchMedia && window matchMedia('(prefers color scheme dark)') matches; devNote style cssText = isDark 'background #3a3000;color #ffc107;border 1px solid #665500;border radius 6px;padding 10px 14px;margin top 1em;max width 400px;font size 0 9em;direction ltr;text align left;' 'background #fff3cd;color #856404;border 1px solid #ffc107;border radius 6px;padding 10px 14px;margin top 1em;max width 400px;font size 0 9em;direction ltr;text align left;'; devNote textContent = 'Dev mode notification emails will only be sent to the dev email (the primary email will not receive them) '; document getElementById('question form') after(devNote); } document addEventListener('DOMContentLoaded' function() { var form = document getElementById('question form'); var status = document getElementById('form status'); var button = form querySelector('button[type=\"submit\"]'); var nameField = document getElementById('sender_name'); var emailField = document getElementById('reply_to'); var savedName = localStorage getItem('fatawa_sender_name'); var savedEmail = localStorage getItem('fatawa_sender_email'); if (savedName) nameField value = savedName; if (savedEmail) emailField value = savedEmail; form addEventListener('submit' function(e) { e preventDefault(); status textContent = ' جاري الإرسال'; button disabled = true; var turnstileInput = document querySelector('[name=\"cf turnstile response\"]'); var turnstileToken = turnstileInput turnstileInput value ''; if ( turnstileToken) { status style color = 'red'; status textContent = 'يرجى انتظار تحميل التحقق ثم المحاولة مرة أخرى '; button disabled = false; return; } fetch('https //blue dew 502c ebrahimalzaabi seed workers dev' { method 'POST' headers { 'Content Type' 'application/json' } body JSON stringify({ name nameField value email emailField value title document getElementById('title') value message document getElementById('message') value dryRun window location hostname === 'localhost' 'cf turnstile response' turnstileToken }) }) then(function(res) { if ( res ok) { return res text() then(function(t) { console error('Response ' res status t); throw new Error(t); }); } return res json(); }) then(function(data) { if (data success) { localStorage setItem('fatawa_sender_name' nameField value); localStorage setItem('fatawa_sender_email' emailField value); status style color = 'green'; status innerHTML = 'تم إرسال سؤالك بنجاح سيصلك بريد إلكتروني عند الإجابة على سؤالك إن شاء الله '; document getElementById('title') value = ''; document getElementById('message') value = ''; if (typeof turnstile == 'undefined') turnstile reset(); } else { status style color = 'red'; status textContent = 'خطأ في الإرسال حاول مرة أخرى '; } button disabled = false; }) catch(function(error) { status style color = 'red'; status textContent = 'خطأ في الإرسال حاول مرة أخرى '; console error('Send error ' error); button disabled = false; if (typeof turnstile == 'undefined') turnstile reset(); }); }); }); تصفح الفتاوى حسب التصنيف {{ }}"
-  },
-  {
     "title": "التعامل مع زملاء غير مسلمين",
     "tags": [
       "فتاوى"
@@ -1975,7 +1957,7 @@
       "النكاح"
     ],
     "href": "/fatawa/posts/2014-02-04-2021",
-    "content": "طلاق غير المدخول بها ؟ طلق الرجل زوجته ثلاث تطليقات ولم يدخل بها هل يحق الرجوع إليها بعقد جديد ام لا ؟ السؤال طلق الرجل زوجته ثلاث تطليقات ولم يدخل بها هل يحق الرجوع إليها بعقد جديد ام لا ؟ الجواب سبق حفظك الله تعالى الجواب على مثل هذا السؤال ينظر الرابط طلاق غير المدخول بها ؟"
+    "content": "طلاق غير المدخول بها ؟ طلق الرجل زوجته ثلاث تطليقات ولم يدخل بها هل يحق الرجوع إليها بعقد جديد ام لا ؟ السؤال طلق الرجل زوجته ثلاث تطليقات ولم يدخل بها هل يحق الرجوع إليها بعقد جديد ام لا ؟ الجواب سبق حفظك الله تعالى الجواب على مثل هذا السؤال ينظر الرابط انظر هنا"
   },
   {
     "title": "اختصاص شجر الغرقد بعدم الإفصاح بأن خلفه يهودي في آخر الزمان ؟",
@@ -2408,12 +2390,6 @@
     "content": "الترجمة page biography إبراهيم بن سيف بن إبراهيم الزعابي ولد في 18/ ربيع الثاني/ 1392 هـ الموافق 1/6/1972 م في دولة الإمارات العربية المتحدة طلب العلم الشرعي في بداية سن 18 وبدأ طلبه للعلم في علوم الآلة كأصول الفقه ومصطلح الحديث والنحو وغيرها و كذلك الفقه والحديث والعقيدة وكان أكثر من تأثر بسماعهم وأخذ العلم من أشرطتهم هما فضيلة الشيخ المحدث / محمد ناصر الدين الألباني –رحمه الله تعالى وفضيلة الشيخ/ محمد بن صالح العثيمين –رحمه الله تعالى تخرج من جامعة أبوظبي (البكالوريوس في التربية لغة عربية وتربية إسلامية ) درس وحضر عدة دورات علمية على مشايخ من الشيوخ الذين حضر لهم أوالتقى بهم فضيلة الشيخ / عبد الله بن عبد الرحمن بن جبرين –حفظه الله تعالى فضيلة الشيخ /صالح بن عبد العزيز آل الشيخ –حفظه الله تعالى فضيلة الشيخ /عبد العزيز بن عبدالله الراجحي –حفظه الله تعالى فضيلة الشيخ/ عبد الله بن صالح العبيلان –حفظه الله تعالى فضيلة الشيخ/ سعد بن عبد الله الحميد –حفظه الله تعالى فضيلة الشيخ/صالح بن سعد السحيمي –حفظه الله تعالى فضيلة الشيخ/ سليم بن سعد الأحمدي –حفظه الله تعالى فضيلة الشيخ/ عبد الباري فتح الله –حفظه الله تعالى تزكية من فضيلة الشيخ الدكتور/صالح بن سعد السحيمي وفضيلة الشيخ الدكتور/ سليم بن سعد الأحمدي –حفظهما الله تعالى له دروس المسجلة في الموقع وفي اليوتيوب شرح كتاب أصول التفسير شرح كتاب الأصول الثلاثة لم يتم شرح كتاب الوجيز شرح كتاب حلية طالب العلم لم يتم شرح كتاب التحفة السنية شرح الآجرومية لم يتم شرح كتاب التيسير شرح البيقونية لم يتم شرح القواعد الفقهية لم يتم شرح عمدة التفسير الفاتحة وبداية سورة البقرة شرح عمدة الفقه لم يتم شرح فتح الباري لم يتم شرح لمعة الاعتقاد لم يتم شرح مذكرة الشنقيطي من البداية إلى باب في تقسيم الكلام والأسماء محاضرات في أحكام الحج والعمرة شرح الآجرومية شرح متن الورقات في أصول الفقه شرح كتابه القول المقترح في علم المصطلح شرح كتاب الطهارة والنجاسة والوضوء وغيرها شرح كتابه جامع الأحكام في مسائل الصيام والاعتكاف وعيد الفطر والقيام وغيرها من الشروحات في موقع اليوتيوب الخاص به التأليف والبحوث الزاد في بيان مناسك المعتمر والحاج مطبوع فتح العلام في أحكام الصيام مطبوع الإصابة في أحكام الحيض والنفاس والاستحاضة مطبوع التنقيحات في شرح تسهيل الطرقات لنظم الورقات يقع في (1000) صفحة تقريبا البشارة في بيان أحكام الطهارة يقع في (1000) تقريبا جامع الأحكام في مسائل الصيام والاعتكاف وعيد الفطر والقيام كتاب في أحكام وصفة الصلاة يقع في (1700) صفحة ولم يتم الانتهاء منه بعد كتابه القول المقترح في علم المصطلح لم يتم شرح ألفية ابن مالك في النحو والصرف يقع في (1700) صفحة تقريبا شرح ألفية السيوطي في الحديث لم يتم شرح مختصر التحرير في أصول الفقه يقع في (1000) صفحة لم يتم شرح منظومة ابن شحنة في البلاغة ( الواجب والمندوب عند الأصوليين ) البحث الجامعي بحث في أخذ الأجرة على العبادة بحث دخول الجن في بدن المصروع بحث في إمامة المرأة للرجل وغيرها من المؤلفات والبحوث نسأل الله تعالى أن ييسر إتمامها"
   },
   {
-    "title": "الصوتيات",
-    "tags": [],
-    "href": "/الصوتيات/_",
-    "content": "الصوتيات page audios /الصوتيات/ audios /images/hero jpg آداب طلب العلم شرح كتاب حلية طالب العلم الاستماع للدروس أصول الفقه وقواعده شرح مذكرة الشنقيطي في أصول الفقه الاستماع للدروس شرح القواعد الفقهية الاستماع للدروس الحديث وعلومه فتح الباري الاستماع للدروس شرح البيقونية الاستماع للدروس العقيدة شرح الأصول الثلاثة الاستماع للدروس التعليق على شرح لمعة الاعتقاد الاستماع للدروس القرآن وعلومه شرح عمدة التفسير الاستماع للدروس شرح أصول التفسير الاستماع للدروس الفقه شرح عمدة الفقه الاستماع للدروس أحكام الصيام الاستماع للدروس دروس علمية في صفة الحج الاستماع للدروس شرح كتاب الوجيز في فقه السنة والكتاب العزيز الاستماع للدروس علوم اللغة شرح الآجرومية الاستماع للدروس"
-  },
-  {
     "title": "أحكام الصيام",
     "tags": [],
     "href": "/الصوتيات/أحكام-الصيام/",
@@ -2468,18 +2444,6 @@
     "content": "شرح عمدة التفسير page {{ }}"
   },
   {
-    "title": "شرح عمدة الفقه",
-    "tags": [],
-    "href": "/الصوتيات/شرح-عمدة-الفقه/_",
-    "content": "شرح عمدة الفقه page audios كتاب الطهارة"
-  },
-  {
-    "title": "كتاب الطهارة",
-    "tags": [],
-    "href": "/الصوتيات/شرح-عمدة-الفقه/كتاب-الطهارة/_",
-    "content": "كتاب الطهارة page audios المياه الأواني قضاء الحاجة"
-  },
-  {
     "title": "الأواني",
     "tags": [],
     "href": "/الصوتيات/شرح-عمدة-الفقه/كتاب-الطهارة/الأواني/",
@@ -2496,12 +2460,6 @@
     "tags": [],
     "href": "/الصوتيات/شرح-عمدة-الفقه/كتاب-الطهارة/قضاء-الحاجة/",
     "content": "قضاء الحاجة page audios {{ }}"
-  },
-  {
-    "title": "شرح كتاب الوجيز في فقه السنة والكتاب العزيز",
-    "tags": [],
-    "href": "/الصوتيات/شرح-كتاب-الوجيز-في-فقه-السنة-والكتاب-العزيز/_",
-    "content": "شرح كتاب الوجيز في فقه السنة والكتاب العزيز page audios كتاب الطهارة كتاب الصلاة كتاب الجنائز كتاب الزكاة كتاب الصيام كتاب الحج كتاب النكاح كتاب الطلاق كتاب البيوع كتاب الأيمان والنذور كتاب الأطعمة كتاب الوصية كتاب الفرائض كتاب الحدود كتاب الجنايات كتاب القضاء كتاب الجهاد كتاب العتق"
   },
   {
     "title": "كتاب الأطعمة",
@@ -2618,12 +2576,6 @@
     "content": "شرح كتاب حلية طالب العلم page audios {{ }}"
   },
   {
-    "title": "شرح مذكرة الشنقيطي في أصول الفقه",
-    "tags": [],
-    "href": "/الصوتيات/شرح-مذكرة-الشنقيطي-في-أصول-الفقه/_",
-    "content": "شرح مذكرة الشنقيطي في أصول الفقه page audios المقدمة الأحكام الحكم الحكم الواجب الحكم المندوب الحكم المباح الحكم المكروه الحكم المحرم التكليف الإعادة الرخصة السبب الشرط المانع الصحة والفساد العلة القرآن المجاز"
-  },
-  {
     "title": "الأحكام",
     "tags": [],
     "href": "/الصوتيات/شرح-مذكرة-الشنقيطي-في-أصول-الفقه/الأحكام/",
@@ -2736,12 +2688,6 @@
     "tags": [],
     "href": "/الصوتيات/شرح-مذكرة-الشنقيطي-في-أصول-الفقه",
     "content": "شرح مذكرة الشنقيطي في أصول الفقه page المقدمة الحكم الحكم الواجب الحكم المندوب الحكم المباح الحكم المكروه الحكم المحرم التكليف العلة السبب الشرط المانع الصحة والفساد الإعادة الرخصة الأحكام القرآن المجاز"
-  },
-  {
-    "title": "فتح الباري",
-    "tags": [],
-    "href": "/الصوتيات/فتح-الباري/_",
-    "content": "فتح الباري page audios كتاب الأذان كتاب الغسل كتاب الحيض كتاب مواقيت الصلاة كتاب صلاة الجماعة كتاب التيمم"
   },
   {
     "title": "كتاب الأذان",
