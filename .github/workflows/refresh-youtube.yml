@@ -1,0 +1,69 @@
+name: Refresh YouTube Videos Cache
+on:
+  schedule:
+    - cron: '30 */1 * * *' # every hour at :30 (offset from tweets at :00)
+  workflow_dispatch: # manual trigger
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install youtubei.js
+
+      - name: Fetch YouTube videos
+        run: |
+          node << 'JSEOF'
+          const { Innertube } = require('youtubei.js');
+
+          const CHANNEL_ID = 'UChYrhls3RB-rZru10I0EF2w';
+          const MAX_VIDEOS = 6;
+
+          async function main() {
+            const yt = await Innertube.create();
+            const channel = await yt.getChannel(CHANNEL_ID);
+            const videosTab = await channel.getVideos();
+            const videos = videosTab.videos.slice(0, MAX_VIDEOS);
+
+            const output = {
+              success: true,
+              videos: videos.map(v => ({
+                videoId: v.id,
+                title: v.title?.text || v.title,
+                url: `https://www.youtube.com/watch?v=${v.id}`,
+                thumbnail: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
+                views: v.short_view_count?.text || v.view_count?.text || '',
+                published: v.published?.text || '',
+                duration: v.duration?.text || '',
+              })),
+            };
+
+            const fs = require('fs');
+            fs.writeFileSync('/tmp/youtube.json', JSON.stringify(output, null, 2));
+            console.log(`Fetched ${output.videos.length} videos`);
+            output.videos.forEach((v, i) => console.log(`  [${i+1}] ${v.title}`));
+          }
+
+          main().catch(err => {
+            console.error('Error:', err.message);
+            process.exit(1);
+          });
+          JSEOF
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Write to Cloudflare KV
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          wrangler kv key put "youtube_videos" --namespace-id="9e052ab39b5e4239a8d09bd4db481538" --remote --path /tmp/youtube.json
+          echo "KV cache updated"

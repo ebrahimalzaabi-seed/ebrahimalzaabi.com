@@ -3,3 +3,7 @@ main = "src/index.js"
 compatibility_date = "2024-01-01"
 
 workers_dev = true
+
+[[kv_namespaces]]
+binding = "YOUTUBE_CACHE"
+id = "9e052ab39b5e4239a8d09bd4db481538"
