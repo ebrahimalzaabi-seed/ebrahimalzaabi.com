@@ -20,7 +20,7 @@ graph TD
     Dev((Developer))
 
     Visitor -->|browses| CFP[Cloudflare Pages<br/>Hugo SSG<br/>ebrahimalzaabi.com<br/>ebrahimalzaabi-com.pages.dev]
-    CFP -->|submits question| CF[Cloudflare Workers<br/>send-question+embeded-tweet+analytics proxy + KV store<br/>+ Turnstile CAPTCHA]
+    CFP -->|submits question| CF[Cloudflare Workers<br/>send-question+embeded-tweet+youtube-videos+analytics proxy<br/>+ KV store + Turnstile CAPTCHA]
 
     CFP --- GA4[Google Analytics 4<br/>Website analytics]
     CFP --- Archive[Archive.org<br/>Legacy MP3s & PDFs]
@@ -33,8 +33,10 @@ graph TD
     Admin -->|notify user question has been answered| Resend
 
     GHA[GitHub Actions<br/>Hourly cron] -->|fetches RSS| Nitter[Nitter<br/>nitter.net]
-    GHA -->|writes tweets JSON| KV[Cloudflare KV<br/>TWEET_CACHE]
-    CF -->|reads cached tweets| KV
+    GHA -->|writes tweets JSON| KV[Cloudflare KV<br/>TWEET_CACHE + YOUTUBE_CACHE]
+    GHA -->|fetches videos via InnerTube API| YT[YouTube<br/>youtubei.js]
+    GHA -->|writes videos JSON| KV
+    CF -->|reads cached tweets & videos| KV
 
     style Dev fill:#e3fafc,stroke:#1e1e1e
     style Visitor fill:#a5d8ff,stroke:#1e1e1e
@@ -47,17 +49,18 @@ graph TD
     style GHA fill:#c3fae8,stroke:#087f5b
     style Nitter fill:#ffe8cc,stroke:#e8590c
     style KV fill:#fff3bf,stroke:#e67700
+    style YT fill:#fcc,stroke:#c00
 ```
 
 ### Tech Stack
 
 | Service | Purpose |
 |---|---|
-| [GitHub](https://github.com/) | Source code repository + Actions cron for tweet refresh |
+| [GitHub](https://github.com/) | Source code repository + Actions cron for tweet & YouTube refresh |
 | [Cloudflare Pages](https://pages.cloudflare.com/) | Static site hosting (auto-deploys on push to main) |
 | [Cloudflare Workers](https://workers.cloudflare.com/) | Question submission backend |
 | [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) | CAPTCHA for the question form |
-| [Cloudflare KV](https://developers.cloudflare.com/kv/) | Stores pending questions for admin review |
+| [Cloudflare KV](https://developers.cloudflare.com/kv/) | Stores pending questions, cached tweets, and cached YouTube videos |
 | [Resend](https://resend.com/) | Transactional emails (notifications to sheikh & questioners) |
 | [Google Analytics 4](https://analytics.google.com/) | Website analytics |
 | [Archive.org](https://archive.org/) | Hosting legacy MP3s & PDFs |
@@ -223,7 +226,7 @@ For local development, create `workers/analytics-proxy/.dev.vars` with these val
 
 ## Cloudflare Worker (`workers/youtube-videos/`)
 
-Fetches the latest videos from the sheikh's YouTube channel via the public YouTube RSS feed. Results are cached at the edge for 1 hour.
+Thin KV reader that serves the latest YouTube videos from the sheikh's channel [@ebrahim_alzaabi](https://www.youtube.com/@ebrahim_alzaabi). The worker itself does no fetching — it simply reads pre-populated JSON from the `YOUTUBE_CACHE` KV namespace (written by the GitHub Actions cron below).
 
 ```bash
 cd workers/youtube-videos
@@ -231,7 +234,26 @@ npm install
 npx wrangler deploy   # deploy to Cloudflare
 ```
 
-No secrets required — uses YouTube's public RSS feed.
+No secrets required — reads from KV namespace `YOUTUBE_CACHE`.
+
+## GitHub Actions — YouTube Refresh (`.github/workflows/refresh-youtube.yml`)
+
+A scheduled workflow that runs **every hour** (at :30, offset from tweets at :00) to keep the YouTube videos cache fresh. YouTube's public RSS feed is unreliable (intermittent 404 outages), so this workflow uses [`youtubei.js`](https://github.com/LuanRT/YouTube.js) — a library that accesses YouTube's private InnerTube API (no API key required).
+
+**How it works:**
+1. Fetches the latest 6 videos from the channel via `youtubei.js`
+2. Formats the data into a JSON structure (videoId, title, url, thumbnail, views, publishedTime, duration)
+3. Writes the JSON to Cloudflare KV (`YOUTUBE_CACHE` namespace, key `youtube_videos`) using Wrangler
+
+**GitHub Secrets required:**
+- `CLOUDFLARE_API_TOKEN` — Cloudflare API token with Workers KV write permission (same as tweet refresh)
+- `CLOUDFLARE_ACCOUNT_ID` — Cloudflare account ID (same as tweet refresh)
+
+The workflow can also be triggered manually from the Actions tab (`workflow_dispatch`), or via the CLI:
+
+```bash
+npm run youtube:refresh   # trigger the GitHub Action
+```
 
 ## Dry Run Mode
 
