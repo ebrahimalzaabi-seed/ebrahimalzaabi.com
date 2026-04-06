@@ -12,7 +12,8 @@
     "worker:youtube": "npm --prefix workers/youtube-videos run dev",
     "worker:question": "npm --prefix workers/send-question run dev",
     "kv:delete-tweets": "wrangler kv key delete tweets_v3 --namespace-id=8d0089feba3848548b989d46f04029b4",
-    "tweets:refresh": "gh workflow run refresh-tweets.yml && echo 'Workflow triggered. Run: gh run list -w refresh-tweets.yml -L 1'"
+    "tweets:refresh": "gh workflow run refresh-tweets.yml && echo 'Workflow triggered. Run: gh run list -w refresh-tweets.yml -L 1'",
+    "youtube:refresh": "gh workflow run refresh-youtube.yml && echo 'Workflow triggered. Run: gh run list -w refresh-youtube.yml -L 1'"
   },
   "dependencies": {
     "dotenv": "^17.3.1",

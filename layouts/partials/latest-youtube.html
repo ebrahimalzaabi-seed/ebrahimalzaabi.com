@@ -11,7 +11,7 @@
     <!-- Videos will be loaded here via JavaScript -->
     <div class="loading-spinner">جاري التحميل...</div>
   </div>
-  <div class="see-more-container tc mt4">
+  <div class="see-more-container tc mt4" style="display:none">
     <a href="https://www.youtube.com/@ebrahim_alzaabi/videos" target="_blank" rel="noopener noreferrer" class="see-more-link">
       <span class="youtube-icon see-more-icon"></span>
       <span class="see-more-text arabic-text">مشاهدة المزيد من الفيديوهات</span>
@@ -146,6 +146,34 @@
     grid-column: 1 / -1;
   }
   
+  .youtube-channel-promo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #333;
+    font-size: 1.25rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    border: 2px solid #e0e0e0;
+  }
+
+  .youtube-channel-promo:hover {
+    background-color: #FF0000;
+    color: white;
+    border-color: #FF0000;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2);
+  }
+
+  .youtube-channel-promo:hover .youtube-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='%23FFFFFF' d='M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z'%3E%3C/path%3E%3C/svg%3E");
+  }
+
   .see-more-container {
     margin-top: 1.5rem;
   }
@@ -213,6 +241,18 @@
       background-color: #FF0000;
       color: white;
     }
+
+    .youtube-channel-promo {
+      background-color: #333;
+      color: #f0f0f0;
+      border-color: #555;
+    }
+
+    .youtube-channel-promo:hover {
+      background-color: #FF0000;
+      color: white;
+      border-color: #FF0000;
+    }
   }
   
   /* Responsive adjustments */
@@ -262,13 +302,19 @@ document.addEventListener('DOMContentLoaded', function() {
           
           videosContainer.appendChild(videoCard);
         });
+        document.querySelector('.see-more-container').style.display = '';
       } else {
-        videosContainer.innerHTML = '<div class="error-message">عذراً، لا يمكن تحميل الفيديوهات حالياً</div>';
+        showChannelPromo();
       }
     })
     .catch(error => {
       console.error('Error fetching YouTube videos:', error);
-      videosContainer.innerHTML = '<div class="error-message">عذراً، حدث خطأ أثناء تحميل الفيديوهات</div>';
+      showChannelPromo();
     });
+
+  function showChannelPromo() {
+    videosContainer.innerHTML = '<a href="https://www.youtube.com/@ebrahim_alzaabi" target="_blank" rel="noopener noreferrer" class="youtube-channel-promo"><span class="youtube-icon"></span><span class="arabic-text">قناة الشيخ على يوتيوب</span></a>';
+    document.querySelector('.see-more-container').style.display = 'none';
+  }
 });
 </script> 

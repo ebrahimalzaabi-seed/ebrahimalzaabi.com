@@ -34,15 +34,19 @@ jobs:
 
             const output = {
               success: true,
-              videos: videos.map(v => ({
-                videoId: v.id,
-                title: v.title?.text || v.title,
-                url: `https://www.youtube.com/watch?v=${v.id}`,
-                thumbnail: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
-                views: v.short_view_count?.text || v.view_count?.text || '',
-                published: v.published?.text || '',
-                duration: v.duration?.text || '',
-              })),
+              videos: videos.map(v => {
+                const viewsRaw = v.short_view_count?.text || v.view_count?.text || '';
+                const views = viewsRaw.replace(/\s*views?$/i, '').trim();
+                return {
+                  videoId: v.id,
+                  title: v.title?.text || v.title,
+                  url: `https://www.youtube.com/watch?v=${v.id}`,
+                  thumbnail: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
+                  views,
+                  publishedTime: v.published?.text || '',
+                  duration: v.duration?.text || '',
+                };
+              }),
             };
 
             const fs = require('fs');
