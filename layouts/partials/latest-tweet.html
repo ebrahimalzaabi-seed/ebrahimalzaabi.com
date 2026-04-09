@@ -180,13 +180,31 @@
   document.getElementById("tweet-nav-prev").addEventListener("click", function() { goToSlide(currentSlide - 1); });
   document.getElementById("tweet-nav-next").addEventListener("click", function() { goToSlide(currentSlide + 1); });
 
+  function showTweetPromo() {
+    var widget = document.getElementById('tweet-widget');
+    var layout = widget.querySelector('.tweet-layout');
+    layout.innerHTML = '<a href="' + profileLink + '" target="_blank" rel="noopener noreferrer" class="tweet-channel-promo">' + xLogoSvg + '<span class="arabic-text">' + '\u062D\u0633\u0627\u0628 \u0627\u0644\u0634\u064A\u062E \u0639\u0644\u0649 \u0645\u0646\u0635\u0629 \u0625\u0643\u0633' + '</span></a>';
+    widget.style.display = '';
+    var row = document.getElementById('homepage-top-row');
+    if (row) row.style.visibility = 'visible';
+    scheduleFatwaHeightSync();
+  }
+
   // -- Fetch & Render --
   fetch(endpoint)
-    .then(function(res) { return res.json(); })
+    .then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
     .then(function(data) {
       var p = data.profile || {};
       var tweets = data.tweets || [];
       var pinned = data.pinned || null;
+
+      if (!pinned && tweets.length === 0) {
+        showTweetPromo();
+        return;
+      }
 
       // Render pinned card
       if (pinned) {
@@ -220,8 +238,7 @@
     })
     .catch(function(err) {
       console.error("Tweet fetch error:", err);
-      var row = document.getElementById('homepage-top-row');
-      if (row) row.style.visibility = 'visible';
+      showTweetPromo();
     });
 
   document.addEventListener('seasonalFatwa:updated', scheduleFatwaHeightSync);
@@ -535,6 +552,32 @@
       font-size: 1rem;
     }
   }
+  /* Channel promo fallback */
+  .tweet-channel-promo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #333;
+    font-size: 1.25rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    border: 2px solid #e0e0e0;
+  }
+  .tweet-channel-promo:hover {
+    background-color: #000;
+    color: white;
+    border-color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  .tweet-channel-promo:hover .tweet-icon {
+    color: #fff;
+  }
   /* Dark mode */
   @media (prefers-color-scheme: dark) {
     .tweet-card {
@@ -597,6 +640,16 @@
     }
     .tweet-modal-btn:hover {
       background: #b08a3e;
+    }
+    .tweet-channel-promo {
+      background-color: #333;
+      color: #f0f0f0;
+      border-color: #555;
+    }
+    .tweet-channel-promo:hover {
+      background-color: #000;
+      color: white;
+      border-color: #000;
     }
   }
 </style> 

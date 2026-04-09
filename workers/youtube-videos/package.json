@@ -4,7 +4,7 @@
   "description": "Fetches latest YouTube videos from channel RSS feed",
   "main": "src/index.js",
   "scripts": {
-    "dev": "wrangler dev --port 8789 --inspector-port 9231",
+    "dev": "wrangler dev --port 8789 --inspector-port 9231 --remote",
     "deploy": "wrangler deploy"
   },
   "keywords": [],
