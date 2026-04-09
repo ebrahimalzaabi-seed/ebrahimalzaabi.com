@@ -194,18 +194,73 @@
         }
         
         .book-thumbnail {
-          margin-bottom: 1rem;
+          margin-bottom: 1.5rem;
+          perspective: 600px;
+          display: flex;
+          justify-content: center;
+          padding: 1rem 0;
+        }
+        
+        .book-thumbnail a {
+          display: block;
+          position: relative;
+          transform-style: preserve-3d;
+          transform: rotateY(-18deg);
+          transition: transform 0.4s ease;
+        }
+        
+        .book-thumbnail a:hover {
+          transform: rotateY(-8deg);
         }
         
         .book-thumbnail img {
           width: 150px;
-          height: 200px;
-          object-fit: contain;
-          transition: transform 0.3s ease;
+          height: 210px;
+          object-fit: cover;
+          display: block;
+          border-radius: 0 3px 3px 0;
+          box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
         }
         
-        .book-thumbnail img:hover {
-          transform: scale(1.05);
+        /* Book spine */
+        .book-thumbnail a::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 28px;
+          height: 100%;
+          background: linear-gradient(to right,
+            #4a3728 0%,
+            #6b4c3b 30%,
+            #5a3f2e 70%,
+            #3d2a1a 100%);
+          transform: translateX(-28px) rotateY(-90deg);
+          transform-origin: right center;
+          border-radius: 3px 0 0 3px;
+        }
+        
+        /* Page edges (right side / book thickness) */
+        .book-thumbnail a::after {
+          content: '';
+          position: absolute;
+          top: 2px;
+          right: 0;
+          width: 28px;
+          height: calc(100% - 4px);
+          background: linear-gradient(to right,
+            #f5f0e8 0%,
+            #ede6db 20%,
+            #f8f4ee 40%,
+            #ede6db 60%,
+            #f5f0e8 80%,
+            #e8e0d4 100%);
+          transform: translateX(27px) rotateY(90deg);
+          transform-origin: left center;
+          border-radius: 0 2px 2px 0;
+          border-top: 1px solid #d4ccc0;
+          border-bottom: 1px solid #d4ccc0;
+          border-right: 1px solid #d4ccc0;
         }
         
         .download-link {
@@ -236,7 +291,17 @@
           
           .book-thumbnail img {
             width: 120px;
-            height: 160px;
+            height: 168px;
+          }
+          
+          .book-thumbnail a::before {
+            width: 20px;
+            transform: translateX(-20px) rotateY(-90deg);
+          }
+          
+          .book-thumbnail a::after {
+            width: 20px;
+            transform: translateX(19px) rotateY(90deg);
           }
         }
       </style>
