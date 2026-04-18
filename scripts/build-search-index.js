@@ -81,8 +81,10 @@ function processFile(absPath, filename) {
     const tags = parsed.data.tags || parsed.data.categories || [];
 
     // Combine all string fields from front-matter (e.g., question, answer, description …) with markdown body
-    const fmText = Object.values(parsed.data)
-      .filter((v) => typeof v === "string")
+    const EXCLUDED_FM_KEYS = new Set(["email", "youtube", "answer_type"]);
+    const fmText = Object.entries(parsed.data)
+      .filter(([k, v]) => typeof v === "string" && !EXCLUDED_FM_KEYS.has(k))
+      .map(([, v]) => v)
       .join(" ");
 
     const combined = `${fmText}\n${parsed.content}`;
