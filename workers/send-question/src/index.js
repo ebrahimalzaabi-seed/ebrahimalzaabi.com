@@ -1,9 +1,23 @@
+import { handleHealthCheck } from './health.js';
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
+    }
+
+    // ── Health check endpoint (authenticated) ────────────────────────────
+    if (url.pathname === '/health' && request.method === 'GET') {
+      const authHeader = request.headers.get('Authorization') || '';
+      const token = authHeader.replace('Bearer ', '');
+      if (!token || token !== env.ADMIN_API_KEY) {
+        return jsonResponse(401, { error: 'Unauthorized' }, request);
+      }
+      const result = await handleHealthCheck(env);
+      const httpStatus = result.status === 'unhealthy' ? 503 : 200;
+      return jsonResponse(httpStatus, result, request);
     }
 
     // ── Admin endpoints (authenticated) ─────────────────────────────────
