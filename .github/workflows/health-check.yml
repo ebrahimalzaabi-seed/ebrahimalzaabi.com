@@ -18,7 +18,7 @@ jobs:
         run: |
           HTTP_CODE=$(curl -s -o /tmp/health_response.json -w "%{http_code}" \
             -H "Authorization: Bearer $ADMIN_API_KEY" \
-            "https://fake-nonexistent-worker.ebrahimalzaabi-seed.workers.dev/health" \
+            "https://blue-dew-502c.ebrahimalzaabi-seed.workers.dev/health?simulate=turnstile" \
             --max-time 15 || echo "000")
           RESPONSE=$(cat /tmp/health_response.json 2>/dev/null || true)
 
