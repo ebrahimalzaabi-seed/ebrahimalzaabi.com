@@ -4,33 +4,100 @@ on:
     - cron: '0 */6 * * *' # every 6 hours
   workflow_dispatch: # manual trigger
 
+permissions:
+  issues: write
+
 jobs:
   health:
     runs-on: ubuntu-latest
     steps:
       - name: Check send-question worker health
+        id: health
         env:
           ADMIN_API_KEY: ${{ secrets.FATWA_ADMIN_API_KEY }}
         run: |
           RESPONSE=$(curl -sf -H "Authorization: Bearer $ADMIN_API_KEY" \
-            https://blue-dew-502c.ebrahimalzaabi-seed.workers.dev/health \
+            https://fake-nonexistent-worker.ebrahimalzaabi-seed.workers.dev/health \
             --max-time 15 || true)
 
           if [ -z "$RESPONSE" ]; then
-            echo "::error::Worker unreachable — no response from /health endpoint"
+            echo "status=unreachable" >> $GITHUB_OUTPUT
+            echo "details=Worker did not respond to /health endpoint" >> $GITHUB_OUTPUT
+            echo "::error::Worker unreachable"
             exit 1
           fi
 
           echo "$RESPONSE" | python3 -m json.tool
+          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
 
           STATUS=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
           echo "Health status: $STATUS"
 
+          # Build per-check summary
+          DETAILS=$(echo "$RESPONSE" | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          lines = []
+          for name, check in data.get('checks', {}).items():
+              icon = '✅' if check.get('ok') else '❌'
+              err = check.get('error', '')
+              extra = f' — {err}' if err else ''
+              lines.append(f'{icon} **{name}**{extra}')
+          print('\n'.join(lines))
+          ")
+          echo "details<<EOF" >> $GITHUB_OUTPUT
+          echo "$DETAILS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
           if [ "$STATUS" = "unhealthy" ]; then
-            echo "::error::Service is UNHEALTHY — email sending is likely broken"
+            echo "::error::Service is UNHEALTHY"
             exit 1
           elif [ "$STATUS" = "degraded" ]; then
-            echo "::warning::Service is DEGRADED — some non-critical checks failed"
+            echo "::warning::Service is DEGRADED"
           else
             echo "All checks passed"
           fi
+
+      - name: Create GitHub issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ steps.health.outputs.status }}' || 'unknown';
+            const details = `${{ steps.health.outputs.details }}` || 'No details available';
+            const now = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const labels = {
+              unreachable: '🔴 Worker Down',
+              unhealthy: '🔴 Unhealthy',
+              degraded: '🟡 Degraded',
+              unknown: '🔴 Unknown Failure'
+            };
+            const label = labels[status] || labels.unknown;
+
+            const title = `⚠️ Health Check Failed: ${label} — ${now}`;
+            const body = [
+              `## ${label}`,
+              '',
+              `**Time:** ${now}`,
+              `**Trigger:** ${context.eventName}`,
+              `**Run:** [View workflow run](${runUrl})`,
+              '',
+              '### Check Results',
+              '',
+              details,
+              '',
+              '---',
+              '> This issue was auto-created by the health check workflow.',
+              '> Close it once the issue is resolved.'
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['health-check']
+            });
