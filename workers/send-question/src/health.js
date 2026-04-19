@@ -11,10 +11,9 @@ export async function handleHealthCheck(env, simulate) {
     kv: simulate === 'kv' ? { ok: false, error: '[SIMULATED] KV unreachable' } : await checkKV(env),
   };
 
-  const resendOk = checks.resend.ok;
-  const allOk = resendOk && checks.turnstile.ok && checks.kv.ok;
+  const allOk = checks.resend.ok && checks.turnstile.ok && checks.kv.ok;
 
-  const status = allOk ? 'healthy' : resendOk ? 'degraded' : 'unhealthy';
+  const status = allOk ? 'healthy' : 'unhealthy';
 
   return {
     status,

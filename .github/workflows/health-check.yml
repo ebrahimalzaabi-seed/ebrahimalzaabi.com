@@ -55,8 +55,6 @@ jobs:
           if [ "$STATUS" = "unhealthy" ]; then
             echo "::error::Service is UNHEALTHY"
             exit 1
-          elif [ "$STATUS" = "degraded" ]; then
-            echo "::warning::Service is DEGRADED"
           else
             echo "All checks passed"
           fi
@@ -74,7 +72,6 @@ jobs:
             const labels = {
               unreachable: '🔴 Worker Down',
               unhealthy: '🔴 Unhealthy',
-              degraded: '🟡 Degraded',
               unknown: '🔴 Unknown Failure'
             };
             const label = labels[status] || labels.unknown;
