@@ -17,22 +17,18 @@ jobs:
           ADMIN_API_KEY: ${{ secrets.FATWA_ADMIN_API_KEY }}
         run: |
           RESPONSE=$(curl -sf -H "Authorization: Bearer $ADMIN_API_KEY" \
-            https://fake-nonexistent-worker.ebrahimalzaabi-seed.workers.dev/health \
+            "https://blue-dew-502c.ebrahimalzaabi-seed.workers.dev/health?simulate=resend" \
             --max-time 15 || true)
 
           if [ -z "$RESPONSE" ]; then
             echo "status=unreachable" >> $GITHUB_OUTPUT
             echo "details=Worker did not respond to /health endpoint" >> $GITHUB_OUTPUT
-            echo "json=N/A — worker unreachable" >> $GITHUB_OUTPUT
             echo "::error::Worker unreachable"
             exit 1
           fi
 
-          PRETTY=$(echo "$RESPONSE" | python3 -m json.tool)
-          echo "$PRETTY"
-          echo "json<<JSONEOF" >> $GITHUB_OUTPUT
-          echo "$PRETTY" >> $GITHUB_OUTPUT
-          echo "JSONEOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" | python3 -m json.tool
+          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
 
           STATUS=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
           echo "status=$STATUS" >> $GITHUB_OUTPUT
@@ -92,12 +88,6 @@ jobs:
               '### Check Results',
               '',
               details,
-              '',
-              '### Raw Response',
-              '',
-              '```json',
-              `${{ steps.health.outputs.json }}`,
-              '```',
               '',
               '---',
               '> This issue was auto-created by the health check workflow.',

@@ -3,12 +3,12 @@
 
 const SENDING_DOMAIN = 'notifications.ebrahimalzaabi.com';
 
-export async function handleHealthCheck(env) {
+export async function handleHealthCheck(env, simulate) {
   const checks = {
     worker: { ok: true },
-    resend: await checkResend(env),
-    turnstile: await checkTurnstile(env),
-    kv: await checkKV(env),
+    resend: simulate === 'resend' ? { ok: false, error: '[SIMULATED] Resend API key invalid' } : await checkResend(env),
+    turnstile: simulate === 'turnstile' ? { ok: false, error: '[SIMULATED] Turnstile secret key invalid' } : await checkTurnstile(env),
+    kv: simulate === 'kv' ? { ok: false, error: '[SIMULATED] KV unreachable' } : await checkKV(env),
   };
 
   const resendOk = checks.resend.ok;
