@@ -1,0 +1,36 @@
+name: Health Check - Send Question
+on:
+  schedule:
+    - cron: '0 */6 * * *' # every 6 hours
+  workflow_dispatch: # manual trigger
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check send-question worker health
+        env:
+          ADMIN_API_KEY: ${{ secrets.FATWA_ADMIN_API_KEY }}
+        run: |
+          RESPONSE=$(curl -sf -H "Authorization: Bearer $ADMIN_API_KEY" \
+            https://blue-dew-502c.ebrahimalzaabi-seed.workers.dev/health \
+            --max-time 15 || true)
+
+          if [ -z "$RESPONSE" ]; then
+            echo "::error::Worker unreachable — no response from /health endpoint"
+            exit 1
+          fi
+
+          echo "$RESPONSE" | python3 -m json.tool
+
+          STATUS=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
+          echo "Health status: $STATUS"
+
+          if [ "$STATUS" = "unhealthy" ]; then
+            echo "::error::Service is UNHEALTHY — email sending is likely broken"
+            exit 1
+          elif [ "$STATUS" = "degraded" ]; then
+            echo "::warning::Service is DEGRADED — some non-critical checks failed"
+          else
+            echo "All checks passed"
+          fi
