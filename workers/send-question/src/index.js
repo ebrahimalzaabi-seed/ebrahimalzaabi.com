@@ -15,8 +15,7 @@ export default {
       if (!token || token !== env.ADMIN_API_KEY) {
         return jsonResponse(401, { error: 'Unauthorized' }, request);
       }
-      const simulate = url.searchParams.get('simulate') || null;
-      const result = await handleHealthCheck(env, simulate);
+      const result = await handleHealthCheck(env);
       const httpStatus = result.status === 'unhealthy' ? 503 : 200;
       return jsonResponse(httpStatus, result, request);
     }
