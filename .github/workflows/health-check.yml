@@ -1,7 +1,7 @@
 name: Health Check - Send Question
 on:
   schedule:
-    - cron: '0 9 * * *' # TEMP: test cron notification
+    - cron: '0 */6 * * *' # every 6 hours
   workflow_dispatch: # manual trigger
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
           ADMIN_API_KEY: ${{ secrets.FATWA_ADMIN_API_KEY }}
         run: |
           RESPONSE=$(curl -sf -H "Authorization: Bearer $ADMIN_API_KEY" \
-            https://fake-nonexistent-worker.ebrahimalzaabi-seed.workers.dev/health \
+            https://blue-dew-502c.ebrahimalzaabi-seed.workers.dev/health \
             --max-time 15 || true)
 
           if [ -z "$RESPONSE" ]; then
