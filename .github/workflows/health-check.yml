@@ -16,14 +16,16 @@ jobs:
         env:
           ADMIN_API_KEY: ${{ secrets.FATWA_ADMIN_API_KEY }}
         run: |
-          RESPONSE=$(curl -sf -H "Authorization: Bearer $ADMIN_API_KEY" \
+          HTTP_CODE=$(curl -s -o /tmp/health_response.json -w "%{http_code}" \
+            -H "Authorization: Bearer $ADMIN_API_KEY" \
             "https://blue-dew-502c.ebrahimalzaabi-seed.workers.dev/health?simulate=resend" \
-            --max-time 15 || true)
+            --max-time 15 || echo "000")
+          RESPONSE=$(cat /tmp/health_response.json 2>/dev/null || true)
 
-          if [ -z "$RESPONSE" ]; then
+          if [ "$HTTP_CODE" = "000" ] || [ -z "$RESPONSE" ]; then
             echo "status=unreachable" >> $GITHUB_OUTPUT
-            echo "details=Worker did not respond to /health endpoint" >> $GITHUB_OUTPUT
-            echo "::error::Worker unreachable"
+            echo "details=Worker did not respond (HTTP $HTTP_CODE)" >> $GITHUB_OUTPUT
+            echo "::error::Worker unreachable (HTTP $HTTP_CODE)"
             exit 1
           fi
 
