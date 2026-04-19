@@ -22,9 +22,9 @@ jobs:
             --max-time 15 || echo "000")
           RESPONSE=$(cat /tmp/health_response.json 2>/dev/null || true)
 
-          if [ "$HTTP_CODE" = "000" ] || [ -z "$RESPONSE" ]; then
+          if [ "$HTTP_CODE" = "000" ] || [ -z "$RESPONSE" ] || ! echo "$RESPONSE" | python3 -m json.tool > /dev/null 2>&1; then
             echo "status=unreachable" >> $GITHUB_OUTPUT
-            echo "details=Worker did not respond (HTTP $HTTP_CODE)" >> $GITHUB_OUTPUT
+            echo "details=Worker did not respond or returned invalid data (HTTP $HTTP_CODE)" >> $GITHUB_OUTPUT
             echo "::error::Worker unreachable (HTTP $HTTP_CODE)"
             exit 1
           fi
