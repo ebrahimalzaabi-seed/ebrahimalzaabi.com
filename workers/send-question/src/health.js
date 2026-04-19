@@ -67,12 +67,9 @@ async function checkResend(env) {
   }
 }
 
-// -- Turnstile: siteverify with real secret + empty token ---------------------
-// A success:false with error "missing-input-response" proves the API is up
-// and the secret key is recognized. An invalid secret would return
-// "invalid-input-secret" instead.
-
-const TURNSTILE_HEALTHY_ERROR = 'missing-input-response';
+// -- Turnstile: siteverify with real secret + dummy token ---------------------
+// A dummy non-empty token forces Turnstile to validate the secret key.
+// Valid secret → "invalid-input-response" (good). Invalid → "invalid-input-secret".
 
 async function checkTurnstile(env) {
   try {
@@ -81,7 +78,7 @@ async function checkTurnstile(env) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         secret: env.TURNSTILE_SECRET_KEY,
-        response: '',
+        response: 'health-check-dummy-token',
       }),
     });
 
@@ -91,15 +88,16 @@ async function checkTurnstile(env) {
 
     const data = await res.json();
 
-    // We expect success:false with "missing-input-response" — that means
-    // the API is reachable AND our secret key is valid.
-    if (!data.success && data['error-codes']?.includes(TURNSTILE_HEALTHY_ERROR)) {
-      return { ok: true };
-    }
-
-    // If we get "invalid-input-secret", the key is broken.
+    // With a dummy token and a VALID secret, Turnstile returns
+    // success:false with "invalid-input-response" — proving the API is
+    // reachable and the secret key is recognized.
+    // With an INVALID secret, it returns "invalid-input-secret".
     if (data['error-codes']?.includes('invalid-input-secret')) {
       return { ok: false, error: 'Turnstile secret key is invalid' };
+    }
+
+    if (!data.success && data['error-codes']?.includes('invalid-input-response')) {
+      return { ok: true };
     }
 
     // Any other unexpected response
