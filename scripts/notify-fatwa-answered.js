@@ -211,7 +211,7 @@ async function sendEmail(recipientEmail) {
   const subject = `تمت الإجابة على سؤال: ${title}`;
 
   try {
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: `موقع الشيخ إبراهيم الزعابي <${FROM_EMAIL}>`,
       to: recipientEmail,
       bcc: BCC_EMAILS,
@@ -219,11 +219,16 @@ async function sendEmail(recipientEmail) {
       html: buildHtmlEmail(),
       text: buildTextEmail()
     });
-    console.log('✅ Email sent successfully to:', recipientEmail);
+    if (error) {
+      console.error('❌ Failed to send email:', error.message || JSON.stringify(error));
+      process.exit(1);
+    }
+    console.log('✅ Email sent successfully to:', recipientEmail, '(id:', data.id + ')');
     if (isDryRun) console.log('   ⚠️ DRY RUN mode (BCC only to ' + NOTIFY_EMAIL_DEV + ')');
     if (BCC_EMAILS.length) console.log('   BCC:', BCC_EMAILS.join(', '));
   } catch (error) {
     console.error('❌ Failed to send email:', error.message);
+    process.exit(1);
   }
 }
 
@@ -240,4 +245,4 @@ async function main() {
   await sendEmail(email.trim());
 }
 
-main().catch(console.error);
+main().catch(err => { console.error(err); process.exit(1); });
