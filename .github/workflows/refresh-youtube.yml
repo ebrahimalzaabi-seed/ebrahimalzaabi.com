@@ -5,78 +5,84 @@ on:
   workflow_dispatch: # manual trigger
 
 jobs:
-  rss-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Test YouTube RSS from GH Actions
-        run: |
-          echo "--- Testing YouTube RSS feed ---"
-          HTTP_CODE=$(curl -s -o /tmp/yt_rss.xml -w "%{http_code}" "https://www.youtube.com/feeds/videos.xml?channel_id=UChYrhls3RB-rZru10I0EF2w")
-          echo "HTTP status: $HTTP_CODE"
-          echo "Entry count: $(grep -c '<entry>' /tmp/yt_rss.xml)"
-          echo "--- First 3 titles ---"
-          grep '<title>' /tmp/yt_rss.xml | head -4
-          echo "--- First 3 videoIds ---"
-          grep '<yt:videoId>' /tmp/yt_rss.xml | head -3
-          echo "--- First view counts ---"
-          grep 'media:statistics' /tmp/yt_rss.xml | head -3
-
   refresh:
     runs-on: ubuntu-latest
-    if: false  # temporarily disabled
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install youtubei.js
-
-      - name: Fetch YouTube videos
+      - name: Fetch YouTube RSS
         run: |
-          node << 'JSEOF'
-          const { Innertube } = require('youtubei.js');
+          curl -sf -o /tmp/yt_rss.xml "https://www.youtube.com/feeds/videos.xml?channel_id=UChYrhls3RB-rZru10I0EF2w"
+          ENTRY_COUNT=$(grep -c '<entry>' /tmp/yt_rss.xml)
+          echo "Fetched RSS with $ENTRY_COUNT entries"
+          if [ "$ENTRY_COUNT" -eq 0 ]; then
+            echo "::error::RSS returned 0 entries, aborting"
+            exit 1
+          fi
 
-          const CHANNEL_ID = 'UChYrhls3RB-rZru10I0EF2w';
-          const MAX_VIDEOS = 6;
+      - name: Parse RSS to JSON
+        run: |
+          python3 << 'PYEOF'
+          import xml.etree.ElementTree as ET
+          import json, datetime
 
-          async function main() {
-            const yt = await Innertube.create();
-            const channel = await yt.getChannel(CHANNEL_ID);
-            const videosTab = await channel.getVideos();
-            const videos = videosTab.videos.slice(0, MAX_VIDEOS);
-
-            const output = {
-              success: true,
-              videos: videos.map(v => {
-                const viewsRaw = v.short_view_count?.text || v.view_count?.text || '';
-                const views = viewsRaw.replace(/\s*views?$/i, '').trim();
-                return {
-                  videoId: v.id,
-                  title: v.title?.text || v.title,
-                  url: `https://www.youtube.com/watch?v=${v.id}`,
-                  thumbnail: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
-                  views,
-                  publishedTime: v.published?.text || '',
-                  duration: v.duration?.text || '',
-                };
-              }),
-            };
-
-            const fs = require('fs');
-            fs.writeFileSync('/tmp/youtube.json', JSON.stringify(output, null, 2));
-            console.log(`Fetched ${output.videos.length} videos`);
-            output.videos.forEach((v, i) => console.log(`  [${i+1}] ${v.title}`));
+          ns = {
+              'atom': 'http://www.w3.org/2005/Atom',
+              'yt': 'http://www.youtube.com/xml/schemas/2015',
+              'media': 'http://search.yahoo.com/mrss/'
           }
 
-          main().catch(err => {
-            console.error('Error:', err.message);
-            process.exit(1);
-          });
-          JSEOF
+          tree = ET.parse('/tmp/yt_rss.xml')
+          root = tree.getroot()
+          entries = root.findall('atom:entry', ns)[:6]
+
+          now = datetime.datetime.now(datetime.timezone.utc)
+
+          def relative_time(iso_str):
+              dt = datetime.datetime.fromisoformat(iso_str)
+              diff = now - dt
+              days = diff.days
+              if days == 0:
+                  hours = diff.seconds // 3600
+                  if hours == 0:
+                      return 'just now'
+                  return f'{hours} hour{"s" if hours != 1 else ""} ago'
+              if days == 1:
+                  return '1 day ago'
+              if days < 7:
+                  return f'{days} days ago'
+              if days < 30:
+                  weeks = days // 7
+                  return f'{weeks} week{"s" if weeks != 1 else ""} ago'
+              if days < 365:
+                  months = days // 30
+                  return f'{months} month{"s" if months != 1 else ""} ago'
+              years = days // 365
+              return f'{years} year{"s" if years != 1 else ""} ago'
+
+          videos = []
+          for entry in entries:
+              vid = entry.find('yt:videoId', ns).text
+              title = entry.find('atom:title', ns).text
+              published = entry.find('atom:published', ns).text
+              stats = entry.find('media:group/media:community/media:statistics', ns)
+              views = stats.get('views', '') if stats is not None else ''
+
+              videos.append({
+                  'videoId': vid,
+                  'title': title,
+                  'url': f'https://www.youtube.com/watch?v={vid}',
+                  'thumbnail': f'https://i.ytimg.com/vi/{vid}/hqdefault.jpg',
+                  'views': views,
+                  'publishedTime': relative_time(published),
+              })
+
+          output = {'success': True, 'videos': videos}
+          with open('/tmp/youtube.json', 'w') as f:
+              json.dump(output, f, ensure_ascii=False, indent=2)
+
+          print(f'Parsed {len(videos)} videos')
+          for i, v in enumerate(videos):
+              print(f'  [{i+1}] {v["title"]} ({v["publishedTime"]}, {v["views"]} views)')
+          PYEOF
 
       - name: Install Wrangler
         run: npm install -g wrangler
