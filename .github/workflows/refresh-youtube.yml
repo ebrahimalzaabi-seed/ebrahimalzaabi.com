@@ -5,8 +5,25 @@ on:
   workflow_dispatch: # manual trigger
 
 jobs:
+  rss-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test YouTube RSS from GH Actions
+        run: |
+          echo "--- Testing YouTube RSS feed ---"
+          HTTP_CODE=$(curl -s -o /tmp/yt_rss.xml -w "%{http_code}" "https://www.youtube.com/feeds/videos.xml?channel_id=UChYrhls3RB-rZru10I0EF2w")
+          echo "HTTP status: $HTTP_CODE"
+          echo "Entry count: $(grep -c '<entry>' /tmp/yt_rss.xml)"
+          echo "--- First 3 titles ---"
+          grep '<title>' /tmp/yt_rss.xml | head -4
+          echo "--- First 3 videoIds ---"
+          grep '<yt:videoId>' /tmp/yt_rss.xml | head -3
+          echo "--- First view counts ---"
+          grep 'media:statistics' /tmp/yt_rss.xml | head -3
+
   refresh:
     runs-on: ubuntu-latest
+    if: false  # temporarily disabled
     steps:
       - uses: actions/checkout@v4
 
