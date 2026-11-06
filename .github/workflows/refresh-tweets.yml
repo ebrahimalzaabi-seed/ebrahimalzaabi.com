@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: '0 */1 * * *' # every hour
   workflow_dispatch: # manual trigger
+    inputs:
+      tweets_json:
+        description: 'Optional: full tweets JSON ({profile, pinned?, tweets[]}) to write to KV instead of fetching Nitter'
+        required: false
+        default: ''
 
 jobs:
   refresh:
@@ -10,20 +15,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Use manually provided tweets JSON
+        if: inputs.tweets_json != ''
+        env:
+          TWEETS_JSON: ${{ inputs.tweets_json }}
+        run: printf '%s' "$TWEETS_JSON" > /tmp/tweets.json
+
       - name: Fetch Nitter RSS
+        if: inputs.tweets_json == ''
         run: |
-          curl -sL -o /tmp/rss.xml --max-time 15 \
+          HTTP_CODE=$(curl -sL -o /tmp/rss.xml -w "%{http_code}" --max-time 15 \
             -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
             -H "Accept: application/rss+xml,application/xml,text/xml" \
-            "https://nitter.net/ebrahimuae1/rss"
-          ITEMS=$(grep -c '<item>' /tmp/rss.xml || echo 0)
-          echo "Found $ITEMS items"
-          if [ "$ITEMS" -eq 0 ]; then
-            echo "No items found, skipping KV update"
+            "https://nitter.net/ebrahimuae1/rss" || echo "000")
+          # grep -c prints 0 AND exits 1 on no match; `|| true` keeps a single value
+          ITEMS=$(grep -c '<item>' /tmp/rss.xml || true)
+          echo "HTTP $HTTP_CODE, found ${ITEMS:-0} items"
+          if [ "${ITEMS:-0}" -eq 0 ]; then
+            echo "::error::Nitter returned no items (HTTP $HTTP_CODE); KV left unchanged"
             exit 1
           fi
 
       - name: Parse RSS to JSON
+        if: inputs.tweets_json == ''
         run: |
           python3 << 'PYEOF'
           import re, json, html
@@ -94,6 +108,17 @@ jobs:
 
           print(f"Parsed {len(result['tweets'])} tweets, pinned: {bool(pinned_item)}")
           PYEOF
+
+      - name: Validate tweets JSON before writing
+        run: |
+          python3 -c "
+          import json, sys
+          d = json.load(open('/tmp/tweets.json'))
+          n = len(d.get('tweets', []))
+          print(f'{n} tweets, pinned: {bool(d.get(\"pinned\"))}')
+          if n == 0 or not d.get('profile', {}).get('name'):
+              sys.exit('::error::Refusing to overwrite KV with empty tweet data')
+          "
 
       - name: Setup Node
         uses: actions/setup-node@v4
