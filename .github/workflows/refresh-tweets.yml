@@ -21,20 +21,36 @@ jobs:
           TWEETS_JSON: ${{ inputs.tweets_json }}
         run: printf '%s' "$TWEETS_JSON" > /tmp/tweets.json
 
-      - name: Fetch Nitter RSS
+      - name: Fetch Nitter RSS (first instance that returns items wins)
         if: inputs.tweets_json == ''
         run: |
-          HTTP_CODE=$(curl -sL -o /tmp/rss.xml -w "%{http_code}" --max-time 15 \
-            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
-            -H "Accept: application/rss+xml,application/xml,text/xml" \
-            "https://nitter.net/ebrahimuae1/rss" || echo "000")
-          # grep -c prints 0 AND exits 1 on no match; `|| true` keeps a single value
-          ITEMS=$(grep -c '<item>' /tmp/rss.xml || true)
-          echo "HTTP $HTTP_CODE, found ${ITEMS:-0} items"
-          if [ "${ITEMS:-0}" -eq 0 ]; then
-            echo "::error::Nitter returned no items (HTTP $HTTP_CODE); KV left unchanged"
-            exit 1
-          fi
+          # Community Nitter instances come and go (nitter.net returns 410 since
+          # Aug 2026). Verified working 2026-11-06; nitter.cf shares a backend
+          # with nitter.gq/xitter.cf/teapaw.org. Status: https://status.d420.de
+          INSTANCES="
+            nitter.kareem.one
+            nitter.meowing.monster
+            nitter.netbub.com
+            nitter.cf
+            nitter.net
+          "
+          for host in $INSTANCES; do
+            rm -f /tmp/rss.xml  # a failed curl leaves the previous file in place
+            HTTP_CODE=$(curl -sL -o /tmp/rss.xml -w "%{http_code}" --max-time 15 \
+              -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
+              -H "Accept: application/rss+xml,application/xml,text/xml" \
+              "https://$host/ebrahimuae1/rss" || true)
+            # grep -c prints 0 AND exits 1 on no match; `|| true` keeps a single value
+            ITEMS=$(grep -c '<item>' /tmp/rss.xml 2>/dev/null || true)
+            echo "$host: HTTP ${HTTP_CODE:-000}, ${ITEMS:-0} items"
+            if [ "${ITEMS:-0}" -gt 0 ]; then
+              echo "Using $host"
+              exit 0
+            fi
+            echo "::warning::$host returned no items"
+          done
+          echo "::error::No Nitter instance returned items; KV left unchanged"
+          exit 1
 
       - name: Parse RSS to JSON
         if: inputs.tweets_json == ''
