@@ -56,7 +56,7 @@ graph TD
 
 | Service | Purpose |
 |---|---|
-| [Cloudflare Registrar](https://www.cloudflare.com/products/registrar/) | Domain registrar for `ebrahimalzaabi.com` (transferred from GoDaddy in Nov 2026, expires Mar 2032) |
+| [Cloudflare Registrar](https://www.cloudflare.com/products/registrar/) | Domain registrar for `ebrahimalzaabi.com` (expires Mar 2032) |
 | [GitHub](https://github.com/) | Source code repository + Actions cron for tweet & YouTube refresh |
 | [Cloudflare Pages](https://pages.cloudflare.com/) | Static site hosting (auto-deploys on push to main) |
 | [Cloudflare Workers](https://workers.cloudflare.com/) | Question submission backend |
