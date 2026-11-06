@@ -6,7 +6,7 @@ Hugo-based website for Sheikh Ibrahim Saif Al-Zaabi.
 
 This project is built around three principles:
 
-1. **Zero cost, maximum sustainability** — Every service used is free-tier. No credit card is attached to any account. The only paid component is the domain name `ebrahimalzaabi.com` (paid through 2031), but the site remains permanently accessible at https://ebrahimalzaabi-com.pages.dev/ regardless of domain renewal. If funding ever stops, nothing breaks — the site keeps running indefinitely.
+1. **Zero cost, maximum sustainability** — Every service used is free-tier. No credit card is attached to any account. The only paid component is the domain name `ebrahimalzaabi.com` (registered with Cloudflare Registrar, paid through March 2032), but the site remains permanently accessible at https://ebrahimalzaabi-com.pages.dev/ regardless of domain renewal. If funding ever stops, nothing breaks — the site keeps running indefinitely.
 
 2. **Ready for handoff** — A new developer should be able to clone the repo and have a working local site in minutes. All infrastructure is documented in this README, all secrets are listed explicitly, and the architecture is intentionally simple (static site + lightweight workers). There is no complex CI/CD pipeline, no containers, no databases — just `git clone`, `npm install`, and `hugo server`.
 
@@ -56,6 +56,7 @@ graph TD
 
 | Service | Purpose |
 |---|---|
+| [Cloudflare Registrar](https://www.cloudflare.com/products/registrar/) | Domain registrar for `ebrahimalzaabi.com` (transferred from GoDaddy in Nov 2026, expires Mar 2032) |
 | [GitHub](https://github.com/) | Source code repository + Actions cron for tweet & YouTube refresh |
 | [Cloudflare Pages](https://pages.cloudflare.com/) | Static site hosting (auto-deploys on push to main) |
 | [Cloudflare Workers](https://workers.cloudflare.com/) | Question submission backend |
